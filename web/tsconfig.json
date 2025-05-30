@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "outDir": "./",
+        "allowJs": true,
+        "target": "ES2024"
+    },
+    "compileOnSave": true,
+    "include": [
+        "./**/*.ts"
+    ],
+    "exclude": []
+}
