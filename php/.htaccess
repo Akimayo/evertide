@@ -1,4 +1,18 @@
-RewriteEngine On
+Order allow, deny
+Options -Indexes
 
-RewriteCond ./%{REQUEST_URI}.php -f
-RewriteRule .* %{REQUEST_URI}.php [L,QSA]
+<Directory "src">
+    deny from all
+</Directory>
+<Directory "templates">
+    deny from all
+</Directory>
+<Directory "vendor">
+    deny from all
+</Directory>
+<Directory "cache">
+    deny from all
+</Directory>
+<Directory "opt">
+    deny from all
+</Directory>

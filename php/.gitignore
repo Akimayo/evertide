@@ -1,0 +1,6 @@
+vendor/
+cache/
+assets
+opt/*
+!opt/migrations/
+!opt/config.schema.json

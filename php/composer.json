@@ -1,0 +1,14 @@
+{
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/Philipp15b/php-i18n.git"
+        }
+    ],
+    "require": {
+        "kornrunner/blurhash": "^1.2",
+        "latte/latte": "^3.0",
+        "philipp15b/php-i18n": "^4.0",
+        "chillerlan/php-qrcode": "^5.0"
+    }
+}

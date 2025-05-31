@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["database"],
+  "properties": {
+    "database": {
+      "oneOf": [
+        {
+          "title": "SQLite Connection",
+          "required": ["type", "name"],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["sqlite"]
+            },
+            "name": { "type": "string" }
+          }
+        },
+        {
+          "title": "MySQL Connection",
+          "required": ["type", "hostname", "database", "username", "password"],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["mysql"]
+            },
+            "hostname": { "type": "string" },
+            "database": { "type": "string" },
+            "username": { "type": "string" },
+            "password": { "type": "string" }
+          }
+        }
+      ]
+    }
+  }
+}
