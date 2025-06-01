@@ -1,5 +1,8 @@
 index:
+  on: 'on'
+  from: 'from'
 add:
+  title: Add link
 about:
 devices:
   list:

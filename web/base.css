@@ -1,0 +1,178 @@
+@import url(https://fonts.bunny.net/css?family=original-surfer:400);
+
+body {
+    font-family: 'Original Surfer', display;
+}
+
+.meta-header,
+.main-header {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    z-index: 2;
+}
+
+.meta-header {
+    background-color: #eee;
+    border-bottom: 1px solid #ddd;
+}
+
+.main-header h1 {
+    font-size: 8pt;
+}
+
+.link-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--grid-cols), 1fr);
+    grid-template-rows: repeat(var(--grid-rows), 1fr);
+    margin: 0 10vw;
+    min-height: 95vh;
+    gap: 1em;
+}
+
+.link-grid article {
+    min-height: 8em;
+    position: relative;
+    grid-column: var(--grid-col) / span 2;
+    grid-row: var(--grid-row);
+}
+
+.link-grid article details {
+    border: 1px solid #ddd;
+    border-radius: 1em;
+    background-image: linear-gradient(-30deg, var(--cat-color-secondary), #eee 20%, #eee 80%, var(--cat-color-primary));
+    background-size: calc(100% + 240px);
+    background-position-x: -80px;
+    box-shadow: 0 0px 0px #000;
+
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 0;
+
+    transition: left 240ms ease-out,
+        right 240ms ease-out,
+        top 240ms ease-out,
+        bottom 240ms ease-out,
+        background-position-x 240ms ease-out,
+        box-shadow 240ms ease-out,
+        z-index 240ms step-end;
+}
+
+.link-grid article details[open] {
+    box-shadow: 0 8px 16px #000;
+    left: calc(-10vw * var(--exp-left));
+    right: calc(-10vw * var(--exp-right));
+    top: calc(-100% * var(--exp-top));
+    bottom: calc(-100% * var(--exp-bottom));
+    background-position-x: -240px;
+    z-index: 1;
+    transition: left 240ms ease-in,
+        right 240ms ease-in,
+        top 240ms ease-in,
+        bottom 240ms ease-in,
+        background-position-x 240ms ease-in,
+        box-shadow 240ms ease-in,
+        z-index 240ms step-start;
+}
+
+.link-grid article details summary {
+    cursor: pointer;
+    color: #444;
+    list-style: none;
+    margin-top: 16%;
+    margin-left: 20%;
+
+    transition-property: margin-top, margin-left;
+    transition-duration: 240ms;
+    transition-timing-function: ease-in-out;
+}
+
+.link-grid article details[open] summary {
+    margin-top: 5%;
+    margin-left: 5%;
+}
+
+.link-grid article details summary h2 {
+    font-size: 24pt;
+    margin-top: 23pt;
+    transition-property: font-size, margin-top;
+    transition-duration: inherit;
+    transition-timing-function: inherit;
+}
+
+.link-grid article details[open] summary h2 {
+    font-size: 28pt;
+    margin-top: -24pt;
+}
+
+.link-grid article details summary h2>i:first-child {
+    font-size: 48pt;
+    vertical-align: -12pt;
+    margin-right: 4pt;
+    margin-left: 0;
+    opacity: 1;
+    color: inherit;
+    display: inline-block;
+    position: relative;
+    z-index: -1;
+
+    transition-property: font-size, vertical-align, margin-left, margin-right, opacity, color;
+    transition-duration: inherit;
+    transition-timing-function: inherit;
+}
+
+.link-grid article details[open] summary h2>i:first-child {
+    font-size: 92pt;
+    opacity: 0.4;
+    vertical-align: -30pt;
+    margin-right: -64pt;
+    margin-left: -24pt;
+    color: var(--cat-color-primary);
+}
+
+.link-grid article details summary aside {
+    margin-left: 60pt;
+    margin-top: -30pt;
+    font-size: 12pt;
+
+    transition-property: margin-left, margin-top, font-size;
+    transition-duration: inherit;
+    transition-timing-function: inherit;
+}
+.link-grid article details[open] summary aside {
+    margin-left: 14pt;
+    margin-top: -54pt;
+    font-size: 16pt;
+}
+
+.link-grid article details summary aside a {
+    color: var(--cat-color-secondary);
+}
+
+.link-grid article details summary::-webkit-details-marker {
+    display: none;
+}
+
+@media only screen and (prefers-color-scheme: dark) {
+    body {
+        background-color: #36353b;
+        color: #fff;
+    }
+
+    .meta-header {
+        background-color: #444;
+        border-bottom-color: #555;
+    }
+
+    .link-grid article details {
+        border-color: #555;
+        background-image: linear-gradient(-30deg, var(--cat-color-secondary), #444 20%, #444 80%, var(--cat-color-primary));
+    }
+
+    .link-grid article details summary {
+        color: #fff;
+    }
+}

@@ -31,6 +31,30 @@
           }
         }
       ]
+    },
+    "instance": {
+      "type": "object",
+      "required": ["domain", "link", "primary", "secondary"],
+      "properties": {
+        "domain": {
+          "title": "Name of the instance (can be anything, but usually will be set to the domain name).",
+          "type": "string"
+        },
+        "link": {
+          "title": "URL of the evertide instance.",
+          "type": "string"
+        },
+        "primary": {
+          "title": "Primary color of this instance.",
+          "type": "string",
+          "pattern": "#([0-9a-fA-F]{3}){1,2}"
+        },
+        "secondary": {
+          "title": "Secondary color of this instance.",
+          "type": "string",
+          "pattern": "#([0-9a-fA-F]{3}){1,2}"
+        }
+      }
     }
   }
 }

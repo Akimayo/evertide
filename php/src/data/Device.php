@@ -72,6 +72,7 @@ class DeviceDAO extends Device implements DAO
         $parts = explode(';', $_COOKIE['evertide']);
         return self::get($db, $parts[1]);
     }
+    /** @return Device[] */
     public static function getAll(Database $db): array
     {
         $data = $db->selectAll('SELECT id, name, first_login, last_login FROM Device;');

@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+require_once(__DIR__ . '/data/Instance.php');
 
 use chillerlan\Settings\SettingsContainerAbstract;
 use chillerlan\Settings\SettingsContainerInterface;
@@ -43,6 +44,7 @@ final class Config extends SettingsContainerCustomAbstract
 {
     public PDO $db;
     protected Config__Database $database;
+    public Instance $instance;
 
     public function __construct()
     {

@@ -48,6 +48,12 @@ class Handler
             return L($original, $params);
         });
         $this->latte->addExtension($translator);
+        // Add Phosphor Icons filter
+        $this->latte->addFunction('icon', function (string $name, string $weight = ''): string {
+            if ($weight === 'fill') $weight = 'ph-fill';
+            else $weight = 'ph';
+            return $weight . ' ph-' . htmlspecialchars($name, ENT_DISALLOWED);
+        });
 
         // Connect to database
         require_once(__DIR__ . '/database.php');
@@ -65,6 +71,7 @@ class Handler
     {
         $params['language'] = $this->language;
         $params['authorized'] = $this->authorized;
+        $params['instance'] = (new Config)->instance;
         $this->latte->render(__DIR__ . '/../templates/' . $template, $params);
         return $this;
     }
@@ -76,7 +83,8 @@ class Handler
             header($_SERVER['SERVER_PROTOCOL'] . ' ' . $status);
         return $this;
     }
-    public function redirect(string $location): static {
+    public function redirect(string $location): static
+    {
         header('Location: ' . $location);
         return $this;
     }
