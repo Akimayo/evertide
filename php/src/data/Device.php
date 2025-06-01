@@ -66,6 +66,12 @@ class DeviceDAO extends Device implements DAO
             );
         else throw new Exception('Device with the given cookie code does not exist');
     }
+    public static function getCurrent(Database $db): ?Device
+    {
+        if (!isset($_COOKIE['evertide'])) return null;
+        $parts = explode(';', $_COOKIE['evertide']);
+        return self::get($db, $parts[1]);
+    }
     public static function getAll(Database $db): array
     {
         $data = $db->selectAll('SELECT id, name, first_login, last_login FROM Device;');

@@ -1,3 +1,8 @@
 index:
 add:
 about:
+devices:
+  list:
+    added: Added
+    lastlogin: Last Accessed
+    current: this device

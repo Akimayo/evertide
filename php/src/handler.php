@@ -7,6 +7,7 @@ class Handler
     private Latte\Engine $latte;
     private string $language;
     private Database $db;
+    private bool $authorized = false;
 
     public function __construct()
     {
@@ -16,6 +17,7 @@ class Handler
         $this->latte->setStrictParsing();
         // Instatiate i18n and add translator extension to Latte
         $i18n = new i18n(__DIR__ . '/../../web/locale/lang_{LANGUAGE}.yml', __DIR__ . '/../cache/locale', 'en');
+        $i18n->setMergeFallback(true);
         $i18n->init();
         $this->language = $i18n->getAppliedLang();
         $translator = new Latte\Essential\TranslatorExtension(function (string $original, ...$params) {
@@ -33,8 +35,8 @@ class Handler
 
         // Set and check cookie authorization
         $_auth_fn = require(__DIR__ . '/functions/auth.php');
-        $authorized = $_auth_fn($this->db);
-        $this->db = $authorized ? new ReadWriteDatabase($this) : new ReadOnlyDatabase($this);
+        $this->authorized = $_auth_fn($this->db);
+        $this->db = $this->authorized ? new ReadWriteDatabase($this) : new ReadOnlyDatabase($this);
 
         // TODO: Add https://darkvisitors.com/docs/robots-txt
     }
@@ -47,6 +49,10 @@ class Handler
     public function getDatabase(): Database
     {
         return $this->db;
+    }
+    public function isAuthorized(): bool
+    {
+        return $this->authorized;
     }
 }
 return new Handler();

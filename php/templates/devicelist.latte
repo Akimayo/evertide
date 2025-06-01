@@ -1,0 +1,11 @@
+{layout '_html.latte'}
+
+{block title}Devices | evertide{/block}
+{block body}
+    <ul n:if=$devices>
+        <li n:foreach="$devices as $device">
+            <h3>{$device->getName()}<small n:if="$current == $device->getId()"> ({_'devices_list_current'})</small></h3>
+            <p>{_'devices_list_added'}:&nbsp;<time datetime={$device->getFirstLogin()}>{$device->getFirstLogin()}</time> | <em>{_'devices_list_lastlogin'}:&nbsp;<time datetime={$device->getLastLogin()}>{$device->getLastLogin()}</time></em></p>
+        </li>
+    </ul>
+{/block}
