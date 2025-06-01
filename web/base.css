@@ -95,6 +95,31 @@ body {
     margin-left: 5%;
 }
 
+.link-grid article details summary::before {
+    font-family: 'Phosphor';
+    content: '\e4f6';
+    text-align: right;
+    font-size: 20pt;
+    padding: 50pt 40pt 30pt;
+
+    display: block;
+    width: calc(100% - 80pt);
+    height: calc(100% - 80pt);
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: -1;
+    opacity: 0;
+
+    transition-property: opacity, height;
+    transition-duration: inherit;
+    transition-timing-function: inherit;
+}
+.link-grid article details[open] summary::before {
+    height: 20pt;
+    opacity: 1;
+}
+
 .link-grid article details summary h2 {
     font-size: 24pt;
     margin-top: 23pt;
@@ -142,6 +167,7 @@ body {
     transition-duration: inherit;
     transition-timing-function: inherit;
 }
+
 .link-grid article details[open] summary aside {
     margin-left: 14pt;
     margin-top: -54pt;
