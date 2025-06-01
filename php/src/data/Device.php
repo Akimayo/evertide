@@ -93,7 +93,7 @@ class DeviceDAO extends Device implements DAO
         $id = $db->insert(
             'INSERT INTO Device (name, first_login, last_login, cookie) VALUES (:N, :F, :L, :C);',
             ['N' => $name, 'F' => $date, 'L' => $date, 'C' => $cookie_code],
-            'Device.id'
+            'Device'
         );
         if ($id !== false)
             return new Device(

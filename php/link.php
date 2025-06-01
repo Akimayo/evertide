@@ -7,7 +7,7 @@ if (isset($_GET['device'])) {
     $_link_fn = require(__DIR__ . '/src/functions/link_device.php');
     if ($_link_fn(new ServerDatabase($handler), $_GET['device']))
         $handler
-            ->status(HTTP_CREATED)
+            // ->status(HTTP_CREATED) // Sending a header along with the redirect stops the redirect
             ->redirect('/link');
     else
         $handler

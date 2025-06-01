@@ -89,7 +89,7 @@ class ReadWriteDatabase extends ReadOnlyDatabase
         if ($stmt === false) return false;
         if ($stmt->execute($params)) {
             $id = $this->db->lastInsertId($rowIdName);
-            if ($id !== false) return -1;
+            if ($id !== false) return intval($id);
             else return false;
         } else return false;
     }

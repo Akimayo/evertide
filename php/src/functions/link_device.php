@@ -11,7 +11,7 @@ return function (ServerDatabase $db, string $code): bool {
 
     // If the link file does not exist, create it
     if (!file_exists(__DIR__ . '/../../opt/link')) {
-        echo 'link failed: link file does not exist' . PHP_EOL;
+        // echo 'link failed: link file does not exist' . PHP_EOL;
         $link = $_gen_code(12);
         $_gen_link($link, $all_devices);
         return false;
@@ -20,7 +20,7 @@ return function (ServerDatabase $db, string $code): bool {
     $check_code = file_get_contents(__DIR__ . '/../../opt/link');
     // If the code does not match, re-generate the link just to be sure
     if ($code !== $check_code) {
-        echo 'link failed: code does not match' . PHP_EOL;
+        // echo 'link failed: code does not match' . PHP_EOL;
         $link = $_gen_code(12);
         $_gen_link($link, $all_devices);
         return false;

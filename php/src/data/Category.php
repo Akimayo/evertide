@@ -9,23 +9,25 @@ class LeafCategory implements DaoAccessible
     protected int $id;
     protected string $name;
     protected string $icon;
-    protected array $links;
     protected ?Instance $source;
+    protected bool $public;
+    protected string $create_date;
+    protected string $update_date;
+    protected Device $from_device;
+    protected array $links;
 
-    /**
-     * @param  int $id
-     * @param  string $name
-     * @param  string $icon
-     * @param  Link[] $links
-     * @param  ?Instance $source
-     */
-    public function __construct(int $id, string $name, string $icon, array $links, ?Instance $source)
+    /** @param Link[] $links */
+    public function __construct(int $id, string $name, string $icon, ?Instance $source, bool $public, string $create_date, string $update_date, Device $from_device, array $links)
     {
         $this->id = $id;
         $this->name = $name;
         $this->icon = $icon;
-        $this->links = $links;
         $this->source = $source;
+        $this->public = $public;
+        $this->create_date = $create_date;
+        $this->update_date = $update_date;
+        $this->from_device = $from_device;
+        $this->links = $links;
     }
 
     /** @return LeafCategoryDAO */
@@ -36,10 +38,14 @@ class LeafCategory implements DaoAccessible
             id: $this->id,
             name: $this->name,
             icon: $this->icon,
+            source: $this->source?->getAccessObject($db),
+            public: $this->public,
+            create_date: $this->create_date,
+            update_date: $this->update_date,
+            from_device: $this->from_device->getAccessObject($db),
             links: array_map(function (Link $link) use ($db): LinkDAO {
                 return $link->getAccessObject($db);
             }, $this->links),
-            source: $this->source?->getAccessObject($db)
         );
     }
 
@@ -55,65 +61,136 @@ class LeafCategory implements DaoAccessible
     {
         return $this->icon;
     }
+    public function getSourceInstance(): ?Instance
+    {
+        return $this->source;
+    }
+    public function isPublic(): bool
+    {
+        return $this->public;
+    }
+    public function getCreationDate(): string
+    {
+        return $this->create_date;
+    }
+    public function getUpdateDate(): string
+    {
+        return $this->update_date;
+    }
+    public function getAuthorDevice(): Device
+    {
+        return $this->from_device;
+    }
     /** @return Link[] */
     public function getLinks(): array
     {
         return $this->links;
     }
-    public function getSourceInstance(): ?Instance
-    {
-        return $this->source;
-    }
 }
 class LeafCategoryDAO extends LeafCategory implements DAO
 {
     private Database $db;
-    /**
-     * @param  Database $db
-     * @param  string $name
-     * @param  string $icon
-     * @param  LinkDAO[] $links
-     * @param  ?InstanceDAO $source
-     */
-    public function __construct(Database $db, int $id, string $name, string $icon, array $links, ?InstanceDAO $source)
+    /** @param  LinkDAO[] $links */
+    public function __construct(Database $db, int $id, string $name, string $icon, ?InstanceDAO $source, bool $public, string $create_date, string $update_date, DeviceDAO $from_device, array $links)
     {
         $this->db = $db;
-        parent::__construct($id, $name, $icon, $links, $source);
+        parent::__construct($id, $name, $icon, $source, $public, $create_date, $update_date, $from_device, $links);
     }
+
     /** @return LinkDAO[] */
     public function getLinks(): array
     {
         return $this->links;
     }
     /** @return ?InstanceDAO */
-    public function getSourceInstance(): ?InstanceDAO
+    public function getSourceInstance(): ?Instance
     {
         return $this->source;
     }
+    /** @return DeviceDAO */
+    public function getAuthorDevice(): Device
+    {
+        return $this->from_device;
+    }
+
+    public function updateParent(?LeafCategory $parent): self
+    {
+        $date = date('Y-m-d H:i:s');
+        if ($this->db->update('UPDATE Category SET parent = :P, update_date = :D WHERE id = :I;', ['P' => $parent?->getId(), 'D' => $date, 'I' => $this->id])) {
+            $this->update_date = $date;
+            return $this;
+        } else throw new Exception('Updating Category.parent and Category.update_date failed');
+    }
+    public function update(string $name, string $icon, bool $public): self
+    {
+        $date = date('Y-m-d H:i:s');
+        if ($this->db->update('UPDATE Category SET name = :N, icon = :C, public = :P, update_date = :D WHERE id = :I;', ['N' => $name, 'C' => $icon, 'P' => $public, 'D' => $date])) {
+            $this->name = $name;
+            $this->icon = $icon;
+            $this->public = $public;
+            $this->update_date = $date;
+            return $this;
+        } else throw new Exception('Updating Category.name, Category.icon, Category.public and Category.update_date failed');
+    }
+
     public static function get(Database $db, int|string $key): LeafCategory
     {
-        throw new Exception('not implemented'); // FIXME:
+        throw new Exception('Getting leaf categories not supported, please use Category::get(...)');
     }
     /** @return LeafCategory[] */
     public static function getAll(Database $db): array
     {
-        throw new Exception('not implemented'); // FIXME:
+        throw new Exception('Getting leaf categories not supported, please use Category::getAll(...)');
+    }
+    public function createLink(string $url, string $title, ?string $blurhash, ?string $favicon): LinkDAO
+    {
+        $date = date('Y-m-d H:i:s');
+        $device = DeviceDAO::getCurrent($this->db);
+        $this->db->begin();
+        $id = $this->db->insert(
+            'INSERT INTO Link (url, title, blurhash, favicon, category, create_date, update_date, from_device, public) VALUES (:U, :T, :B, :F, :C, :D, :D, :R, :P);',
+            ['U' => $url, 'T' => $title, 'B' => $blurhash, 'F' => $favicon, 'C' => $this->id, 'D' => $date, 'R' => $device->getId(), 'P' => $this->public],
+            'Link'
+        );
+        if (
+            $id !== false &&
+            ($cat = $this->db->select('SELECT parent FROM Category WHERE id = :I;', ['I' => $this->id])) !== false &&
+            $this->db->update('UPDATE Category SET update_date = :D WHERE id IN (:I, :J);', ['D' => $date, 'I' => $this->id, 'J' => $cat['parent'] ?? -1])
+        ) {
+            $instance = new LinkDAO(
+                db: $this->db,
+                id: $id,
+                url: $url,
+                title: $title,
+                blurhash: $blurhash,
+                name: null,
+                description: null,
+                favicon: $favicon,
+                public: $this->public,
+                create_date: $date,
+                update_date: $date,
+                from_device: $device->getAccessObject($this->db),
+            );
+            $this->links[] = $instance;
+            $this->db->commit();
+            return $instance;
+        } else {
+            $this->db->rollback();
+            throw new Exception('Creating link failed');
+        }
     }
 }
 class Category extends LeafCategory implements DaoAccessible
 {
     protected array $categories;
     /**
-     * @param  string $name
-     * @param  string $icon
      * @param  Link[] $links
      * @param  CategoryLeaf[] $categories
-     * @param  ?Instance $source
      */
-    public function __construct(int $id, string $name, string $icon, array $links, array $categories, ?Instance $source)
+    public function __construct(int $id, string $name, string $icon, ?Instance $source, bool $public, string $create_date, string $update_date, Device $from_device, array $links, array $categories)
     {
         $this->categories = $categories;
-        parent::__construct($id, $name, $icon, $links, $source);
+        parent::__construct($id, $name, $icon, $source, $public, $create_date, $update_date, $from_device, $links);
     }
 
     /** @return CategoryLeaf[] */
@@ -130,32 +207,31 @@ class Category extends LeafCategory implements DaoAccessible
             id: $this->id,
             name: $this->name,
             icon: $this->icon,
+            source: $this->source?->getAccessObject($db),
+            public: $this->public,
+            create_date: $this->create_date,
+            update_date: $this->update_date,
+            from_device: $this->from_device->getAccessObject($db),
             links: array_map(function (Link $link) use ($db) {
                 return $link->getAccessObject($db);
             }, $this->links),
             categories: array_map(function (LeafCategory $cat) use ($db) {
                 return $cat->getAccessObject($db);
             }, $this->categories),
-            source: $this->source->getAccessObject($db)
         );
     }
 }
-class CategoryDAO extends Category implements DAO
+class CategoryDAO extends LeafCategoryDAO implements DAO
 {
-    private Database $db;
+    private array $categories;
     /**
-     * @param  Database $db
-     * @param  int $id
-     * @param  string $name
-     * @param  string $icon
      * @param  LinkDAO[] $links
      * @param  CategoryLeafDAO[] $categories
-     * @param  ?InstanceDAO $source
      */
-    public function __construct(Database $db, int $id, string $name, string $icon, array $links, array $categories, ?InstanceDAO $source)
+    public function __construct(Database $db, int $id, string $name, string $icon, ?InstanceDAO $source, bool $public, string $create_date, string $update_date, DeviceDAO $from_device, array $links, array $categories)
     {
-        $this->db = $db;
-        parent::__construct($id, $name, $icon, $links, $categories, $source);
+        $this->categories = $categories;
+        parent::__construct($db, $id, $name, $icon, $source, $public, $create_date, $update_date, $from_device, $links);
     }
     /** @return LinkDAO[] */
     public function getLinks(): array
@@ -168,17 +244,273 @@ class CategoryDAO extends Category implements DAO
         return $this->categories;
     }
     /** @return ?InstanceDAO */
-    public function getSourceInstance(): ?InstanceDAO
+    public function getSourceInstance(): ?Instance
     {
         return $this->source;
     }
+    /** @return DeviceDAO */
+    public function getAuthorDevice(): Device
+    {
+        return $this->from_device;
+    }
+
+    public const SELECT = <<<PHP_EOL
+    SELECT l.id AS link_id, l.url, l.title, l.blurhash, l.name AS link_name, l.description, l.favicon, l.create_date AS link_create_date, l.update_date AS link_update_date, l.from_device AS link_device, l.public AS link_public,
+           dl.name AS link_device_name, dl.first_login AS link_device_first_login, dl.last_login AS link_device_last_login,
+           c.id AS category_id, c.name AS category_name, c.icon AS category_icon, c.source AS category_source, c.create_date AS category_create_date, c.update_date AS category_update_date, c.from_device AS category_device, c.public AS category_public,
+           dc.name AS category_device_name, dc.first_login AS category_device_first_login, dc.last_login AS category_device_last_login,
+           i.domain, i.link, i.`primary`, i.secondary, i.first_link_date, i.last_link_date, i.last_link_status, i.from_device AS instance_device,
+           di.name AS instance_device_name, di.first_login AS instance_device_first_login, di.last_login AS instance_device_last_login,
+           p.id AS parent_id, p.name AS parent_name, p.icon AS parent_icon, p.create_date AS parent_create_date, p.update_date AS parent_update_date, p.from_device AS parent_device, p.public AS parent_public,
+           dp.name AS parent_device_name, dp.first_login AS parent_device_first_login, dp.last_login AS parent_device_last_login
+      FROM Link l
+     INNER JOIN Device dl  ON dl.id = l.from_device
+     INNER JOIN Category c ON  c.id = l.category
+     INNER JOIN Device dc  ON dc.id = c.from_device
+      LEFT JOIN Instance i ON  i.id = c.source
+      LEFT JOIN Device di  ON di.id = i.from_device
+      LEFT JOIN Category p ON  p.id = c.parent
+      LEFT JOIN Device dp  ON dp.id = p.from_device
+    PHP_EOL;
+    public const ORDER = <<<PHP_EOL
+     ORDER BY IFNULL(p.id, c.id) ASC, p.id IS NULL ASC, p.id ASC, c.id ASC, l.id ASC;
+    PHP_EOL;
+    /** @return Category[] */
+    public static function __mapInstances(array $rows): array
+    {
+        $instances = [];
+        $lastParent = null;
+        $lastParentId = -1;
+        $lastParentAddedId = -1;
+        $categories = [];
+        $lastCategory = null;
+        $lastCategoryId = -1;
+        $links = [];
+        $lastSource = null;
+        $lastSourceId = -1;
+
+        ob_start();
+        echo '<pre>';
+        foreach ($rows as $row) {
+            if ($lastParentId != $row['parent_id'] && $row['parent_id'] !== null) {
+                if ($lastParent !== null) {
+                    $instances[] = new Category(
+                        id: $lastParentId,
+                        name: $lastParent['parent_name'],
+                        icon: $lastParent['parent_icon'],
+                        source: $lastSource,
+                        public: boolval($lastParent['parent_public']),
+                        create_date: $lastParent['parent_create_date'],
+                        update_date: $lastParent['parent_update_date'],
+                        from_device: new Device(
+                            id: $lastParent['parent_device'],
+                            name: $lastParent['parent_device_name'],
+                            first_login: $lastParent['parent_device_first_login'],
+                            last_login: $lastParent['parent_device_last_login']
+                        ),
+                        links: $links,
+                        categories: $categories
+                    );
+
+                    echo 'added category "' . $lastParent['parent_name'] . '"' . PHP_EOL;
+
+                    $links = [];
+                    $categories = [];
+                    $lastCategoryId = -1;
+                    $lastParentAddedId = $lastParentId;
+                }
+                $lastParent = $row;
+                $lastParentId = $row['parent_id'];
+            }
+            if ($lastCategoryId != $row['category_id']) {
+                if ($lastCategory !== null) {
+                    if ($lastCategory['parent_id'] === $lastParentId) {
+                        $categories[] = new LeafCategory(
+                            id: $lastCategory['category_id'],
+                            name: $lastCategory['category_name'],
+                            icon: $lastCategory['category_icon'],
+                            source: $lastSource,
+                            public: boolval($lastCategory['category_public']),
+                            create_date: $lastCategory['category_create_date'],
+                            update_date: $lastCategory['category_update_date'],
+                            from_device: new Device(
+                                id: $lastCategory['category_device'],
+                                name: $lastCategory['category_device_name'],
+                                first_login: $lastCategory['category_device_first_login'],
+                                last_login: $lastCategory['category_device_last_login']
+                            ),
+                            links: $links
+                        );
+                        echo 'added category "' . $lastCategory['category_name'] . '" to "' . $lastParent['parent_name'] . '"' . PHP_EOL;
+                    } else {
+                        $instances[] = new Category(
+                            id: $lastCategory['category_id'],
+                            name: $lastCategory['category_name'],
+                            icon: $lastCategory['category_icon'],
+                            source: $lastSource,
+                            public: boolval($lastCategory['category_public']),
+                            create_date: $lastCategory['category_create_date'],
+                            update_date: $lastCategory['category_update_date'],
+                            from_device: new Device(
+                                id: $lastCategory['category_device'],
+                                name: $lastCategory['category_device_name'],
+                                first_login: $lastCategory['category_device_first_login'],
+                                last_login: $lastCategory['category_device_last_login']
+                            ),
+                            links: $links,
+                            categories: $categories
+                        );
+                        $lastParentAddedId = $lastCategoryId;
+                        $categories = [];
+                        echo 'added category "' . $lastCategory['category_name'] . '"' . PHP_EOL;
+                    }
+
+                    $links = [];
+                }
+                $lastCategory = $row;
+                $lastCategoryId = $row['category_id'];
+            }
+            if ($lastSourceId !== $row['category_source'])
+                $lastSource = is_null($lastParent['category_source']) ? null : Instance::raw(
+                    id: $lastParent['category_source'],
+                    domain: $lastParent['domain'],
+                    link: $lastParent['link'],
+                    primary: $lastParent['primary'],
+                    secondary: $lastParent['secondary'],
+                    first_link_date: $lastParent['first_link_date'],
+                    last_link_date: $lastParent['last_link_date'],
+                    last_link_status: $lastParent['last_link_status'],
+                    from_device: new Device(
+                        id: $lastParent['instance_device'],
+                        name: $lastParent['instance_device_name'],
+                        first_login: $lastParent['instance_device_first_login'],
+                        last_login: $lastParent['instance_device_last_login']
+                    )
+                );
+
+            $links[] = new Link(
+                id: $row['link_id'],
+                url: $row['url'],
+                title: $row['title'],
+                blurhash: $row['blurhash'],
+                name: $row['link_name'],
+                description: $row['description'],
+                favicon: $row['favicon'],
+                public: boolval($row['link_public']),
+                create_date: $row['link_create_date'],
+                update_date: $row['link_update_date'],
+                from_device: new Device(
+                    id: $row['link_device'],
+                    name: $row['link_device_name'],
+                    first_login: $row['link_device_first_login'],
+                    last_login: $row['link_device_last_login']
+                ),
+            );
+            echo 'added link "' . $row['title'] . '" to "' . $lastCategory['category_name'] . '"' . PHP_EOL;
+        }
+        if ($lastCategory !== null) {
+            if ($lastCategory['parent_id'] === $lastParentId) {
+                $categories[] = new LeafCategory(
+                    id: $lastCategory['category_id'],
+                    name: $lastCategory['category_name'],
+                    icon: $lastCategory['category_icon'],
+                    source: $lastSource,
+                    public: boolval($lastCategory['category_public']),
+                    create_date: $lastCategory['category_create_date'],
+                    update_date: $lastCategory['category_update_date'],
+                    from_device: new Device(
+                        id: $lastCategory['category_device'],
+                        name: $lastCategory['category_device_name'],
+                        first_login: $lastCategory['category_device_first_login'],
+                        last_login: $lastCategory['category_device_last_login']
+                    ),
+                    links: $links
+                );
+                echo 'added category "' . $lastCategory['category_name'] . '" to "' . $lastParent['parent_name'] . '"' . PHP_EOL;
+            } else {
+                $instances[] = new Category(
+                    id: $lastCategory['category_id'],
+                    name: $lastCategory['category_name'],
+                    icon: $lastCategory['category_icon'],
+                    source: $lastSource,
+                    public: boolval($lastCategory['category_public']),
+                    create_date: $lastCategory['category_create_date'],
+                    update_date: $lastCategory['category_update_date'],
+                    from_device: new Device(
+                        id: $lastCategory['category_device'],
+                        name: $lastCategory['category_device_name'],
+                        first_login: $lastCategory['category_device_first_login'],
+                        last_login: $lastCategory['category_device_last_login']
+                    ),
+                    links: $links,
+                    categories: $categories
+                );
+                echo 'added category "' . $lastCategory['category_name'] . '"' . PHP_EOL;
+            }
+        }
+        if ($lastParent !== null && $lastParentId !== $lastParentAddedId) {
+            $instances[] = new Category(
+                id: $lastParentId,
+                name: $lastParent['parent_name'],
+                icon: $lastParent['parent_icon'],
+                source: $lastSource,
+                public: boolval($lastParent['parent_public']),
+                create_date: $lastParent['parent_create_date'],
+                update_date: $lastParent['parent_update_date'],
+                from_device: new Device(
+                    id: $lastParent['parent_device'],
+                    name: $lastParent['parent_device_name'],
+                    first_login: $lastParent['parent_device_first_login'],
+                    last_login: $lastParent['parent_device_last_login']
+                ),
+                links: $links,
+                categories: $categories
+            );
+            echo 'added category "' . $lastParent['parent_name'] . '"' . PHP_EOL;
+        }
+        echo '</pre>';
+
+        // Set to true to enable debug logging
+        if (false) ob_end_flush();
+        else ob_end_clean();
+
+        return $instances;
+    }
     public static function get(Database $db, int|string $key): Category
     {
-        throw new Exception('not implemented'); // FIXME:
+        $data = $db->selectAll(self::SELECT . ' WHERE c.id = :I ' . self::ORDER, ['I' => $key]);
+        if ($data && ($instances = self::__mapInstances($data)) && count($instances) > 0) return $instances[0];
+        else throw new Exception('Category with the given id does not exist');
     }
     /** @return Category[] */
-    public static function getAll(Database $db): array
+    public static function getAll(Database $db, bool $includePrivate = false): array
     {
-        throw new Exception('not implemented'); // FIXME:
+        $data = $db->selectAll(self::SELECT . ($includePrivate ? '' : ' WHERE l.public > 0 ') . self::ORDER);
+        if ($data) return self::__mapInstances($data);
+        else return [];
+    }
+    public static function create(Database $db, string $name, string $icon, bool $public, ?Instance $source = null)
+    {
+        $date = date('Y-m-d H:i:s');
+        $device = DeviceDAO::getCurrent($db);
+        $id = $db->insert(
+            'INSERT INTO Category (name, icon, source, create_date, update_date, from_device, public) VALUES (:N, :C, :S, :D, :D, :F, :P);',
+            ['N' => $name, 'C' => $icon, 'S' => $source?->getId(), 'D' => $date, 'F' => $device->getId(), 'P' => $public],
+            'Category'
+        );
+        if ($id !== false)
+            return new Category(
+                id: $id,
+                name: $name,
+                icon: $icon,
+                source: $source,
+                public: $public,
+                create_date: $date,
+                update_date: $date,
+                from_device: $device,
+                links: [],
+                categories: [],
+            );
+        else throw new Exception('Creating category failed');
     }
 }
