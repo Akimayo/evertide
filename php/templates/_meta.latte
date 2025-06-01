@@ -1,0 +1,14 @@
+{layout '_html.latte'}
+{block body_}
+    <header>
+        <h1>evertide</h1>
+        <nav>
+            <a href="/">{_'nav_base'}</a>
+            <a href="/about">{_'nav_about'}</a>
+            <a href="/link" n:if=$authorized>{_'nav_devices'}</a>
+        </nav>
+    </header>
+    <main>
+        {block body}{/block}
+    </main>
+{/block}

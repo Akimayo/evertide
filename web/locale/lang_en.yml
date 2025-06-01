@@ -6,3 +6,20 @@ devices:
     added: Added
     lastlogin: Last Accessed
     current: this device
+  failed:
+    title: Link failed
+    reason: Either you got an invalid or expired link, or you cancelled the browser dialog asking you for the device name.
+    dialog: >
+      If you encountered a browser dialog asking you for an username and password, you had a working link, the browser dialog
+      is how evertide handles adding new devices. Refresh this page, enter how you want to have this device named in evertide
+      as the username and leave the password field empty.
+nav:
+  base: Links
+  about: About
+  devices: Devices
+http:
+  400: Bad Request
+  401: Unauthorized
+  403: Forbidden
+  404: Not Found
+  405: Method Not Allowed

@@ -2,12 +2,32 @@
 
 declare(strict_types=1);
 require_once(__DIR__ . "/../vendor/autoload.php");
+
+define('HTTP_OK', 200);
+define('HTTP_CREATED', 201);
+define('HTTP_ACCEPTED', 202);
+define('HTTP_BAD_REQUEST', 400);
+define('HTTP_UNAUTHORIZED', 401);
+define('HTTP_FORBIDDEN', 403);
+define('HTTP_NOT_FOUND', 404);
+define('HTTP_METHOD_NOT_ALLOWED', 405);
+
 class Handler
 {
     private Latte\Engine $latte;
     private string $language;
     private Database $db;
     private bool $authorized = false;
+    private const STATUS_CODES = [
+        HTTP_OK => 'OK',
+        HTTP_CREATED => 'Created',
+        HTTP_ACCEPTED => 'Accepted',
+        HTTP_BAD_REQUEST => 'Bad Request',
+        HTTP_UNAUTHORIZED => 'Unauthorized',
+        HTTP_FORBIDDEN => 'Forbidden',
+        HTTP_NOT_FOUND => 'Not Found',
+        HTTP_METHOD_NOT_ALLOWED => 'Method Not Allowed'
+    ];
 
     public function __construct()
     {
@@ -41,10 +61,24 @@ class Handler
         // TODO: Add https://darkvisitors.com/docs/robots-txt
     }
 
-    public function render(string $template, object|array $params = []): void
+    public function render(string $template, object|array $params = []): static
     {
         $params['language'] = $this->language;
+        $params['authorized'] = $this->authorized;
         $this->latte->render(__DIR__ . '/../templates/' . $template, $params);
+        return $this;
+    }
+    public function status(int $status): static
+    {
+        if (array_key_exists($status, self::STATUS_CODES))
+            header($_SERVER['SERVER_PROTOCOL'] . ' ' . $status . ' ' . self::STATUS_CODES[$status]);
+        else
+            header($_SERVER['SERVER_PROTOCOL'] . ' ' . $status);
+        return $this;
+    }
+    public function redirect(string $location): static {
+        header('Location: ' . $location);
+        return $this;
     }
     public function getDatabase(): Database
     {

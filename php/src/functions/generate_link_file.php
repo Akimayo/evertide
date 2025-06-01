@@ -8,7 +8,7 @@ return function (string $code, array $devices): void {
     $list = implode(PHP_EOL, array_map(function (Device $device): string {
         return '- **' . $device->getName() . '** (added ' . $device->getFirstLogin() . ')';
     }, $devices));
-    $link = 'http://localhost/link.php?device=' . $code; // FIXME: Add the actual URL
+    $link = 'http://localhost/link?device=' . $code; // FIXME: Add the actual URL
     $qr = (new QRCode())->render($link);
 
     file_put_contents(__DIR__ . '/../../opt/authentication.md', <<<PHP_EOL

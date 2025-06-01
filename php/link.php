@@ -5,14 +5,19 @@ $handler = require("src/handler.php");
 if (isset($_GET['device'])) {
     // Link new device
     $_link_fn = require(__DIR__ . '/src/functions/link_device.php');
-    $_link_fn(new ServerDatabase($handler), $_GET['device']);
-    header('HTTP/1.0 201 Created');
-    header('Location: /link.php');
+    if ($_link_fn(new ServerDatabase($handler), $_GET['device']))
+        $handler
+            ->status(HTTP_CREATED)
+            ->redirect('/link');
+    else
+        $handler
+            ->status(HTTP_UNAUTHORIZED)
+            ->render('link/link_failed.latte');
 } else if ($handler->isAuthorized()) {
     // Display device management
     $db = $handler->getDatabase();
     $handler->render(
-        'devicelist.latte',
+        'link/device_list.latte',
         [
             'devices' => DeviceDAO::getAll($db),
             'current' => DeviceDAO::getCurrent($db)->getId()
@@ -20,5 +25,7 @@ if (isset($_GET['device'])) {
     );
 } else {
     // Send an 'Unauthorized' response
-    header('HTTP/1.0 401 Unauthorized');
+    $handler
+        ->status(HTTP_UNAUTHORIZED)
+        ->render('error.latte', ['status' => HTTP_UNAUTHORIZED]);
 }

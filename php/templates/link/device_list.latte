@@ -1,7 +1,8 @@
-{layout '_html.latte'}
+{layout '../_meta.latte'}
 
-{block title}Devices | evertide{/block}
+{block title}{_'nav_devices'} | evertide{/block}
 {block body}
+    <h2>{_'nav_devices'}</h2>
     <ul n:if=$devices>
         <li n:foreach="$devices as $device">
             <h3>{$device->getName()}<small n:if="$current == $device->getId()"> ({_'devices_list_current'})</small></h3>
