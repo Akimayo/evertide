@@ -7,7 +7,7 @@
         [0,0,0,0,0,0,   0,0]
     ],
     [
-        [1,1,1,1,1,1,   2,1]
+        [1,1,0,0,0,0,   2,1]
     ],
     [
         [1,2,1,1,0,0,   3,2],
@@ -74,23 +74,43 @@
                     <aside>{_'index_from'}&nbsp;<a href={$inst->getLink()} target="_blank">{$inst->getDomainName()}&nbsp;<i class={icon(arrow-square-out)}></i></a></aside>
                 {/if}
                 </summary>
+                <ul>
+                    <li n:foreach="$cat->getLinks() as $link">
+                        <canvas n:if="$link->getBlurHash()" data-blurhash={$link->getBlurHash()}></canvas>
+                        <a href={$link->getUrl()} target="_blank">
+                            <img n:if="$link->getFavicon()" src={$link->getFavicon()} />
+                            <h4>
+                                {$link->getName() ?? $link->getTitle()}
+                            </h4>
+                            <aside n:if="$link->getName() !== null">{$link->getTitle()}</aside>
+                        </a>
+                        <nav n:if=$authorized>
+                            <a href="/add?link={$link->getId()}"><i class={icon(pencil-simple)}></i></a>
+                        </nav>
+                    </li>
+                </ul>
                 <section n:foreach="$cat->getCategories() as $incat">
                     <details>
                         <summary>
-                            <h3>{$incat->getName()}</h3>
+                            <h3><i class={icon($incat->getIcon())}></i>&nbsp;{$incat->getName()}&nbsp;<i class={icon(caret-down)}></i></h3>
                         </summary>
                         <ul>
                             <li n:foreach="$incat->getLinks() as $link">
-                                <h4>{$link->getName()}</h4>
+                                <canvas n:if="$link->getBlurHash()" data-blurhash={$link->getBlurHash()}></canvas>
+                                <a href={$link->getUrl()} target="_blank">
+                                    <img n:if="$link->getFavicon()" src={$link->getFavicon()} />
+                                    <h4>
+                                        {$link->getName() ?? $link->getTitle()}
+                                    </h4>
+                                    <aside n:if="$link->getName() !== null">{$link->getTitle()}</aside>
+                                </a>
+                                <nav n:if=$authorized>
+                                    <a href="/add?link={$link->getId()}"><i class={icon(pencil-simple)}></i></a>
+                                </nav>
                             </li>
                         </ul>
                     </details>
                 </section>
-                <ul>
-                    <li n:foreach="$cat->getLinks() as $link">
-                        <h4>{$link->getName()}</h4>
-                    </li>
-                </ul>
             </details>
         </article>
     {/foreach}

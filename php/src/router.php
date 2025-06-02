@@ -20,6 +20,10 @@ if (file_exists($path)) {
         case 'css':
             header('Content-Type: text/css', true);
             break;
+        case 'js':
+        case 'mjs':
+            header('Content-Type: text/javascript', true);
+            break;
     }
     include($path);
 } else header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found');

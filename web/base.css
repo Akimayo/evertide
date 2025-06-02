@@ -37,13 +37,14 @@ body {
     grid-row: var(--grid-row);
 }
 
-.link-grid article details {
+.link-grid article>details {
     border: 1px solid #ddd;
     border-radius: 1em;
     background-image: linear-gradient(-30deg, var(--cat-color-secondary), #eee 20%, #eee 80%, var(--cat-color-primary));
     background-size: calc(100% + 240px);
     background-position-x: -80px;
     box-shadow: 0 0px 0px #000;
+    overflow-y: hidden;
 
     position: absolute;
     left: 0;
@@ -61,7 +62,7 @@ body {
         z-index 240ms step-end;
 }
 
-.link-grid article details[open] {
+.link-grid article>details[open] {
     box-shadow: 0 8px 16px #000;
     left: calc(-10vw * var(--exp-left));
     right: calc(-10vw * var(--exp-right));
@@ -69,6 +70,7 @@ body {
     bottom: calc(-100% * var(--exp-bottom));
     background-position-x: -240px;
     z-index: 1;
+    overflow-y: auto;
     transition: left 240ms ease-in,
         right 240ms ease-in,
         top 240ms ease-in,
@@ -78,7 +80,7 @@ body {
         z-index 240ms step-start;
 }
 
-.link-grid article details summary {
+.link-grid article>details>summary {
     cursor: pointer;
     color: #444;
     list-style: none;
@@ -90,12 +92,12 @@ body {
     transition-timing-function: ease-in-out;
 }
 
-.link-grid article details[open] summary {
+.link-grid article>details[open]>summary {
     margin-top: 5%;
     margin-left: 5%;
 }
 
-.link-grid article details summary::before {
+.link-grid article>details>summary::before {
     font-family: 'Phosphor';
     content: '\e4f6';
     text-align: right;
@@ -115,12 +117,13 @@ body {
     transition-duration: inherit;
     transition-timing-function: inherit;
 }
-.link-grid article details[open] summary::before {
+
+.link-grid article>details[open] summary::before {
     height: 20pt;
     opacity: 1;
 }
 
-.link-grid article details summary h2 {
+.link-grid article>details summary h2 {
     font-size: 24pt;
     margin-top: 23pt;
     transition-property: font-size, margin-top;
@@ -128,12 +131,12 @@ body {
     transition-timing-function: inherit;
 }
 
-.link-grid article details[open] summary h2 {
+.link-grid article>details[open] summary h2 {
     font-size: 28pt;
     margin-top: -24pt;
 }
 
-.link-grid article details summary h2>i:first-child {
+.link-grid article>details summary h2>i:first-child {
     font-size: 48pt;
     vertical-align: -12pt;
     margin-right: 4pt;
@@ -149,7 +152,7 @@ body {
     transition-timing-function: inherit;
 }
 
-.link-grid article details[open] summary h2>i:first-child {
+.link-grid article>details[open] summary h2>i:first-child {
     font-size: 92pt;
     opacity: 0.4;
     vertical-align: -30pt;
@@ -158,7 +161,112 @@ body {
     color: var(--cat-color-primary);
 }
 
-.link-grid article details summary aside {
+.link-grid article>details ul {
+    display: flex;
+    flex-flow: row wrap;
+    list-style-type: none;
+    gap: 16pt;
+    opacity: 0;
+    transition: opacity 240ms ease-out;
+}
+
+.link-grid article>details[open] ul {
+    opacity: 1;
+    transition-timing-function: ease-in;
+}
+
+.link-grid article>details ul li {
+    position: relative;
+    border: 1px solid #ccc;
+    background-color: #ddd;
+    border-radius: 1em;
+    padding: 4pt 16pt 4pt 8pt;
+    overflow: clip;
+}
+
+.link-grid article>details ul li canvas {
+    opacity: 0;
+    transition: opacity 120ms ease-out;
+    position: absolute;
+    top: 0;
+    left: 0;
+    min-width: 100%;
+    min-height: 100%;
+    object-fit: cover;
+    object-position: center center;
+}
+
+.link-grid article>details ul li canvas.blurhash-ready {
+    opacity: 1;
+}
+
+.link-grid article>details ul li a {
+    object-fit: cover;
+}
+
+.link-grid article>details ul li h4 {
+    position: relative;
+    display: inline-block;
+    color: #000;
+    margin: unset;
+    padding: 8pt 0;
+}
+
+.link-grid article>details ul li img {
+    position: relative;
+    /* height: calc(100% + 8pt); */
+    margin: -4pt 8pt -4pt 0
+        /*-8pt*/
+    ;
+    vertical-align: -4pt;
+}
+
+.link-grid article>details ul li nav {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+.link-grid article>details ul li nav a {
+    text-decoration: none;
+    color: var(--cat-color-primary);
+}
+
+.link-grid article>details details>summary {
+    margin-left: 5%;
+    list-style: none;
+    cursor: pointer;
+}
+
+.link-grid article>details details>summary h3 {
+    margin: unset;
+    font-size: 22pt;
+}
+
+.link-grid article>details details>summary h3 i:first-child {
+    color: var(--cat-color-secondary);
+    opacity: 0.2;
+    font-size: 64pt;
+    vertical-align: -19pt;
+    margin: 0 -40pt 0 -20pt;
+    display: inline-block;
+    position: relative;
+    z-index: -1;
+}
+
+.link-grid article>details details>summary h3 i:last-child {
+    display: inline-block;
+    margin-left: 32pt;
+    transform: rotate(-90deg);
+    transition: transform 120ms ease-out;
+}
+
+.link-grid article>details details[open]>summary h3 i:last-child {
+    transform: rotate(0deg);
+    transition-timing-function: ease-in;
+}
+
+.link-grid article>details>summary aside {
     margin-left: 60pt;
     margin-top: -30pt;
     font-size: 12pt;
@@ -168,17 +276,17 @@ body {
     transition-timing-function: inherit;
 }
 
-.link-grid article details[open] summary aside {
+.link-grid article>details[open]>summary aside {
     margin-left: 14pt;
     margin-top: -54pt;
     font-size: 16pt;
 }
 
-.link-grid article details summary aside a {
+.link-grid article>details>summary aside a {
     color: var(--cat-color-secondary);
 }
 
-.link-grid article details summary::-webkit-details-marker {
+.link-grid article>details summary::-webkit-details-marker {
     display: none;
 }
 
@@ -193,12 +301,25 @@ body {
         border-bottom-color: #555;
     }
 
-    .link-grid article details {
+    .link-grid article>details {
         border-color: #555;
         background-image: linear-gradient(-30deg, var(--cat-color-secondary), #444 20%, #444 80%, var(--cat-color-primary));
     }
 
-    .link-grid article details summary {
+    .link-grid article>details summary {
         color: #fff;
+    }
+
+    .link-grid article>details ul li {
+        border-color: #666;
+        background-color: #555;
+    }
+
+    .link-grid article>details ul li h4 {
+        color: #fff;
+    }
+
+    .link-grid article>details ul li canvas.blurhash-ready {
+        opacity: 0.4;
     }
 }
