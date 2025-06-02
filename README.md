@@ -32,8 +32,7 @@ If you make any changes to the JS code in _`web/index.ts`_, you will need to run
 
 Run the development server by running
 ```cmd
-cd php
-php -S localhost[:<port>] ./src/router.php
+php -S localhost[:<port>] ./php/src/router.php
 ```
 
 ### Multiple instances
@@ -58,3 +57,22 @@ or
 New-Item Env:/EVERTIDE_INSTANCE -Value <domain>
 php -S ...
 ```
+
+<details>
+<summary>Full PowerShell example</summary>
+
+Shell 1:
+```ps1
+node .\scripts\setup.js # Multiple instances: yes, URL: localhost
+New-Item Env:/EVERTIDE_INSTANCE -Value "localhost"
+php -S localhost:80 .\php\src\router.php
+```
+
+Shell 2:
+```ps1
+node .\scripts\setup.js # Multiple instances: yes, URL: localhost:81
+New-Item Env:/EVERTIDE_INSTANCE -Value "localhost:81"
+php -S localhost:80 .\php\src\router.php
+```
+
+</details>
