@@ -6,7 +6,7 @@ require_once(__DIR__ . '/src/data/Category.php');
 
 $db = $handler->getDatabase();
 $categories = CategoryDAO::getAll($db, $handler->isAuthorized());
-if (empty($categories)) {
+if (empty($categories) && $handler->isAuthorized()) {
     $placeholder_blurhash_1 = 'LEHLk~WB2yk8pyo0adR*.7kCMdnj';
     $placeholder_blurhash_2 = 'LGF5]+Yk^6#M@-5c,1J5@[or[Q6.';
 
