@@ -49,7 +49,7 @@ class DeviceDAO extends Device implements DAO
     public function updateLastLogin(): self
     {
         $date = date('Y-m-d H:i:s');
-        if ($this->db->update('UPDATE Device SET last_login = :L;', ['L' => $date])) {
+        if ($this->db->update('UPDATE Device SET last_login = :L WHERE id = :I;', ['L' => $date, 'I' => $this->id])) {
             $this->last_login = $date;
             return $this;
         } else throw new Exception('Updating Device.last_login failed');
@@ -68,8 +68,9 @@ class DeviceDAO extends Device implements DAO
     }
     public static function getCurrent(Database $db): ?Device
     {
-        if (!isset($_COOKIE['evertide'])) return null;
-        $parts = explode(';', $_COOKIE['evertide']);
+        $cookie_name = Config::get_config()->get_cookie_name();
+        if (!isset($_COOKIE[$cookie_name])) return null;
+        $parts = explode(';', $_COOKIE[$cookie_name]);
         return self::get($db, $parts[1]);
     }
     /** @return Device[] */

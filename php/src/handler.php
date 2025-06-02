@@ -71,7 +71,7 @@ class Handler
     {
         $params['language'] = $this->language;
         $params['authorized'] = $this->authorized;
-        $params['instance'] = (new Config)->instance;
+        $params['instance'] = Config::get_config()->instance;
         $this->latte->render(__DIR__ . '/../templates/' . $template, $params);
         return $this;
     }

@@ -19,7 +19,7 @@ class ReadOnlyDatabase implements Database
     protected Handler $handler;
     public function __construct(Handler $handler)
     {
-        $this->db = (new Config)->db;
+        $this->db = Config::get_config()->db;
         $this->handler = $handler;
     }
     public function select(string $query, array $params = []): array|false
@@ -99,8 +99,9 @@ final class ServerDatabase extends ReadWriteDatabase
     public function __construct(Handler $handler)
     {
         parent::__construct($handler);
-        $last_migration = file_exists(__DIR__ . '/../opt/last_migration') ? intval(file_get_contents(__DIR__ . '/../opt/last_migration')) : -1;
-        $waiting = array_filter(glob(__DIR__ . '/../opt/migrations/*.sql'), function (string $file) use ($last_migration) {
+        $data_location = Config::get_config()->get_data_location();
+        $last_migration = file_exists($data_location . 'last_migration') ? intval(file_get_contents($data_location . 'last_migration')) : -1;
+        $waiting = array_filter(glob(Config::get_config()->get_common_data_location() . 'migrations/*.sql'), function (string $file) use ($last_migration) {
             return intval(basename($file, '.sql')) > $last_migration;
         });
         if (count($waiting) > 0)
@@ -109,8 +110,9 @@ final class ServerDatabase extends ReadWriteDatabase
 
     private function migrate(array $migrations): void
     {
+        $data_location = Config::get_config()->get_data_location();
         foreach ($migrations as $m) {
-            if ($this->db->exec(file_get_contents($m)) !== false) file_put_contents(__DIR__ . '/../opt/last_migration', basename($m, '.sql'));
+            if ($this->db->exec(file_get_contents($m)) !== false) file_put_contents($data_location . 'last_migration', basename($m, '.sql'));
             else return;
         }
     }

@@ -24,6 +24,10 @@ if (file_exists($path)) {
         case 'mjs':
             header('Content-Type: text/javascript', true);
             break;
+        case 'json':
+        case 'webmanifest':
+            header('Content-Type: application/json', true);
+            break;
     }
     include($path);
 } else header($_SERVER['SERVER_PROTOCOL'] . ' 404 Not Found');

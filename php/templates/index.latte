@@ -56,7 +56,7 @@
 {block title}🌊 evertide{/block}
 {block body_}
     <header class="main-header">
-        <h1>evertide {_'index_on'} {$instance->domain}</h1>
+        <h1>evertide {_'index_on'} {$instance->getDisplayName()}</h1>
         <nav>
             <a href="/add" n:if=$authorized><i class={icon(plus)}></i>&nbsp;{_'add_title'}</a>
         </nav>

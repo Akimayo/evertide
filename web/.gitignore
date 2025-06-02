@@ -1,3 +1,4 @@
 *.js
-evertide.webmanifest
+*.webmanifest
+!evertide.template.webmanifest
 node_modules

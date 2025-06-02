@@ -8,16 +8,17 @@ return function (ServerDatabase $db, string $code): bool {
     $_gen_link = require(__DIR__ . '/generate_link_file.php');
     $_set_cookie = require(__DIR__ . '/set_cookie.php');
     $all_devices = DeviceDAO::getAll($db);
+    $data_location = Config::get_config()->get_data_location();
 
     // If the link file does not exist, create it
-    if (!file_exists(__DIR__ . '/../../opt/link')) {
+    if (!file_exists($data_location . 'link')) {
         // echo 'link failed: link file does not exist' . PHP_EOL;
         $link = $_gen_code(12);
         $_gen_link($link, $all_devices);
         return false;
     }
 
-    $check_code = file_get_contents(__DIR__ . '/../../opt/link');
+    $check_code = file_get_contents($data_location . 'link');
     // If the code does not match, re-generate the link just to be sure
     if ($code !== $check_code) {
         // echo 'link failed: code does not match' . PHP_EOL;

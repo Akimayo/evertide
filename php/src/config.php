@@ -31,9 +31,9 @@ abstract class SettingsContainerCustomAbstract extends SettingsContainerAbstract
 final class Config__Database extends SettingsContainerCustomAbstract
 {
     // Common
-    public string $type;
+    public string $type = "sqlite";
     // SQLite
-    public string $name;
+    public string $name = "evertide.sqlite";
     // MySQL
     public string $hostname;
     public string $database;
@@ -42,20 +42,51 @@ final class Config__Database extends SettingsContainerCustomAbstract
 }
 final class Config extends SettingsContainerCustomAbstract
 {
+    // Functional variables
+    private static ?Config $singleton = null;
+    public static function get_config(): static
+    {
+        if (is_null(self::$singleton)) self::$singleton = new self();
+        return self::$singleton;
+    }
     public PDO $db;
+    private string $opt;
+    private string $opt_common;
+    public function get_data_location(): string
+    {
+        return $this->opt;
+    }
+    public function get_common_data_location(): string
+    {
+        return $this->opt_common;
+    }
+    public function get_cookie_name(): string
+    {
+        return 'evertide@' . $this->instance->getDomainName();
+    }
+
+    // Variables filled by SettingsContainer
     protected Config__Database $database;
     public Instance $instance;
 
-    public function __construct()
+    private function __construct()
     {
+        $opt_location = dirname(__DIR__) . '/opt/';
+        $this->opt_common = $opt_location;
+        if (($instance_location = getenv('EVERTIDE_INSTANCE'))) $opt_location .= preg_replace('/[\/<>:"\\|?\*]+/', '_', $instance_location) . '/';
+        $this->opt = $opt_location;
+        if (!file_exists($opt_location)) throw new Exception("Configuration for this instance does not exist");
+
+        $this->database = new Config__Database(); // Blank, in case instance uses default SQLite
+
         // Load config file
-        $cfg_array = spyc_load_file(__DIR__ . '/../opt/config.yml');
+        $cfg_array = spyc_load_file($opt_location . 'config.yml');
         parent::__construct($cfg_array);
 
         // Build PDO connection
         switch ($this->database->type) {
             case 'sqlite':
-                $this->db = new PDO('sqlite:' . __DIR__ . '/../opt/' . $this->database->name);
+                $this->db = new PDO('sqlite:' . $opt_location . $this->database->name);
                 break;
             case 'mysql':
                 $this->db = new PDO('mysql:host=' . $this->database->hostname . ';dbname=' . $this->database->database, $this->database->username, $this->database->password);

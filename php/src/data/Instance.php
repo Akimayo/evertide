@@ -14,6 +14,7 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
 {
     protected ?int $id = null;
     protected string $domain;
+    protected ?string $display; // This is only available for the local instance as we need the $domain variable to be a safe file path. Other instances can have anything in $domain.
     protected string $link;
     protected string $primary;
     protected string $secondary;
@@ -44,6 +45,10 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
     public function getDomainName(): string
     {
         return $this->domain;
+    }
+    public function getDisplayName(): string
+    {
+        return $this->display ?? $this->domain;
     }
     public function getPrimaryColor(): string
     {

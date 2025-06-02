@@ -1,10 +1,12 @@
 {
   "$schema": "https://raw.githubusercontent.com/SchemaStore/schemastore/refs/heads/master/src/schemas/json/web-manifest.json",
   "id": "evertide@",
-  "name": "evertide",
+  "name": "🌊 evertide",
   "scope": "https://",
   "display": "browser",
   "start_url": "./",
+  "background_color": "#36353b",
+  "theme_color": "",
   "share_target": {
     "action": "/add",
     "method": "POST"

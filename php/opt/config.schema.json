@@ -1,13 +1,13 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "required": ["database"],
+  "required": ["instance"],
   "properties": {
     "database": {
       "oneOf": [
         {
           "title": "SQLite Connection",
-          "required": ["type", "name"],
+          "required": ["type"],
           "properties": {
             "type": {
               "type": "string",
@@ -37,7 +37,11 @@
       "required": ["domain", "link", "primary", "secondary"],
       "properties": {
         "domain": {
-          "title": "Name of the instance (can be anything, but usually will be set to the domain name).",
+          "title": "Domain name of the instance.",
+          "type": "string"
+        },
+        "display": {
+          "title": "Optional display name of the instance. This will be displayed instead of the domain name on other instances.",
           "type": "string"
         },
         "link": {

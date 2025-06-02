@@ -9,6 +9,6 @@ return function (int $length = 32): string {
         $pieces[] = $keyspace[random_int(0, $max)];
     $link = implode('', $pieces);
 
-    file_put_contents(__DIR__ . '/../../opt/link', $link);
+    file_put_contents(Config::get_config()->get_data_location() . 'link', $link);
     return $link;
 };

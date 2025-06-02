@@ -4,9 +4,10 @@ declare(strict_types=1);
 require_once(__DIR__ . '/../data/Device.php');
 
 return function (ServerDatabase $db): bool {
-    if (isset($_COOKIE['evertide'])) {
+    $cookie_name = Config::get_config()->get_cookie_name();
+    if (isset($_COOKIE[$cookie_name])) {
         try {
-            $parts = explode(';', $_COOKIE['evertide']);
+            $parts = explode(';', $_COOKIE[$cookie_name]);
             $device = DeviceDAO::get($db, $parts[1]);
             /** @var DeviceDAO $device */
             $device = $device->getAccessObject($db);
@@ -16,10 +17,11 @@ return function (ServerDatabase $db): bool {
             return true;
         } catch (Exception) {
             /* Device not found, delete cookie if present */
-            setcookie('evertide', 'false', 1);
+            setcookie($cookie_name, 'false', 1);
         }
     }
-    if (!file_exists(__DIR__ . '/../../opt/link') || !file_exists(__DIR__ . '/../../opt/authentication.md')) {
+    $data_location = Config::get_config()->get_data_location();
+    if (!file_exists($data_location . 'link') || !file_exists($data_location . 'authentication.md')) {
         $_gen_code = require(__DIR__ . '/generate_link_code.php');
         $link = $_gen_code(12);
         require_once(__DIR__ . '/../data/Device.php');

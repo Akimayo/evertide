@@ -8,10 +8,11 @@ return function (string $code, array $devices): void {
     $list = implode(PHP_EOL, array_map(function (Device $device): string {
         return '- **' . $device->getName() . '** (added ' . $device->getFirstLogin() . ')';
     }, $devices));
-    $link = 'http://localhost/link?device=' . $code; // FIXME: Add the actual URL
+    $cfg = Config::get_config();
+    $link = $cfg->instance->getLink() . 'link?device=' . $code;
     $qr = (new QRCode())->render($link);
 
-    file_put_contents(__DIR__ . '/../../opt/authentication.md', <<<PHP_EOL
+    file_put_contents($cfg->get_data_location() . 'authentication.md', <<<PHP_EOL
     # 🌊 evertide Authentication
     > This file is re-generated each time a new device is added and contains a new authentication link every time.
     
