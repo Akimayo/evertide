@@ -1,0 +1,15 @@
+{layout '../_meta.latte'}
+
+{block title}{_'add_title'} | evertide{/block}
+{block body}
+<form method="POST" action="?type=link">
+    <input type="url" name="url" />
+    <select name="category">
+        {foreach $categories as $cat}
+        <option value={$cat->getId()}>{$cat->getName()}</option>
+        <option n:foreach="$cat->getCategories() as $c" value={$c->getId()}>{$c->getName()}</option>
+        {/foreach}
+    </select>
+    <input type="submit" />
+</form>
+{/block}

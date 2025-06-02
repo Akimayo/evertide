@@ -115,6 +115,23 @@ class LinkDAO extends Link implements DAO
         return ($cat = $this->db->select('SELECT c.id, c.parent FROM Link l INNER JOIN Category c ON c.id = l.category WHERE l.id = :I', ['I' => $this->id])) !== false &&
             $this->db->update('UPDATE Category SET update_date = :D WHERE id IN (:I, :J);', ['D' => $date, 'I' => $cat['id'], 'J' => $cat['parent'] ?? -1]);
     }
+    public function updateParent(LeafCategory $parent): self
+    {
+        $date = date('Y-m-d H:i:s');
+        $this->db->begin();
+        if (
+            $this->updateCategories($date) &&
+            $this->db->update('UPDATE Link SET category = :C WHERE id = :I;', ['C' => $parent->getId(), 'I' => $this->id]) &&
+            $this->updateCategories($date)
+        ) {
+            $this->update_date = $date;
+            $this->db->commit();
+            return $this;
+        } else {
+            $this->db->rollback();
+            throw new Exception('Updating Link.category and Category.update_date failed');
+        }
+    }
     public function update(?string $name, ?string $description): self
     {
         $date = date('Y-m-d H:i:s');
@@ -150,6 +167,20 @@ class LinkDAO extends Link implements DAO
         } else {
             $this->db->rollback();
             throw new Exception('Updating Link.title, Link.blurhash, Link.favicon, Link.update_date and Category.update_date failed');
+        }
+    }
+    public function delete(): void
+    {
+        $date = date('Y-m-d H:i:s');
+        $this->db->begin();
+        if (
+            $this->updateCategories($date) &&
+            $this->db->delete('DELETE FROM Link WHERE id = :I;', ['I' => $this->id])
+        ) {
+            $this->db->commit();
+        } else {
+            $this->db->rollback();
+            throw new Exception('Deleting Link failed');
         }
     }
 

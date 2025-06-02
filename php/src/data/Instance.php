@@ -54,7 +54,7 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
     {
         return $this->primary;
     }
-    public function getSeconaryColor(): string
+    public function getSecondaryColor(): string
     {
         return $this->secondary;
     }

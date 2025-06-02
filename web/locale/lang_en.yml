@@ -3,6 +3,16 @@ index:
   from: 'from'
 add:
   title: Add link
+  link:
+    edit: Edit link
+    url: URL
+    category: Category
+    meta: Display
+    preview: Preview
+    name: Display Name
+    description: Description
+    save: Save Changes
+    delete: Delete Link
 about:
 devices:
   list:

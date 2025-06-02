@@ -370,7 +370,7 @@ class CategoryDAO extends LeafCategoryDAO implements DAO
                 $lastCategory = $row;
                 $lastCategoryId = $row['category_id'];
             }
-            if ($lastSourceId !== $row['category_source'])
+            if ($lastSourceId !== $row['category_source'] && $lastParent !== null)
                 $lastSource = is_null($lastParent['category_source']) ? null : Instance::raw(
                     id: $lastParent['category_source'],
                     domain: $lastParent['domain'],

@@ -1,5 +1,6 @@
 @import url(https://fonts.bunny.net/css?family=original-surfer:400);
 
+/* #region Common */
 body {
     font-family: 'Original Surfer', display;
 }
@@ -9,23 +10,41 @@ body {
     display: flex;
     flex-flow: row wrap;
     justify-content: space-between;
+    align-items: center;
+    padding: 8px 32px;
     z-index: 2;
+}
+
+.meta-header nav a,
+.main-header nav a {
+    text-decoration: none;
 }
 
 .meta-header {
     background-color: #eee;
     border-bottom: 1px solid #ddd;
+    margin: -8px;
+}
+
+.meta-header nav {
+    display: flex;
+    flex-flow: row wrap;
+    column-gap: 16px;
+    row-gap: 8px;
 }
 
 .main-header h1 {
     font-size: 8pt;
 }
 
+/* #endregion */
+
+/* #region Links */
 .link-grid {
     display: grid;
     grid-template-columns: repeat(var(--grid-cols), 1fr);
     grid-template-rows: repeat(var(--grid-rows), 1fr);
-    margin: 0 10vw;
+    margin: -20pt 10vw 0;
     min-height: 95vh;
     gap: 1em;
 }
@@ -43,7 +62,7 @@ body {
     background-image: linear-gradient(-30deg, var(--cat-color-secondary), #eee 20%, #eee 80%, var(--cat-color-primary));
     background-size: calc(100% + 240px);
     background-position-x: -80px;
-    box-shadow: 0 0px 0px #000;
+    box-shadow: 0 0px 0px rgba(0, 0, 0, 0.4);
     overflow-y: hidden;
 
     position: absolute;
@@ -63,7 +82,7 @@ body {
 }
 
 .link-grid article>details[open] {
-    box-shadow: 0 8px 16px #000;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
     left: calc(-10vw * var(--exp-left));
     right: calc(-10vw * var(--exp-right));
     top: calc(-100% * var(--exp-top));
@@ -182,6 +201,7 @@ body {
     border-radius: 1em;
     padding: 4pt 16pt 4pt 8pt;
     overflow: clip;
+    height: 42px;
 }
 
 .link-grid article>details ul li canvas {
@@ -202,14 +222,21 @@ body {
 
 .link-grid article>details ul li a {
     object-fit: cover;
+    color: #000;
 }
 
 .link-grid article>details ul li h4 {
     position: relative;
     display: inline-block;
-    color: #000;
     margin: unset;
     padding: 8pt 0;
+}
+
+.link-grid article>details ul li aside {
+    font-size: 8pt;
+    margin: -8pt 0;
+    color: #444;
+    height: 0;
 }
 
 .link-grid article>details ul li img {
@@ -219,6 +246,8 @@ body {
         /*-8pt*/
     ;
     vertical-align: -4pt;
+    width: 32px;
+    height: 32px;
 }
 
 .link-grid article>details ul li nav {
@@ -290,7 +319,90 @@ body {
     display: none;
 }
 
+/* #endregion */
+
+/* #region Form */
+.bare-form {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.bare-form label>span {
+    display: block;
+}
+
+.bare-form fieldset {
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+.bare-form fieldset>legend {}
+
+/* #endregion */
+
+/* #region Form Categories */
+.add-link-category details {
+    border: 1px solid #ddd;
+    border-radius: 1em;
+    overflow: clip;
+    list-style: none;
+}
+
+.add-link-category details .category input[type=radio] {
+    display: none;
+}
+
+
+.add-link-category details .category {
+    background-color: #eee;
+}
+
+.add-link-category details .category input[type=radio]+label {
+    cursor: pointer;
+    background-image: linear-gradient(120deg, #eee 90%, var(--cat-color-secondary));
+    background-size: calc(100% + 80px);
+    background-position-x: 0;
+    margin-top: -20px;
+    padding: 4pt 8pt;
+    border-radius: 1em;
+    display: block;
+    transition: background-position 240ms ease-out;
+}
+
+.add-link-category details .category input[type=radio]+label>i {
+    font-size: 32pt;
+    color: #444;
+    opacity: 1;
+    vertical-align: -8pt;
+    margin: 0 8pt 0 8pt;
+    transition-property: margin, color, opacity, vertical-align, font-size;
+    transition-duration: inherit;
+    transition-timing-function: inherit;
+}
+
+.add-link-category details .category input[type=radio]+label>span {
+    display: inline;
+    font-size: 16pt;
+}
+
+.add-link-category details .category input[type=radio]:checked+label {
+    background-position-x: -80px;
+    transition-timing-function: ease-in;
+}
+
+.add-link-category details .category input[type=radio]:checked+label>i {
+    font-size: 48pt;
+    color: var(--cat-color-primary);
+    opacity: 0.4;
+    vertical-align: -17pt;
+    margin: 0 -28pt 0 8pt;
+}
+
+/* #endregion */
+
 @media only screen and (prefers-color-scheme: dark) {
+
+    /* #region Common */
     body {
         background-color: #36353b;
         color: #fff;
@@ -301,6 +413,9 @@ body {
         border-bottom-color: #555;
     }
 
+    /* #endregion */
+
+    /* #region Links */
     .link-grid article>details {
         border-color: #555;
         background-image: linear-gradient(-30deg, var(--cat-color-secondary), #444 20%, #444 80%, var(--cat-color-primary));
@@ -322,4 +437,6 @@ body {
     .link-grid article>details ul li canvas.blurhash-ready {
         opacity: 0.4;
     }
+
+    /* #endregion */
 }

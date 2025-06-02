@@ -56,7 +56,7 @@
 {block title}🌊 evertide{/block}
 {block body_}
     <header class="main-header">
-        <h1>evertide {_'index_on'} {$instance->getDisplayName()}</h1>
+        <h1>🌊 evertide {_'index_on'} {$instance->getDisplayName()}</h1>
         <nav>
             <a href="/add" n:if=$authorized><i class={icon(plus)}></i>&nbsp;{_'add_title'}</a>
         </nav>
@@ -66,7 +66,7 @@
     {foreach $categories as $cat}
         {var $inst = $cat->getSourceInstance() ?? $instance}
         {var $pos = $spiralSeries[$count][$i++]}
-        <article id="category_{$cat->getId()}" style="--cat-color-primary: {$inst->getPrimaryColor()|noescape};--cat-color-secondary: {$inst->getSeconaryColor()|noescape};--grid-col: {$pos[0]};--grid-row: {$pos[1]};--exp-top: {$pos[2]};--exp-right: {$pos[3]};--exp-bottom: {$pos[4]};--exp-left: {$pos[5]};">
+        <article id="category_{$cat->getId()}" style="--cat-color-primary: {$inst->getPrimaryColor()|noescape};--cat-color-secondary: {$inst->getSecondaryColor()|noescape};--grid-col: {$pos[0]};--grid-row: {$pos[1]};--exp-top: {$pos[2]};--exp-right: {$pos[3]};--exp-bottom: {$pos[4]};--exp-left: {$pos[5]};">
             <details>
                 <summary>
                     <h2><i class={icon($cat->getIcon())}></i>&nbsp;{$cat->getName()}</h2>
@@ -85,7 +85,7 @@
                             <aside n:if="$link->getName() !== null">{$link->getTitle()}</aside>
                         </a>
                         <nav n:if=$authorized>
-                            <a href="/add?link={$link->getId()}"><i class={icon(pencil-simple)}></i></a>
+                            <a href="/add?type=link&id={$link->getId()}"><i class={icon(pencil-simple)}></i></a>
                         </nav>
                     </li>
                 </ul>
@@ -105,7 +105,7 @@
                                     <aside n:if="$link->getName() !== null">{$link->getTitle()}</aside>
                                 </a>
                                 <nav n:if=$authorized>
-                                    <a href="/add?link={$link->getId()}"><i class={icon(pencil-simple)}></i></a>
+                                    <a href="/add?type=link&id={$link->getId()}"><i class={icon(pencil-simple)}></i></a>
                                 </nav>
                             </li>
                         </ul>

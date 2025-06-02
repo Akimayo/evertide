@@ -1,0 +1,57 @@
+{layout '../_meta.latte'}
+
+{var $link = $category->getLinks()[0]}
+{var $cat_id = $category->getId()}
+{block title}{_add_link_edit} | evertide{/block}
+{block body}
+<h2>{_add_link_edit} <em>{$link->getName() ?? $link->getTitle()}</em></h2>
+<form method="POST" class="bare-form add-link">
+    <input type="hidden" name="id" value={$link->getId()} />
+    <fieldset class="add-link-category"
+        style="--cat-color-primary: {$instance->getPrimaryColor()|noescape};--cat-color-secondary: {$instance->getSecondaryColor()|noescape};">
+        <legend>{_add_link_category}</legend>
+        <details n:foreach="$categories as $cat" {if $cat->getId() === $expand_category}open{/if}>
+            <summary class="category">
+                <input type="radio" name="category" value={$cat->getId()} id="cat-{$cat->getId()}" {if $cat_id ===
+                $cat->getId()}checked{/if} />
+                <label for="cat-{$cat->getId()}">
+                    <i class={icon($cat->getIcon())}></i>
+                    <span>{$cat->getName()}</span>
+                </label>
+            </summary>
+            <div n:foreach="$cat->getCategories() as $c" class="category">
+                <input type="radio" name="category" value={$c->getId()} id="cat-{$c->getId()}" {if $cat_id ===
+                $c->getId()}checked{/if}
+                />
+                <label for="cat-{$c->getId()}">
+                    <i class={icon($c->getIcon())}></i>
+                    <span>{$c->getName()}</span>
+                </label>
+            </div>
+        </details>
+    </fieldset>
+    <fieldset class="add-link-meta">
+        <legend>{_add_link_meta}</legend>
+        <label for="name">
+            <span>{_add_link_name}: </span>
+            <input type="text" name="name" id="name" value={$link->getName()} />
+        </label>
+        <label for="description">
+            <span>{_add_link_description}</span>
+            <textarea rows="3">{$link->getDescription()}</textarea>
+        </label>
+    </fieldset>
+    <fieldset class="add-link-preview">
+        <legend>{_add_link_preview}</legend>
+        <canvas data-blurhash={$link->getBlurhash()}></canvas>
+        <img n:if="$link->getFavicon()" src={$link->getFavicon()} />
+        <label>
+            <span>{_add_link_url}: </span>
+            <a href={$link->getUrl()} target="_blank">{$link->getUrl()}</a>
+        </label>
+        <input type="text" value={$link->getTitle()} disabled />
+    </fieldset>
+    <input type="submit" formaction="/add?type=link&action=update" value={_add_link_save} />
+    <input type="submit" formaction="/add?type=link&action=delete" formnovalidate value={_add_link_delete} />
+</form>
+{/block}
