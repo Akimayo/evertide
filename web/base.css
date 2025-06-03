@@ -244,23 +244,24 @@ body {
     position: relative;
     /* height: calc(100% + 8pt); */
     margin: -4pt 8pt -4pt 0
-    /*-8pt*/
+        /*-8pt*/
     ;
     vertical-align: -4pt;
     width: 32px;
     height: 32px;
 }
-.link-grid article>details ul li img ~ aside {
+
+.link-grid article>details ul li img~aside {
     margin-left: calc(32px + 11pt);
 }
 
-.link-grid article>details ul li nav {
+.link-grid article>details nav {
     position: absolute;
     bottom: 0;
     right: 0;
 }
 
-.link-grid article>details ul li nav a {
+.link-grid article>details nav a {
     text-decoration: none;
     color: var(--cat-color-primary);
 }
@@ -353,6 +354,7 @@ body {
     list-style: none;
 }
 
+.add-link-category details .category input[type=checkbox],
 .add-link-category details .category input[type=radio] {
     display: none;
 }
@@ -362,6 +364,7 @@ body {
     background-color: #eee;
 }
 
+.add-link-category details .category input[type=checkbox]+label,
 .add-link-category details .category input[type=radio]+label {
     cursor: pointer;
     background-image: linear-gradient(120deg, #eee 90%, var(--cat-color-secondary));
@@ -374,6 +377,7 @@ body {
     transition: background-position 240ms ease-out;
 }
 
+.add-link-category details .category input[type=checkbox]+label>i,
 .add-link-category details .category input[type=radio]+label>i {
     font-size: 32pt;
     color: #444;
@@ -385,16 +389,19 @@ body {
     transition-timing-function: inherit;
 }
 
+.add-link-category details .category input[type=checkbox]+label>span,
 .add-link-category details .category input[type=radio]+label>span {
     display: inline;
     font-size: 16pt;
 }
 
+.add-link-category details .category input[type=checkbox]:checked+label,
 .add-link-category details .category input[type=radio]:checked+label {
     background-position-x: -80px;
     transition-timing-function: ease-in;
 }
 
+.add-link-category details .category input[type=checkbox]:checked+label>i,
 .add-link-category details .category input[type=radio]:checked+label>i {
     font-size: 48pt;
     color: var(--cat-color-primary);
@@ -458,7 +465,8 @@ body {
         background-color: #555;
     }
 
-    .link-grid article>details ul li h4 {
+    .link-grid article>details ul li h4,
+    .link-grid article>details ul li aside {
         color: #fff;
     }
 

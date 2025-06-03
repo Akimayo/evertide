@@ -37,6 +37,8 @@ if ($handler->isAuthorized()) {
                          * Used fields: --
                          */
                         $id = $_GET['id'];
+                        $category = LinkDAO::get($db, $id);
+                        if (!is_null($category->getSourceInstance())) return $handler->error(HTTP_BAD_REQUEST, 'Cannot edit remote link');
                         break;
                     case 'update':
                         /*
@@ -46,6 +48,7 @@ if ($handler->isAuthorized()) {
                         if (!isset($_POST['id'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "id" in POST body');
                         $id = $_POST['id'];
                         $category = LinkDAO::get($db, $id)->getAccessObject($db);
+                        if (!is_null($category->getSourceInstance())) return $handler->error(HTTP_BAD_REQUEST, 'Cannot update remote link');
                         // Take out nested category, if applicable
                         if (!empty($category->getCategories())) $category = $category->getCategories()[0];
                         $link = $category->getLinks()[0];
@@ -68,6 +71,7 @@ if ($handler->isAuthorized()) {
                         if (!isset($_POST['id'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "id" in POST body');
                         $id = $_POST['id'];
                         $category = LinkDAO::get($db, $id)->getAccessObject($db);
+                        if (!is_null($category->getSourceInstance())) return $handler->error(HTTP_BAD_REQUEST, 'Cannot delete remote link');
                         // Take out nested category, if applicable
                         if (!empty($category->getCategories())) $category = $category->getCategories()[0];
                         $link = $category->getLinks()[0];
@@ -87,7 +91,7 @@ if ($handler->isAuthorized()) {
                 $handler->render('add/link.latte', [
                     'category' => $category,
                     'expand_category' => $expand_category,
-                    'categories' => CategoryDAO::getAll($db, true, true)
+                    'categories' => CategoryDAO::getAllLocal($db, true, true)
                 ]);
                 break;
             case 'category':
@@ -115,6 +119,7 @@ if ($handler->isAuthorized()) {
                          * Used fields: --
                          */
                         $category = CategoryDAO::get($db, $_GET['id']);
+                        if (!is_null($category->getSourceInstance())) return $handler->error(HTTP_BAD_REQUEST, 'Cannot edit remote category');
                         if (!empty($category->getCategories())) {
                             $expand_category = $category->getId();
                             $category = $category->getCategories()[0];
@@ -129,6 +134,7 @@ if ($handler->isAuthorized()) {
                         if (!isset($_POST['name'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "name" in POST body');
                         if (!isset($_POST['icon'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "icon" in POST body');
                         $category = CategoryDAO::get($db, $_POST['id'])->getAccessObject($db);
+                        if (!is_null($category->getSourceInstance())) return $handler->error(HTTP_BAD_REQUEST, 'Cannot update remote category');
                         $parent = null;
                         if (!empty($category->getCategories())) {
                             $parent = $category;
@@ -154,9 +160,11 @@ if ($handler->isAuthorized()) {
                     case 'delete':
                         /*
                          * DELETE CATEGORY
+                         * Used fields: id
                          */
                         if (!isset($_POST['id'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "id" in POST body');
                         $category = CategoryDAO::get($db, $_POST['id'])->getAccessObject($db);
+                        if (!is_null($category->getSourceInstance())) return $handler->error(HTTP_BAD_REQUEST, 'Cannot delete remote category');
                         if (!empty($category->getCategories())) $category = $category->getCategories()[0];
                         $category->delete();
                         return $handler->redirect('/');
@@ -165,18 +173,132 @@ if ($handler->isAuthorized()) {
                 }
                 $handler->render('add/category.latte', [
                     'category' => $category,
-                    'categories' => CategoryDAO::getAll($db, true, true),
+                    'categories' => CategoryDAO::getAllLocal($db, true, true),
                     'expand_category' => $expand_category
                 ]);
                 break;
             case 'instance':
-                $_probe_instance = require(__DIR__ . '/src/functions/fetch_instance_data.php');
-                $instance = $_probe_instance($db);
-                if ($instance) {
-                    $handler
-                        ->status(HTTP_NON_AUTHORITATIVE_INFORMATION)
-                        ->render('add/instance.latte', ['remote' => $instance]);
-                } else $handler->error(HTTP_FORBIDDEN);
+                if (!$action && isset($_POST['url'])) $action = 'probe';
+                switch ($action) {
+                    case 'probe':
+                        $_probe_instance = require(__DIR__ . '/src/functions/fetch_instance_data.php');
+                        [$remote, $extra] = $_probe_instance($db);
+                        if ($remote) {
+                            $local_categories = [];
+                            foreach (CategoryDAO::getAllFromRemote($db, $remote) as $cat) {
+                                $local_categories[] = $cat->getSourceId();
+                                foreach ($cat->getCategories() as $cat)
+                                    $local_categories[] = $cat->getSourceId();
+                            }
+                            $handler
+                                ->status(HTTP_NON_AUTHORITATIVE_INFORMATION)
+                                ->render('add/instance.latte', ['remote' => $remote, 'categories' => $extra, 'local_categories' => $local_categories]);
+                        } else $handler->error(HTTP_FORBIDDEN, $extra);
+                        break;
+                    case 'edit_form':
+                        $id = intval($_GET['id']);
+                        $remote = InstanceDAO::get($db, $id);
+                        $local_categories = [];
+                        foreach (CategoryDAO::getAllFromRemote($db, $remote) as $cat) {
+                            $local_categories[] = $cat->getSourceId();
+                            foreach ($cat->getCategories() as $cat)
+                                $local_categories[] = $cat->getSourceId();
+                        }
+                        $_probe_instance = require(__DIR__ . '/src/functions/fetch_instance_data.php');
+                        [$maybe_remote, $extra] = $_probe_instance($db, instance_id: $id);
+                        if ($maybe_remote)
+                            $handler->render('add/instance.latte', [
+                                'remote' => $maybe_remote,
+                                'categories' => $extra,
+                                'local_categories' => $local_categories,
+                                'responded' => true
+                            ]);
+                        else
+                            $handler->render('add/instance.latte', [
+                                'remote' => $remote,
+                                'categories' => CategoryDAO::getAllFromRemote($db, $remote),
+                                'local_categories' => $local_categories,
+                                'responded' => false
+                            ]);
+                        break;
+                    case 'update':
+                        if (!isset($_POST['id'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "id" in POST body');
+                        // if (!isset($_POST['category'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "category" in POST body');
+                        $id = intval($_POST['id']);
+                        $c_selected = !isset($_POST['category']) ? [] : (is_array($_POST['category']) ? array_map(function (mixed $x) {
+                            return intval($x);
+                        }, $_POST['category']) : [intval($_POST['category'])]);
+
+                        $remote = InstanceDAO::get($db, $id);
+                        $c_local = CategoryDAO::getAllFromRemote($db, $remote);
+                        $_probe_instance = require(__DIR__ . '/src/functions/fetch_instance_data.php');
+                        [$remote, $c_available] = $_probe_instance($db, instance_id: $id);
+
+                        // Go through local categories and delete unselected
+                        $has_local = [];
+                        $local_map = [];
+                        foreach ($c_local as $cat) {
+                            $local_map[$cat->getSourceId()] = $cat;
+                            foreach ($cat->getCategories() as $cat) {
+                                $local_map[$cat->getSourceId()] = $cat;
+                                if (array_search($cat->getSourceId(), $c_selected) === false)
+                                    $cat->getAccessObject($db)->delete();
+                                else $has_local[] = $cat->getSourceId();
+                            }
+                            if (array_search($cat->getSourceId(), $c_selected) === false)
+                                $cat->getAccessObject($db)->delete();
+                            else $has_local[] = $cat->getSourceId();
+                        }
+
+                        // Go through available categories and create selected, unless they already exist locally
+                        if ($remote) {
+                            foreach ($c_available as $cat) {
+                                $parent = null;
+                                if (array_search($cat->getSourceId(), $c_selected) !== false) {
+                                    if (array_search($cat->getSourceId(), $has_local) === false) {
+                                        $parent = CategoryDAO::create(
+                                            $db,
+                                            name: $cat->getName(),
+                                            icon: $cat->getIcon(),
+                                            public: true,
+                                            source: $remote,
+                                            source_id: $cat->getSourceId()
+                                        );
+                                        $c_local[] = $parent;
+                                    } else $parent = $local_map[$cat->getSourceId()];
+                                }
+                                foreach ($cat->getCategories() as $cat) {
+                                    if (array_search($cat->getSourceId(), $c_selected) !== false && array_search($cat->getSourceId(), $has_local) === false) {
+                                        $inst = CategoryDAO::create(
+                                            $db,
+                                            name: $cat->getName(),
+                                            icon: $cat->getIcon(),
+                                            public: true,
+                                            source: $remote,
+                                            source_id: $cat->getSourceId()
+                                        );
+                                        if ($parent !== null) $inst->getAccessObject($db)->updateParent($parent);
+                                        $c_local[] = $inst;
+                                    }
+                                }
+                            }
+                        }
+
+                        $handler->render('add/instance.latte', [
+                            'remote' => $remote,
+                            'categories' => $c_available,
+                            'local_categories' => $c_selected,
+                            'responded' => $remote !== false
+                        ]);
+                        break;
+                    case 'delete':
+                        if (!isset($_POST['id'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "id" in POST body');
+                        // TODO: Delete instance, or just its categories?
+                        return $handler->error(HTTP_NOT_IMPLEMENTED);
+                        return $handler->redirect('/');
+                    default:
+                        return $handler->error(HTTP_METHOD_NOT_ALLOWED, 'Invalid action "' . $action . '"');
+                }
                 break;
             default:
                 if (isset($_POST['url'])) {
@@ -184,7 +306,7 @@ if ($handler->isAuthorized()) {
                     return $handler->error(HTTP_NOT_IMPLEMENTED);
                 } else return $handler->error(HTTP_BAD_REQUEST, 'Invalid type "' . $type . '"');
         }
-    } catch (Exception $ex) {
-        $handler->error(HTTP_INTERNAL_SERVER_ERROR, $ex->getMessage());
+    } catch (Throwable $ex) {
+        $handler->error(HTTP_INTERNAL_SERVER_ERROR, $ex->getMessage() . PHP_EOL . $ex->getTraceAsString());
     }
 } else $handler->error(HTTP_UNAUTHORIZED);

@@ -20,6 +20,7 @@ class ReadOnlyDatabase implements Database
     public function __construct(Handler $handler)
     {
         $this->db = Config::get_config()->db;
+        $this->db->exec('PRAGMA foreign_keys = ON;');
         $this->handler = $handler;
     }
     public function select(string $query, array $params = []): array|false

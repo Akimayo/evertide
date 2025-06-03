@@ -17,8 +17,9 @@ class Link implements DaoAccessible
     protected Device $from_device;
     protected bool $public;
     protected ?string $description;
+    protected ?int $source_id;
 
-    public function __construct(int $id, string $url, string $title, ?string $blurhash, ?string $name, ?string $description, ?string $favicon, bool $public, string $create_date, string $update_date, Device $from_device)
+    public function __construct(int $id, string $url, string $title, ?string $blurhash, ?string $name, ?string $description, ?string $favicon, bool $public, string $create_date, string $update_date, Device $from_device, ?int $source_id = null)
     {
         $this->id = $id;
         $this->url = $url;
@@ -31,6 +32,7 @@ class Link implements DaoAccessible
         $this->create_date = $create_date;
         $this->update_date = $update_date;
         $this->from_device = $from_device;
+        $this->source_id=$source_id;
     }
 
     public function getId(): int
@@ -77,6 +79,9 @@ class Link implements DaoAccessible
     {
         return $this->from_device;
     }
+    public function getSourceId(): ?int {
+        return $this->source_id;
+    }
 
     public function getAccessObject(Database $db): DAO
     {
@@ -93,16 +98,17 @@ class Link implements DaoAccessible
             create_date: $this->create_date,
             update_date: $this->update_date,
             from_device: $this->from_device->getAccessObject($db),
+            source_id: $this->source_id
         );
     }
 }
 class LinkDAO extends Link implements DAO
 {
     private Database $db;
-    public function __construct(Database $db, int $id, string $url, string $title, ?string $blurhash, ?string $name, ?string $description, ?string $favicon, bool $public, string $create_date, string $update_date, DeviceDAO $from_device)
+    public function __construct(Database $db, int $id, string $url, string $title, ?string $blurhash, ?string $name, ?string $description, ?string $favicon, bool $public, string $create_date, string $update_date, DeviceDAO $from_device, ?int $source_id = null)
     {
         $this->db = $db;
-        parent::__construct($id, $url, $title, $blurhash, $name, $description, $favicon, $public, $create_date, $update_date, $from_device);
+        parent::__construct($id, $url, $title, $blurhash, $name, $description, $favicon, $public, $create_date, $update_date, $from_device, $source_id);
     }
     /** @return DeviceDAO */
     public function getAuthorDevice(): Device

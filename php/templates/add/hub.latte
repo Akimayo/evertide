@@ -18,7 +18,12 @@
     <input type="text" name="name" />
     <input type="text" name="icon" style="grid-row: 1;grid-column: 2;" />
     <a href="https://phosphoricons.com/#toolbar" target="_blank"
-        style="grid-column: 2;grid-row: 1;justify-self:end;">{_add_category_icons}</a>
+    style="grid-column: 2;grid-row: 1;justify-self:end;">{_add_category_icons}</a>
     <input type="submit" value={_add_category_add} />
+</form>
+<h2>{_add_instance_add}</h2>
+<form method="POST" action="?type=instance" class="bare-form">
+    <input type="url" name="url" />
+    <input type="submit" value={_add_title} />
 </form>
 {/block}

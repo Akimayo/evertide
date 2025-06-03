@@ -1,0 +1,43 @@
+{layout '../_meta.latte'}
+
+{block title}{_add_instance_edit} | evertide{/block}
+{block body}
+<h2>{_add_instance_edit} <em>{$remote->getDisplayName()}</em></h2>
+<form method="POST" class="bare-form add-link">
+    <input type="hidden" name="id" value={$remote->getId()} />
+    <fieldset class="add-link-category"
+        style="--cat-color-primary: {$remote->getPrimaryColor()|noescape};--cat-color-secondary: {$remote->getSecondaryColor()|noescape};">
+        <legend>{_add_link_category}</legend>
+        <details n:foreach="$categories as $cat">
+            <summary class="category">
+                <input type="checkbox" name="category[]" value={$cat->getSourceId()} id="cat-{$cat->getSourceId()}" {if $cat->getSourceId() in $local_categories}checked{/if} />
+                <label for="cat-{$cat->getSourceId()}">
+                    <i class={icon($cat->getIcon())}></i>
+                    <span>{$cat->getName()}</span>
+                </label>
+            </summary>
+            <div n:foreach="$cat->getCategories() as $c" class="category">
+                <input type="checkbox" name="category[]" value={$c->getSourceId()} id="cat-{$c->getSourceId()}" {if $cat->getSourceId() in $local_categories}checked{/if} />
+                <label for="cat-{$c->getSourceId()}">
+                    <i class={icon($c->getIcon())}></i>
+                    <span>{$c->getName()}</span>
+                </label>
+            </div>
+        </details>
+    </fieldset>
+    <fieldset class="add-link-preview">
+        <legend>{_add_link_preview}</legend>
+        {* <canvas data-blurhash={$link->getBlurhash()}></canvas> *}
+        {* <img n:if="$link->getFavicon()" src={$link->getFavicon()} /> *}
+        <label>
+            <span>{_add_link_url}: </span>
+            {* <a href={$link->getUrl()} target="_blank">{$link->getUrl()}</a> *}
+        </label>
+        {* <input type="text" value={$link->getTitle()} disabled /> *}
+    </fieldset>
+    <input type="submit" formaction="/add?type=instance&action=update" style="grid-row: 2;grid-column: 2;"
+        value={_add_link_save} />
+    <input type="submit" formaction="/add?type=instance&action=delete" style="grid-row: 2;grid-column: 3;"
+        formnovalidate disabled value={_add_link_delete} />
+</form>
+{/block}

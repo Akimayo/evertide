@@ -13,6 +13,12 @@ const generateBlurhash = (canvas: HTMLCanvasElement) => {
 };
 
 window.addEventListener("load", () => {
+  // Synchronize remote links in the background, then replace the <main> element with new links
+  fetch('?sync')
+    .then(response => response.text())
+    .then(body => body && (document.querySelector('main.link-grid').outerHTML = body))
+    .catch(console.error);
+  // Generate blurhashes when a category opens
   document
     .querySelectorAll("article>details")
     .forEach((elmt: HTMLDetailsElement) =>
@@ -25,6 +31,7 @@ window.addEventListener("load", () => {
             .forEach(generateBlurhash)
       )
     );
+  // Generate blurhashes in link edit form
   document
     .querySelectorAll(".add-link-preview canvas:not(.blurhash-ready)")
     .forEach(generateBlurhash);

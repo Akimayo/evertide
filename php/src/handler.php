@@ -7,11 +7,13 @@ define('HTTP_OK', 200);
 define('HTTP_CREATED', 201);
 define('HTTP_ACCEPTED', 202);
 define('HTTP_NON_AUTHORITATIVE_INFORMATION', 203);
+define('HTTP_NOT_MODIFIED', 304);
 define('HTTP_BAD_REQUEST', 400);
 define('HTTP_UNAUTHORIZED', 401);
 define('HTTP_FORBIDDEN', 403);
 define('HTTP_NOT_FOUND', 404);
 define('HTTP_METHOD_NOT_ALLOWED', 405);
+define('HTTP_REQUEST_TIMEOUT', 408);
 define('HTTP_INTERNAL_SERVER_ERROR', 500);
 define('HTTP_NOT_IMPLEMENTED', 501);
 
@@ -21,16 +23,6 @@ class Handler
     private string $language;
     private Database $db;
     private bool $authorized = false;
-    private const STATUS_CODES = [
-        HTTP_OK => 'OK',
-        HTTP_CREATED => 'Created',
-        HTTP_ACCEPTED => 'Accepted',
-        HTTP_BAD_REQUEST => 'Bad Request',
-        HTTP_UNAUTHORIZED => 'Unauthorized',
-        HTTP_FORBIDDEN => 'Forbidden',
-        HTTP_NOT_FOUND => 'Not Found',
-        HTTP_METHOD_NOT_ALLOWED => 'Method Not Allowed'
-    ];
 
     public function __construct()
     {
@@ -70,18 +62,34 @@ class Handler
         // TODO: Add https://darkvisitors.com/docs/robots-txt
     }
 
-    public function render(string $template, object|array $params = []): static
+    public function render(string $template, object|array $params = [], bool $allow_fetch = false): static
     {
-        $params['language'] = $this->language;
         $params['authorized'] = $this->authorized;
-        $params['instance'] = Config::get_config()->instance;
-        $this->latte->render(__DIR__ . '/../templates/' . $template, $params);
+        $instance = Config::get_config()->instance;
+        if (
+            !$allow_fetch ||
+            (!empty($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'text/html') === 0)
+        ) {
+            $params['language'] = $this->language;
+            $params['instance'] = $instance;
+            $this->latte->render(__DIR__ . '/../templates/' . $template, $params);
+        } else {
+            $params['instance'] = [
+                'domain' => $instance->getDisplayName(),
+                'link' => $instance->getLink(),
+                'primary' => $instance->getPrimaryColor(),
+                'secondary' => $instance->getSecondaryColor()
+            ];
+            header('Content-Type: application/json');
+            echo json_encode($params);
+        }
         return $this;
     }
     public function status(int $status): static
     {
-        if (array_key_exists($status, self::STATUS_CODES))
-            header($_SERVER['SERVER_PROTOCOL'] . ' ' . $status . ' ' . self::STATUS_CODES[$status]);
+        $key = 'http_' . $status;
+        if (property_exists(L::class, $key))
+            header($_SERVER['SERVER_PROTOCOL'] . ' ' . $status . ' ' . L::{$key});
         else
             header($_SERVER['SERVER_PROTOCOL'] . ' ' . $status);
         return $this;
@@ -89,7 +97,7 @@ class Handler
     public function error(int $status, ?string $message = null): static
     {
         return $this->status($status)
-            ->render('error.latte', ['status' => $status, 'message' => $message]);
+            ->render('error.latte', ['status' => $status, 'message' => $message], true);
     }
     public function redirect(string $location): static
     {

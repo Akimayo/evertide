@@ -57,6 +57,12 @@
           "title": "Secondary color of this instance.",
           "type": "string",
           "pattern": "#([0-9a-fA-F]{3}){1,2}"
+        },
+        "open": {
+          "title": "Whether to open this instance to federation.",
+          "description": "This can be changed at any time, but keep in mind already linked instances will still be allowed to fetch.",
+          "type": "boolean",
+          "default": false
         }
       }
     }

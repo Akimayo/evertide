@@ -1,24 +1,24 @@
 CREATE TABLE Instance (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     domain TEXT NOT NULL,
-    link TEXT NOT NULL,
+    link TEXT NOT NULL UNIQUE,
     `primary` TEXT NOT NULL,
     secondary TEXT NOT NULL,
     first_link_date TEXT NOT NULL,
     last_link_date TEXT NULL,
     last_link_status INTEGER NOT NULL DEFAULT -1,
-    from_device INTEGER NOT NULL REFERENCES Device(id)
+    from_device INTEGER NOT NULL REFERENCES Device(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 CREATE TABLE Category (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     icon TEXT NOT NULL,
     public INTEGER NOT NULL DEFAULT 0,
-    parent INTEGER NULL REFERENCES Category(id),
-    source INTEGER NULL REFERENCES Instance(id),
+    parent INTEGER NULL REFERENCES Category(id) ON DELETE SET NULL ON UPDATE CASCADE,
+    source INTEGER NULL REFERENCES Instance(id) ON DELETE CASCADE ON UPDATE CASCADE,
     create_date TEXT NOT NULL,
     update_date TEXT NOT NULL,
-    from_device INTEGER NOT NULL REFERENCES Device(id)
+    from_device INTEGER NOT NULL REFERENCES Device(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 CREATE TABLE Link (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -29,8 +29,8 @@ CREATE TABLE Link (
     description TEXT NULL,
     favicon TEXT NULL,
     public INTEGER NOT NULL DEFAULT 0,
-    category INTEGER NOT NULL REFERENCES Category(id),
+    category INTEGER NOT NULL REFERENCES Category(id) ON DELETE CASCADE ON UPDATE CASCADE,
     create_date TEXT NOT NULL,
     update_date TEXT NOT NULL,
-    from_device INTEGER NOT NULL REFERENCES Device(id)
+    from_device INTEGER NOT NULL REFERENCES Device(id) ON DELETE CASCADE ON UPDATE CASCADE
 );

@@ -56,7 +56,7 @@ class DeviceDAO extends Device implements DAO
     }
     public static function get(Database $db, int|string $key): Device
     {
-        $data = $db->select('SELECT id, name, first_login, last_login FROM Device WHERE cookie = :C;', ['C' => $key]);
+        $data = $db->select('SELECT id, name, first_login, last_login FROM Device WHERE cookie = :C AND cookie IS NOT NULL;', ['C' => $key]);
         if ($data !== false)
             return new Device(
                 id: $data['id'],
@@ -65,6 +65,18 @@ class DeviceDAO extends Device implements DAO
                 last_login: $data['last_login']
             );
         else throw new Exception('Device with the given cookie code does not exist');
+    }
+    public static function getRemote(Database $db): Device
+    {
+        $data = $db->select('SELECT name, first_login, last_login FROM Device WHERE id = -1;');
+        if ($data !== false)
+            return new Device(
+                id: -1,
+                name: $data['name'],
+                first_login: $data['first_login'],
+                last_login: $data['last_login']
+            );
+        else throw new Exception('"Remote" device does not exist');
     }
     public static function getCurrent(Database $db): ?Device
     {
@@ -76,7 +88,7 @@ class DeviceDAO extends Device implements DAO
     /** @return Device[] */
     public static function getAll(Database $db): array
     {
-        $data = $db->selectAll('SELECT id, name, first_login, last_login FROM Device;');
+        $data = $db->selectAll('SELECT id, name, first_login, last_login FROM Device WHERE id >= 0;');
         if ($data !== false)
             return array_map(function (array $row) {
                 return new Device(

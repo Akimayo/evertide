@@ -6,21 +6,12 @@ use Dom\HTMLDocument;
 
 return function (CategoryDAO $category, int $target_favicon_size = 96): Link {
     $url = $_POST['url'];
-    $querypos = strpos($url, '?');
-    $startpos = strpos($url, '/') + 2;
-    $trailpos = strpos($url, '/', $startpos) + 1;
-    if ($trailpos < $startpos) {
-        $domain = $path = $url . '/';
-    } else {
-        $domain = substr($url, 0, $trailpos);
-        $path = substr($url, 0, $querypos ? $querypos : null);
-        if ($path[strlen($path) - 1] != '/') $path .= '/';
-    }
+    $_normalize_url = require(__DIR__ . '/normalize_url.php');
+    ['domain' => $domain, 'path' => $path, 'display' => $title] = $_normalize_url($url);
     ob_start();
     echo '<pre>';
     echo 'DOMAIN: ' . $domain . PHP_EOL;
     echo 'PATH: ' . $path . PHP_EOL;
-    $title = substr($url, $startpos, $querypos ? $querypos - $startpos : null);
     try {
         $page = HTMLDocument::createFromFile($url);
     } catch (Exception $ex) {

@@ -24,6 +24,10 @@ add:
     public: Make links in this category public by default
     save: Save Changes
     delete: Delete Category
+    bookmarks: Bookmarks
+  instance:
+    add: Add link to another evertide instance
+    edit: Select instance categories
 about:
 devices:
   list:
@@ -42,10 +46,16 @@ nav:
   about: About
   devices: Devices
 http:
+  200: OK
+  201: Created
+  202: Accepted
+  203: Non-Authoritative Information
+  304: Not Modified
   400: Bad Request
   401: Unauthorized
   403: Forbidden
   404: Not Found
   405: Method Not Allowed
+  408: Request Timeout
   500: Internal Server Error
   501: Not Implemented
