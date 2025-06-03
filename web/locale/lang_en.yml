@@ -1,6 +1,6 @@
 index:
   on: 'on'
-  from: 'from'
+  from: from
 add:
   title: Add link
   link:

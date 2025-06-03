@@ -1,3 +1,61 @@
 index:
+  on: na
+  from: z
 add:
+  title: Přidat odkaz
+  link:
+    edit: Upravit odkaz
+    url: Adresa URL
+    category: Skupina
+    meta: Zobrazení
+    preview: Náhled
+    name: Zobrazované jméno
+    description: Popis
+    public: Zobrazovat odkaz veřejně
+    save: Uložit změny
+    delete: Odstranit odkaz
+  category:
+    add: Přidat skupinu
+    edit: Upravit skupinu
+    root: (samostatná skupina)
+    name: Název
+    icon: Ikona
+    icons: Najít ikony
+    public: Zobrazovat nové odkazy v této kategorii veřejně
+    save: Uložit změny
+    delete: Odstranit skupinu
+    bookmarks: Záložky
+  instance:
+    add: Připojit jinou instanci evertide
+    edit: Vybrat skupiny z instance
 about:
+devices:
+  list:
+    added: Přidáno
+    lastlogin: Naposledy připojeno
+    current: toto zařízení
+  failed:
+    title: Připojení se nepovedlo
+    reason: Odkaz je neplatný, vypršela mu lhůta platnosti, nebo jste zavřeli okno pro zadání názvu zařízení.
+    dialog: >
+      Pokud na Vás vyskočilo okno prohlížeče žádající uživatelské jméno a heslo, je Váš odkaz funkční - tímto oknem
+      evertide přidává nová zařízení. Obnovte stránku, zadejte název, pod kterým toto zařízení chcete vidět v evertide,
+      do políčka uživatelské jméno a heslo nechte prázdné.
+nav:
+  base: Odkazy
+  about: O aplikaci
+  devices: Zařízení
+http:
+  200: OK
+  201: Vytvořeno
+  202: Přijato
+  203: Nejistá informace
+  304: Nezměněno
+  400: Špatný požadavek
+  401: Přístup zamítnut
+  403: Přístup odepřen
+  404: Nenalezeno
+  405: Nepovolená akce
+  408: Příliš mnoho požadavků
+  500: Chyba serveru
+  501: Nedokončená funkce
