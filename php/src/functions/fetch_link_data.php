@@ -61,7 +61,7 @@ return function (CategoryDAO $category, int $target_favicon_size = 96): Link {
             foreach ($collection as $tag) {
                 $target = $tag->attributes->getNamedItem('target')?->value;
                 if (empty($target) || strtolower($target) == '_self' || strtolower($target) == '_top') {
-                    $base .= $tag->attributes->getNamedItem('href')->value;
+                    $base = mod_url($tag->attributes->getNamedItem('href')->value, $base, $path);
                     echo 'BASE: ' . $base . PHP_EOL;
                     break;
                 }
@@ -76,12 +76,17 @@ return function (CategoryDAO $category, int $target_favicon_size = 96): Link {
     try {
         foreach ($page->getElementsByTagName('meta') as $tag) {
             $property = $tag->attributes->getNamedItem('property')?->value;
-            if ($property !== null && array_search($property, ['og:image']) !== false) {
-                $images[] = mod_url(
-                    url: $tag->attributes->getNamedItem('content')->value,
-                    base: $base,
-                    path: $path
-                );
+            if ($property !== null) {
+                if (array_search($property, ['og:image', 'og:image:url', 'image', 'twitter:image:url']) !== false) {
+                    $images[] = mod_url(
+                        url: $tag->attributes->getNamedItem('content')->value,
+                        base: $base,
+                        path: $path
+                    );
+                } else if ($property == 'name') {
+                    $title_candidate = $tag->attributes->getNamedItem('content')->value;
+                    if (!empty($title_candidate)) $title = $title_candidate;
+                }
             }
         }
     } catch (Exception $ex) {
@@ -115,7 +120,7 @@ return function (CategoryDAO $category, int $target_favicon_size = 96): Link {
             }
         }
         if ($icon !== null) {
-            $icon = mod_url(url: $icon, base: $base, path: $path);
+            $icon = mod_url(url: $icon, base: $domain, path: $path);
             $images[] = $icon;
             echo 'ICON: ' . $icon . PHP_EOL;
         }
