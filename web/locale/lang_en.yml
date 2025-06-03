@@ -11,8 +11,19 @@ add:
     preview: Preview
     name: Display Name
     description: Description
+    public: Make link public
     save: Save Changes
     delete: Delete Link
+  category:
+    add: Add category
+    edit: Edit category
+    root: (top-level category)
+    name: Name
+    icon: Icon
+    icons: Look up icons
+    public: Make links in this category public by default
+    save: Save Changes
+    delete: Delete Category
 about:
 devices:
   list:
@@ -36,3 +47,5 @@ http:
   403: Forbidden
   404: Not Found
   405: Method Not Allowed
+  500: Internal Server Error
+  501: Not Implemented

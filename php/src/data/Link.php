@@ -132,16 +132,17 @@ class LinkDAO extends Link implements DAO
             throw new Exception('Updating Link.category and Category.update_date failed');
         }
     }
-    public function update(?string $name, ?string $description): self
+    public function update(?string $name, ?string $description, bool $public): self
     {
         $date = date('Y-m-d H:i:s');
         $this->db->begin();
         if (
-            $this->db->update('UPDATE Link SET name = :N, description = :O, update_date = :D WHERE id = :I;', ['N' => $name, 'O' => $description, 'D' => $date, 'I' => $this->id]) &&
+            $this->db->update('UPDATE Link SET name = :N, description = :O, public = :P, update_date = :D WHERE id = :I;', ['N' => $name, 'O' => $description, 'P' => $public, 'D' => $date, 'I' => $this->id]) &&
             $this->updateCategories($date)
         ) {
             $this->name = $name;
             $this->description = $description;
+            $this->public = $public;
             $this->update_date = $date;
             $this->db->commit();
             return $this;
@@ -188,7 +189,7 @@ class LinkDAO extends Link implements DAO
     public static function get(Database $db, int|string $key): DaoAccessible
     {
         $data = $db->selectAll(CategoryDAO::SELECT . ' WHERE l.id = :I ' . CategoryDAO::ORDER, ['I' => $key]);
-        if ($data && ($instances = CategoryDAO::__mapInstances($data)) && count($instances) > 0) return $instances[0];
+        if ($data && ($instances = CategoryDAO::__mapInstances($data, false)) && count($instances) > 0) return $instances[0];
         else throw new Exception('Link with the given id does not exist');
     }
     /** @return Link[] */

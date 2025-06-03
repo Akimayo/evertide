@@ -12,6 +12,8 @@ define('HTTP_UNAUTHORIZED', 401);
 define('HTTP_FORBIDDEN', 403);
 define('HTTP_NOT_FOUND', 404);
 define('HTTP_METHOD_NOT_ALLOWED', 405);
+define('HTTP_INTERNAL_SERVER_ERROR', 500);
+define('HTTP_NOT_IMPLEMENTED', 501);
 
 class Handler
 {
@@ -83,6 +85,11 @@ class Handler
         else
             header($_SERVER['SERVER_PROTOCOL'] . ' ' . $status);
         return $this;
+    }
+    public function error(int $status, ?string $message = null): static
+    {
+        return $this->status($status)
+            ->render('error.latte', ['status' => $status, 'message' => $message]);
     }
     public function redirect(string $location): static
     {

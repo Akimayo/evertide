@@ -1,0 +1,52 @@
+{layout '../_meta.latte'}
+
+{block title}{_add_category_edit} | evertide{/block}
+{block body}
+<h2>{_add_category_edit} <em>{$category->getName()}</em></h2>
+<form method="POST" class="bare-form add-category">
+    <input type="hidden" name="id" value={$category->getId()} />
+    <fieldset class="add-link-category"
+        style="--cat-color-primary: {$instance->getPrimaryColor()|noescape};--cat-color-secondary: {$instance->getSecondaryColor()|noescape};">
+        <legend>{_add_link_category}</legend>
+        <div class="category">
+            <input type="radio" name="parent" value="" id="cat-null" {if $expand_category===null}checked{/if} />
+            <label for="cat-null">
+                <i class={icon(empty)}></i>
+                <span>{_add_category_root}</span>
+            </label>
+        </div>
+        <div n:foreach="$categories as $cat" n:if="$cat->getId() !== $category->getId()">
+            <summary class="category">
+                <input type="radio" name="parent" value={$cat->getId()} id="cat-{$cat->getId()}" {if $expand_category
+                ===
+                $cat->getId()}checked{/if} />
+                <label for="cat-{$cat->getId()}">
+                    <i class={icon($cat->getIcon())}></i>
+                    <span>{$cat->getName()}</span>
+                </label>
+            </summary>
+        </div>
+    </fieldset>
+    <fieldset class="add-link-meta">
+        <legend>{_add_link_meta}</legend>
+        <label for="name">
+            <span>{_add_category_name}: </span>
+            <input type="text" name="name" id="name" value={$category->getName()} />
+        </label>
+        <label for="icon">
+            <span>{_add_category_icon}: </span>
+            <input type="text" name="icon" id="icon" value={$category->getIcon()} />
+            <a href="https://phosphoricons.com/#toolbar" target="_blank">{_add_category_icons}</a>
+
+        </label>
+        <label for="public">
+            <input type="checkbox" name="public" {if $category->isPublic()}checked{/if} />
+            <span>{_add_category_public}</span>
+        </label>
+    </fieldset>
+    <input type="submit" formaction="/add?type=category&action=update" style="grid-row: 2;grid-column: 2;"
+        value={_add_category_save} />
+    <input type="submit" formaction="/add?type=category&action=delete" style="grid-row: 2;grid-column: 3;"
+        formnovalidate value={_add_category_delete} />
+</form>
+{/block}

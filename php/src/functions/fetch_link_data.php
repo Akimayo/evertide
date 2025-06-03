@@ -16,6 +16,8 @@ return function (CategoryDAO $category, int $target_favicon_size = 96): Link {
         $path = substr($url, 0, $querypos ? $querypos : null);
         if ($path[strlen($path) - 1] != '/') $path .= '/';
     }
+    ob_start();
+    echo '<pre>';
     echo 'DOMAIN: ' . $domain . PHP_EOL;
     echo 'PATH: ' . $path . PHP_EOL;
     $title = substr($url, $startpos, $querypos ? $querypos - $startpos : null);
@@ -41,8 +43,6 @@ return function (CategoryDAO $category, int $target_favicon_size = 96): Link {
         else if ($url[0] == '/') return $base . substr($url, 1);
         else return $path . $url;
     }
-    ob_start();
-    echo '<pre>';
     echo 'URL: ' . $url . PHP_EOL;
     // Title
     try {

@@ -38,7 +38,11 @@
         </label>
         <label for="description">
             <span>{_add_link_description}</span>
-            <textarea rows="3">{$link->getDescription()}</textarea>
+            <textarea rows="3" name="description">{$link->getDescription()}</textarea>
+        </label>
+        <label for="public">
+            <input type="checkbox" name="public" {if $link->isPublic()}checked{/if} />
+            <span>{_add_link_public}</span>
         </label>
     </fieldset>
     <fieldset class="add-link-preview">
@@ -51,7 +55,9 @@
         </label>
         <input type="text" value={$link->getTitle()} disabled />
     </fieldset>
-    <input type="submit" formaction="/add?type=link&action=update" value={_add_link_save} />
-    <input type="submit" formaction="/add?type=link&action=delete" formnovalidate value={_add_link_delete} />
+    <input type="submit" formaction="/add?type=link&action=update" style="grid-row: 2;grid-column: 2;"
+        value={_add_link_save} />
+    <input type="submit" formaction="/add?type=link&action=delete" style="grid-row: 2;grid-column: 3;" formnovalidate
+        value={_add_link_delete} />
 </form>
 {/block}

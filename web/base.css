@@ -1,6 +1,6 @@
 @import url(https://fonts.bunny.net/css?family=original-surfer:400);
 
-/* #region Common */
+/* #region Headers */
 body {
     font-family: 'Original Surfer', display;
 }
@@ -223,6 +223,7 @@ body {
 .link-grid article>details ul li a {
     object-fit: cover;
     color: #000;
+    text-decoration: none;
 }
 
 .link-grid article>details ul li h4 {
@@ -243,11 +244,14 @@ body {
     position: relative;
     /* height: calc(100% + 8pt); */
     margin: -4pt 8pt -4pt 0
-        /*-8pt*/
+    /*-8pt*/
     ;
     vertical-align: -4pt;
     width: 32px;
     height: 32px;
+}
+.link-grid article>details ul li img ~ aside {
+    margin-left: calc(32px + 11pt);
 }
 
 .link-grid article>details ul li nav {
@@ -265,6 +269,7 @@ body {
     margin-left: 5%;
     list-style: none;
     cursor: pointer;
+    color: #444;
 }
 
 .link-grid article>details details>summary h3 {
@@ -400,9 +405,31 @@ body {
 
 /* #endregion */
 
+/* #region Form Preview */
+.add-link-preview {
+    position: relative;
+}
+
+.add-link-preview canvas {
+    position: absolute;
+    top: -10px;
+    left: 0;
+    height: calc(100% + 10px);
+    width: 100%;
+    opacity: 0.6;
+    z-index: -1;
+}
+
+.add-link-preview img {
+    width: 64px;
+    height: 64px;
+}
+
+/* #endregion */
+
 @media only screen and (prefers-color-scheme: dark) {
 
-    /* #region Common */
+    /* #region Headers */
     body {
         background-color: #36353b;
         color: #fff;
@@ -421,7 +448,8 @@ body {
         background-image: linear-gradient(-30deg, var(--cat-color-secondary), #444 20%, #444 80%, var(--cat-color-primary));
     }
 
-    .link-grid article>details summary {
+    .link-grid article>details summary,
+    .link-grid article>details details>summary {
         color: #fff;
     }
 
