@@ -1,18 +1,5 @@
-Order allow, deny
+RewriteEngine On
 Options -Indexes
-
-<Directory "src">
-    deny from all
-</Directory>
-<Directory "templates">
-    deny from all
-</Directory>
-<Directory "vendor">
-    deny from all
-</Directory>
-<Directory "cache">
-    deny from all
-</Directory>
-<Directory "opt">
-    deny from all
-</Directory>
+SetEnvIf Authorization .+ HTTP_AUTHORIZATION=$0
+RewriteCond %{REQUEST_FILENAME}.php -f [NC]
+RewriteRule ^ %{REQUEST_URI}.php [L]
