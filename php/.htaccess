@@ -1,5 +1,10 @@
 RewriteEngine On
+
 Options -Indexes
 SetEnvIf Authorization .+ HTTP_AUTHORIZATION=$0
+
 RewriteCond %{REQUEST_FILENAME}.php -f [NC]
 RewriteRule ^ %{REQUEST_URI}.php [L]
+
+AddType application/javascript .js
+AddType text/css .css
