@@ -301,10 +301,10 @@ class CategoryDAO extends LeafCategoryDAO implements DAO
            di.name AS instance_device_name, di.first_login AS instance_device_first_login, di.last_login AS instance_device_last_login,
            p.id AS parent_id, p.name AS parent_name, p.icon AS parent_icon, p.create_date AS parent_create_date, p.update_date AS parent_update_date, p.from_device AS parent_device, p.public AS parent_public, p.source_id AS parent_source_id,
            dp.name AS parent_device_name, dp.first_login AS parent_device_first_login, dp.last_login AS parent_device_last_login
-      FROM Link l
-     INNER JOIN Device dl  ON dl.id = l.from_device
-     RIGHT JOIN Category c ON  c.id = l.category
-     INNER JOIN Device dc  ON dc.id = c.from_device
+      FROM Category c
+      INNER JOIN Device dc  ON dc.id = c.from_device
+      LEFT JOIN Link l     ON  c.id = l.category
+      LEFT JOIN Device dl  ON dl.id = l.from_device
       LEFT JOIN Instance i ON  i.id = c.source
       LEFT JOIN Device di  ON di.id = i.from_device
       LEFT JOIN Category p ON  p.id = c.parent
@@ -331,7 +331,7 @@ class CategoryDAO extends LeafCategoryDAO implements DAO
         echo '<pre>';
         foreach ($rows as $row) {
             if ($lastParentId != $row['parent_id'] && $lastParentId != $row['category_id']) {
-                if ($lastParent !== null) {
+                if ($lastParent !== null && $lastParentId != $lastParentAddedId) {
                     if (!$only_non_empty || !(empty($links) && empty($categories)))
                         $instances[] = new Category(
                             id: $lastParentId,
@@ -358,8 +358,10 @@ class CategoryDAO extends LeafCategoryDAO implements DAO
                     $categories = [];
                     $lastParentAddedId = $lastParentId;
                 }
-                $lastParent = $row;
-                $lastParentId = $row['parent_id'];
+                if ($row['parent_id'] !== null) {
+                    $lastParent = $row;
+                    $lastParentId = $row['parent_id'];
+                }
             }
             if ($lastCategoryId != $row['category_id']) {
                 if ($lastCategory !== null) {
@@ -403,7 +405,6 @@ class CategoryDAO extends LeafCategoryDAO implements DAO
                                 categories: $categories,
                                 source_id: $lastCategory['category_source_id']
                             );
-                        $lastParentAddedId = $lastCategoryId;
                         $categories = [];
                         echo 'added category "' . $lastCategory['category_name'] . '" (from alone)' . PHP_EOL;
                     }
@@ -501,6 +502,7 @@ class CategoryDAO extends LeafCategoryDAO implements DAO
                 $lastParentAddedId = $lastCategory['category_id'];
                 echo 'added category "' . $lastCategory['category_name'] . '"' . PHP_EOL;
             }
+            $links = [];
         }
         if ($lastParent !== null && $lastParentId != $lastParentAddedId && $lastCategoryId != $lastParentAddedId) {
             if (!$only_non_empty || !(empty($links) && empty($categories)))
@@ -541,7 +543,7 @@ class CategoryDAO extends LeafCategoryDAO implements DAO
     /** @return Category[] */
     public static function getAll(Database $db, bool $includePrivate = false, bool $includeEmpty = false): array
     {
-        $data = $db->selectAll(self::SELECT . ($includePrivate ? '' : ' WHERE l.public > 0 ') . self::ORDER);
+        $data = $db->selectAll(self::SELECT . ($includePrivate ? '' : ' WHERE l.public = 1 ') . self::ORDER);
         if ($data) return self::__mapInstances($data, !$includeEmpty);
         else return [];
     }
