@@ -42,9 +42,9 @@ body {
 /* #region Links */
 .link-grid {
     display: grid;
-    grid-template-columns: repeat(var(--grid-cols), 1fr);
-    grid-template-rows: repeat(var(--grid-rows), 1fr);
-    margin: -20pt 10vw 0;
+    grid-template-columns: unset;
+    grid-template-rows: 1fr;
+    margin: 0 10vw 0;
     min-height: 95vh;
     gap: 1em;
 }
@@ -52,8 +52,6 @@ body {
 .link-grid article {
     min-height: 8em;
     position: relative;
-    grid-column: var(--grid-col) / span 2;
-    grid-row: var(--grid-row);
 }
 
 .link-grid article>details {
@@ -83,10 +81,10 @@ body {
 
 .link-grid article>details[open] {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-    left: calc(-10vw * var(--exp-left));
-    right: calc(-10vw * var(--exp-right));
-    top: calc(-100% * var(--exp-top));
-    bottom: calc(-100% * var(--exp-bottom));
+    left: -10vw;
+    right: -10vw;
+    top: 0;
+    bottom: -200%;
     background-position-x: -240px;
     z-index: 1;
     overflow-y: auto;
@@ -103,8 +101,8 @@ body {
     cursor: pointer;
     color: #444;
     list-style: none;
-    margin-top: 16%;
-    margin-left: 20%;
+    margin-top: 20%;
+    margin-left: 10%;
 
     transition-property: margin-top, margin-left;
     transition-duration: 240ms;
@@ -121,7 +119,7 @@ body {
     content: '\e4f6';
     text-align: right;
     font-size: 20pt;
-    padding: 50pt 40pt 30pt;
+    padding: 26pt 0 30pt 72pt;
 
     display: block;
     width: calc(100% - 80pt);
@@ -143,7 +141,7 @@ body {
 }
 
 .link-grid article>details summary h2 {
-    font-size: 24pt;
+    font-size: 16pt;
     margin-top: 23pt;
     transition-property: font-size, margin-top;
     transition-duration: inherit;
@@ -151,13 +149,13 @@ body {
 }
 
 .link-grid article>details[open] summary h2 {
-    font-size: 28pt;
+    font-size: 24pt;
     margin-top: -24pt;
 }
 
 .link-grid article>details summary h2>i:first-child {
-    font-size: 48pt;
-    vertical-align: -12pt;
+    font-size: 24pt;
+    vertical-align: -6pt;
     margin-right: 4pt;
     margin-left: 0;
     opacity: 1;
@@ -187,6 +185,7 @@ body {
     gap: 16pt;
     opacity: 0;
     transition: opacity 240ms ease-out;
+    padding: 0 8pt;
 }
 
 .link-grid article>details[open] ul {
@@ -202,13 +201,14 @@ body {
     padding: 4pt 16pt 4pt 8pt;
     overflow: clip;
     height: 42px;
+    max-width: calc(100% - 26pt);
 }
 
 .link-grid article>details ul li canvas {
     opacity: 0;
     transition: opacity 120ms ease-out;
     position: absolute;
-    top: 0;
+    top: -100%;
     left: 0;
     min-width: 100%;
     min-height: 100%;
@@ -221,9 +221,13 @@ body {
 }
 
 .link-grid article>details ul li a {
-    object-fit: cover;
     color: #000;
     text-decoration: none;
+    white-space: nowrap;
+}
+
+.link-grid article>details ul li nav a {
+    color: var(--cat-color-primary);
 }
 
 .link-grid article>details ul li h4 {
@@ -231,6 +235,7 @@ body {
     display: inline-block;
     margin: unset;
     padding: 8pt 0;
+    max-width: calc(100% - 24pt);
 }
 
 .link-grid article>details ul li aside {
@@ -433,6 +438,56 @@ body {
 }
 
 /* #endregion */
+
+@media (min-width: 1400px) {
+    .link-grid {
+        grid-template-columns: repeat(var(--grid-cols), 1fr);
+        grid-template-rows: repeat(var(--grid-rows), 1fr);
+        margin-top: -20pt;
+    }
+
+    .link-grid article {
+        grid-column: var(--grid-col) / span 2;
+        grid-row: var(--grid-row);
+    }
+
+    .link-grid article>details[open] {
+        left: calc(-10vw * var(--exp-left));
+        right: calc(-10vw * var(--exp-right));
+        top: calc(-100% * var(--exp-top));
+        bottom: calc(-100% * var(--exp-bottom));
+    }
+
+    .link-grid article>details ul {
+        padding: 0 24pt;
+    }
+
+    .link-grid article>details ul li {
+        max-width: calc(100% - 56pt);
+    }
+
+    .link-grid article>details>summary {
+        margin-top: 16%;
+        margin-left: 20%;
+    }
+
+    .link-grid article>details>summary::before {
+        padding: 50pt 40pt 30pt;
+    }
+
+    .link-grid article>details summary h2 {
+        font-size: 24pt;
+    }
+
+    .link-grid article>details[open] summary h2 {
+        font-size: 28pt;
+    }
+
+    .link-grid article>details summary h2>i:first-child {
+        font-size: 48pt;
+        vertical-align: -12pt;
+    }
+}
 
 @media only screen and (prefers-color-scheme: dark) {
 
