@@ -62,7 +62,7 @@ final class Config extends SettingsContainerCustomAbstract
     }
     public function get_cookie_name(): string
     {
-        return 'evertide@' . $this->instance->getDomainName();
+        return 'evertide@' . preg_replace('/[.\/]+/', '_', $this->instance->getDomainName());
     }
 
     // Variables filled by SettingsContainer
