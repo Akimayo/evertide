@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 // use \Dom\HTMLDocument;
 
-return function (CategoryDAO $category, int $target_favicon_size = 96): Link {
+return function (LeafCategoryDAO $category, int $target_favicon_size = 96): Link {
     $url = $_POST['url'];
     $_normalize_url = require(__DIR__ . '/normalize_url.php');
     ['domain' => $domain, 'path' => $path, 'display' => $title] = $_normalize_url($url);
