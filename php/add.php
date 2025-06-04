@@ -26,6 +26,7 @@ if ($handler->isAuthorized()) {
                         if (!isset($_POST['category'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "category" in POST body');
 
                         $category = CategoryDAO::get($db, $_POST['category'])->getAccessObject($db);
+                        if (!empty($category->getCategories())) $category = $category->getCategories()[0];
                         $_create_link = require(__DIR__ . '/src/functions/fetch_link_data.php');
                         $link = $_create_link($category);
                         $id = $link->getId();
@@ -46,7 +47,7 @@ if ($handler->isAuthorized()) {
                          * Used fields: id[, name = null, description = null, public = false, parent = (keep)]
                          */
                         if (!isset($_POST['id'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "id" in POST body');
-                        $id = $_POST['id'];
+                        $id = intval($_POST['id']);
                         $category = LinkDAO::get($db, $id)->getAccessObject($db);
                         if (!is_null($category->getSourceInstance())) return $handler->error(HTTP_BAD_REQUEST, 'Cannot update remote link');
                         // Take out nested category, if applicable
@@ -56,10 +57,11 @@ if ($handler->isAuthorized()) {
                         $link->update(
                             name: empty($_POST['name']) ? null : $_POST['name'],
                             description: empty($_POST['description']) ? null : $_POST['description'],
-                            public: $_POST['public'] ?? false
+                            public: isset($_POST['public']) ? boolval($_POST['public']) : false
                         );
-                        if (isset($_POST['parent']) && $category->getId() !== $_POST['parent']) {
-                            $category = CategoryDAO::get($db, $_POST['parent']);
+                        if (isset($_POST['category']) && $category->getId() !== ($parent_id = intval($_POST['category']))) {
+                            $category = CategoryDAO::get($db, $parent_id);
+                            if (!empty($category->getCategories())) $category = $category->getCategories()[0];
                             $link->updateParent($category);
                         }
                         break;
@@ -145,7 +147,7 @@ if ($handler->isAuthorized()) {
                             icon: $_POST['icon'],
                             public: isset($_POST['public']) ? $_POST['public'] : null
                         );
-                        if (isset($_POST['parent']) && $_POST['parent'] !== $parent->getId()) {
+                        if (isset($_POST['parent']) && $_POST['parent'] !== $parent?->getId()) {
                             if (empty($_POST['parent'])) {
                                 $category->updateParent(null);
                                 $parent = null;
