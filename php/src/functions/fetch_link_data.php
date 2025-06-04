@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Dom\HTMLDocument;
+// use \Dom\HTMLDocument;
 
 return function (CategoryDAO $category, int $target_favicon_size = 96): Link {
     $url = $_POST['url'];
@@ -13,7 +13,9 @@ return function (CategoryDAO $category, int $target_favicon_size = 96): Link {
     echo 'DOMAIN: ' . $domain . PHP_EOL;
     echo 'PATH: ' . $path . PHP_EOL;
     try {
-        $page = HTMLDocument::createFromFile($url);
+        // $page = HTMLDocument::createFromFile($url);
+        $page = new DOMDocument();
+        $page->loadHTMLFile($url);
     } catch (Exception $ex) {
         /* Not a webpage, fail gracefuly and use default title */
         return $category->createLink(
