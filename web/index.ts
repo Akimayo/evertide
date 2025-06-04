@@ -1,4 +1,4 @@
-import { decode } from "./node_modules/blurhash/dist/index.mjs";
+import { decode } from "./node_modules/blurhash/dist/esm/index.js";
 
 const generateBlurhash = (canvas: HTMLCanvasElement) => {
   const width = canvas.width,
