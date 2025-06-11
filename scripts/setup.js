@@ -175,7 +175,7 @@ async function main() {
   obj.id = "evertide@" + domain;
   obj.scope = instanceUrl;
   obj.share_target.action = instanceUrl + "add";
-  obj.theme_color = primaryColor;
+  obj.background_color = primaryColor;
   await fs.writeFile(
     WEB_PATH + domainPath + ".webmanifest",
     JSON.stringify(obj, null, 2)

@@ -3,8 +3,8 @@
   "id": "evertide@",
   "name": "🌊 evertide",
   "scope": "https://",
-  "display": "browser",
-  "start_url": "./",
+  "display": "standalone",
+  "start_url": "../",
   "background_color": "#36353b",
   "theme_color": "",
   "share_target": {
