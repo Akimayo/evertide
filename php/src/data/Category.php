@@ -162,7 +162,8 @@ class LeafCategoryDAO extends LeafCategory implements DAO
         $this->db->begin();
         if (
             $this->db->update('UPDATE Category SET update_date = :D WHERE id = (SELECT parent FROM Category WHERE id = :I);', ['D' => $date, 'I' => $this->id]) &&
-            $this->db->delete('DELETE FROM Category WHERE id = :I;', ['I' => $this->id])
+            $this->db->delete('DELETE FROM Category WHERE id = :I;', ['I' => $this->id]) &&
+            $this->db->insert('INSERT INTO DeletedItems (type, id, from_device, delete_date) VALUES (0, :I, :F, :D);', ['I' => $this->id, 'F' => DeviceDAO::getCurrent($this->db)->getId(), 'D' => $date])
         ) {
             $this->db->commit();
             return;

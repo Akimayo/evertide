@@ -32,7 +32,7 @@ class Link implements DaoAccessible
         $this->create_date = $create_date;
         $this->update_date = $update_date;
         $this->from_device = $from_device;
-        $this->source_id=$source_id;
+        $this->source_id = $source_id;
     }
 
     public function getId(): int
@@ -79,7 +79,8 @@ class Link implements DaoAccessible
     {
         return $this->from_device;
     }
-    public function getSourceId(): ?int {
+    public function getSourceId(): ?int
+    {
         return $this->source_id;
     }
 
@@ -182,7 +183,8 @@ class LinkDAO extends Link implements DAO
         $this->db->begin();
         if (
             $this->updateCategories($date) &&
-            $this->db->delete('DELETE FROM Link WHERE id = :I;', ['I' => $this->id])
+            $this->db->delete('DELETE FROM Link WHERE id = :I;', ['I' => $this->id]) &&
+            $this->db->insert('INSERT INTO DeletedItems (type, id, from_device, delete_date) VALUES (1, :I, :F, :D);', ['I' => $this->id, 'F' => DeviceDAO::getCurrent($this->db)->getId(), 'D' => $date])
         ) {
             $this->db->commit();
         } else {
