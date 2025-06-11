@@ -111,7 +111,7 @@ if ($handler->isAuthorized()) {
                             $db,
                             name: $_POST['name'],
                             icon: $_POST['icon'],
-                            public: isset($_POST['public']) ? $_POST['public'] : false
+                            public: isset($_POST['public']) ? boolval($_POST['public']) : false
                         );
                         $handler->status(HTTP_CREATED);
                         break;
@@ -145,7 +145,7 @@ if ($handler->isAuthorized()) {
                         $category->update(
                             name: $_POST['name'],
                             icon: $_POST['icon'],
-                            public: isset($_POST['public']) ? $_POST['public'] : null
+                            public: isset($_POST['public']) ? boolval($_POST['public']) : false
                         );
                         if (isset($_POST['parent']) && $_POST['parent'] !== $parent?->getId()) {
                             if (empty($_POST['parent'])) {

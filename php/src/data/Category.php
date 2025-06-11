@@ -142,7 +142,7 @@ class LeafCategoryDAO extends LeafCategory implements DAO
         $date = date('Y-m-d H:i:s');
         $this->db->begin();
         if (
-            $this->db->update('UPDATE Category SET name = :N, icon = :C, public = :P, update_date = :D WHERE id = :I;', ['N' => $name, 'C' => $icon, 'P' => $public, 'D' => $date]) &&
+            $this->db->update('UPDATE Category SET name = :N, icon = :C, public = :P, update_date = :D WHERE id = :I;', ['N' => $name, 'C' => $icon, 'P' => $public, 'D' => $date, 'I' => $this->id]) &&
             $this->db->update('UPDATE Category SET update_date = :D WHERE id = (SELECT parent FROM Category WHERE id = :I);', ['D' => $date, 'I' => $this->id])
         ) {
             $this->name = $name;
