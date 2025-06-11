@@ -43,7 +43,7 @@ body {
 .link-grid {
     display: grid;
     grid-template-columns: unset;
-    grid-template-rows: 1fr;
+    grid-template-rows: auto;
     margin: 0 10vw 0;
     min-height: 95vh;
     gap: 1em;
@@ -172,8 +172,8 @@ body {
 .link-grid article>details[open] summary h2>i:first-child {
     font-size: 92pt;
     opacity: 0.4;
-    vertical-align: -30pt;
-    margin-right: -64pt;
+    vertical-align: -34pt;
+    margin-right: -62pt;
     margin-left: -24pt;
     color: var(--cat-color-primary);
 }
@@ -307,9 +307,9 @@ body {
 }
 
 .link-grid article>details>summary aside {
-    margin-left: 60pt;
-    margin-top: -30pt;
-    font-size: 12pt;
+    margin-left: 32pt;
+    margin-top: -18pt;
+    font-size: 8pt;
 
     transition-property: margin-left, margin-top, font-size;
     transition-duration: inherit;
@@ -467,7 +467,7 @@ body {
     }
 
     .link-grid article>details>summary {
-        margin-top: 16%;
+        margin-top: calc((47.5vh - 10pt) / var(--grid-rows) - 32px);
         margin-left: 20%;
     }
 
@@ -477,6 +477,12 @@ body {
 
     .link-grid article>details summary h2 {
         font-size: 24pt;
+    }
+
+    .link-grid article>details>summary aside {
+        margin-left: 60pt;
+        margin-top: -30pt;
+        font-size: 12pt;
     }
 
     .link-grid article>details[open] summary h2 {
