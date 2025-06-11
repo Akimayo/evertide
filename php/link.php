@@ -47,50 +47,54 @@ if (isset($_GET['device'])) {
     }, $_POST['categories']) : [intval($_POST['categories'])];
     $last_sync = empty($_POST['last_sync']) ? '0' : $_POST['last_sync'];
 
-    $handler->render('', ['categories' => array_map(function (Category $cat): array {
-        return [
-            'id' => $cat->getId(),
-            'name' => $cat->getName(),
-            'icon' => $cat->getIcon(),
-            'created' => $cat->getCreationDate(),
-            'updated' => $cat->getUpdateDate(),
-            'links' => array_map(function (Link $l): array {
-                return [
-                    'id' => $l->getId(),
-                    'url' => $l->getUrl(),
-                    'title' => $l->getTitle(),
-                    'blurhash' => $l->getBlurHash(),
-                    'name' => $l->getName(),
-                    'description' => $l->getDescription(),
-                    'favicon' => $l->getFavicon(),
-                    'created' => $l->getCreationDate(),
-                    'updated' => $l->getUpdateDate()
-                ];
-            }, $cat->getLinks()),
-            'categories' => array_map(function (LeafCategory $cat): array {
-                return [
-                    'id' => $cat->getId(),
-                    'name' => $cat->getName(),
-                    'icon' => $cat->getIcon(),
-                    'created' => $cat->getCreationDate(),
-                    'updated' => $cat->getUpdateDate(),
-                    'links' => array_map(function (Link $l): array {
-                        return [
-                            'id' => $l->getId(),
-                            'url' => $l->getUrl(),
-                            'title' => $l->getTitle(),
-                            'blurhash' => $l->getBlurHash(),
-                            'name' => $l->getName(),
-                            'description' => $l->getDescription(),
-                            'favicon' => $l->getFavicon(),
-                            'created' => $l->getCreationDate(),
-                            'updated' => $l->getUpdateDate()
-                        ];
-                    }, $cat->getLinks())
-                ];
-            }, $cat->getCategories())
-        ];
-    }, CategoryDAO::getSync($db, $categories, $last_sync))], true);
+    $handler->render('', [
+        'categories' => array_map(function (Category $cat): array {
+            return [
+                'id' => $cat->getId(),
+                'name' => $cat->getName(),
+                'icon' => $cat->getIcon(),
+                'created' => $cat->getCreationDate(),
+                'updated' => $cat->getUpdateDate(),
+                'links' => array_map(function (Link $l): array {
+                    return [
+                        'id' => $l->getId(),
+                        'url' => $l->getUrl(),
+                        'title' => $l->getTitle(),
+                        'blurhash' => $l->getBlurHash(),
+                        'name' => $l->getName(),
+                        'description' => $l->getDescription(),
+                        'favicon' => $l->getFavicon(),
+                        'created' => $l->getCreationDate(),
+                        'updated' => $l->getUpdateDate()
+                    ];
+                }, $cat->getLinks()),
+                'categories' => array_map(function (LeafCategory $cat): array {
+                    return [
+                        'id' => $cat->getId(),
+                        'name' => $cat->getName(),
+                        'icon' => $cat->getIcon(),
+                        'created' => $cat->getCreationDate(),
+                        'updated' => $cat->getUpdateDate(),
+                        'links' => array_map(function (Link $l): array {
+                            return [
+                                'id' => $l->getId(),
+                                'url' => $l->getUrl(),
+                                'title' => $l->getTitle(),
+                                'blurhash' => $l->getBlurHash(),
+                                'name' => $l->getName(),
+                                'description' => $l->getDescription(),
+                                'favicon' => $l->getFavicon(),
+                                'created' => $l->getCreationDate(),
+                                'updated' => $l->getUpdateDate()
+                            ];
+                        }, $cat->getLinks())
+                    ];
+                }, $cat->getCategories())
+            ];
+        }, CategoryDAO::getSync($db, $categories, $last_sync)),
+        'deleted_categories' => [], // TODO: Get deleted categories from database
+        'deleted_links' => [] // TODO: Get deleted links from database
+    ], true);
 } else if (!empty($_POST)) {
     /*
      * INSTANCE FETCH REQUEST

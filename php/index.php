@@ -69,6 +69,8 @@ if (isset($_GET['sync'])) {
                 default => LinkStatus::UNREACHABLE
             } : LinkStatus::ERROR;
             $categories = $result->categories;
+            $deleted_categories = property_exists($result, 'deleted_categories') ? $result->deleted_categories : [];
+            $deleted_links = property_exists($result, 'deleted_links') ? $result->deleted_links : [];
             $result = $result->instance;
             $instance_changed = false;
             if (
@@ -80,10 +82,8 @@ if (isset($_GET['sync'])) {
                 $instance_changed = true;
             } else $remote->updateLinkStatus($link_status);
 
-            if (empty($categories) && !$instance_changed) return false; // Nothing changed
+            if (empty($categories) && empty($deleted_categories) && empty($deleted_links) && !$instance_changed) return false; // Nothing changed
 
-            $categories_updated = []; // Category IDs not to be deleted
-            $links_updated = []; // Link IDs not to be deleted
             // Iterate through "parent" categories
             foreach ($categories as $cat) {
                 echo 'Category ' . $cat->name . PHP_EOL;
@@ -103,7 +103,6 @@ if (isset($_GET['sync'])) {
                     'UPDATE Category SET create_date = :C, update_date = :D, name = :N, icon = :I WHERE id = :J;',
                     ['C' => $cat->created, 'D' => $cat->updated, 'N' => $cat->name, 'I' => $cat->icon, 'J' => $parent]
                 );
-                $categories_updated[] = $parent;
                 // Create a local <-> source ID map for links in this category
                 $link_map = [];
                 foreach ($db->selectAll('SELECT id, source_id FROM Link WHERE category = :C;', ['C' => $parent]) as ['source_id' => $key, 'id' => $value])
@@ -124,7 +123,6 @@ if (isset($_GET['sync'])) {
                         'UPDATE Link SET title = :T, blurhash = :B, name = :N, description = :D, favicon = :F, category = :K, update_date = :D WHERE id = :I;',
                         ['T' => $link->title, 'B' => $link->blurhash, 'N' => $link->name, 'D' => $link->description, 'F' => $link->favicon, 'K' => $parent, 'D' => $link->updated, 'I' => $l]
                     );
-                    $links_updated[] = $l;
                 }
                 // Iterate through "leaf" categories
                 foreach ($cat->categories as $cat) {
@@ -142,7 +140,6 @@ if (isset($_GET['sync'])) {
                     )->getId();
                     // In both cases there are some updates necessary, so just do them in a single query
                     $db->update('UPDATE Category SET create_date = :C, update_date = :D, parent = :P WHERE id = :I;', ['I' => $inst, 'C' => $cat->created, 'D' => $cat->updated, 'P' => $parent]);
-                    $categories_updated[] = $inst;
                     // Create a local <-> source ID map for links in this category
                     $link_map = [];
                     foreach ($db->selectAll('SELECT id, source_id FROM Link WHERE category = :C;', ['C' => $parent]) as ['source_id' => $key, 'id' => $value])
@@ -163,20 +160,13 @@ if (isset($_GET['sync'])) {
                             'UPDATE Link SET title = :T, blurhash = :B, name = :N, description = :D, favicon = :F, public = TRUE, category = :K, create_date = :C, update_date = :D WHERE id = :I;',
                             ['T' => $link->title, 'B' => $link->blurhash, 'N' => $link->name, 'D' => $link->description, 'F' => $link->favicon, 'K' => $inst, 'D' => $link->updated, 'I' => $l]
                         );
-                        $links_updated[] = $l;
                     }
                 }
             }
-            $categories_updated = implode(', ', $categories_updated);
-            echo 'Deleting categories not in ' . $categories_updated . PHP_EOL;
-            $db->delete('DELETE FROM Category WHERE source = :S AND id NOT IN (:K);', ['S' => $instance_id, 'K' => $categories_updated]);
-            $links_delete = [];
-            foreach ($db->selectAll('SELECT id FROM Link WHERE category IN (:K);', ['K' => $categories_updated]) as ['id' => $existing_link])
-                if (array_search($existing_link, $links_updated) === false)
-                    $links_delete[] = $existing_link;
-            $links_updated = implode(', ', $links_delete);
-            echo 'Deleting links in ' . $links_updated . PHP_EOL;
-            $db->delete('DELETE FROM Link WHERE id IN (:L);', ['L' => $links_updated]);
+            
+            // Deleted categories and links, as sent in the sync response
+            if (!empty($deleted_links)) $db->delete('DELETE FROM Link WHERE source = :S AND source_id IN (:I);', ['S' => $remote->getId(), 'I' => implode(', ', $deleted_links)]);
+            if (!empty($deleted_categories)) $db->delete('DELETE FROM Category WHERE source = :S AND source_id IN (:I);', ['S' => $remote->getId(), 'I' => implode(', ', $deleted_categories)]);
             $db->commit();
             return true;
         } catch (Exception $ex) {
