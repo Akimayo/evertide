@@ -89,7 +89,7 @@ class Handler
     {
         $key = 'http_' . $status;
         if (property_exists(L::class, $key))
-            header($_SERVER['SERVER_PROTOCOL'] . ' ' . $status . ' ' . L::{$key});
+            header($_SERVER['SERVER_PROTOCOL'] . ' ' . $status . ' ' . L($key));
         else
             header($_SERVER['SERVER_PROTOCOL'] . ' ' . $status);
         return $this;
