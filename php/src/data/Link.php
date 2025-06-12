@@ -205,4 +205,9 @@ class LinkDAO extends Link implements DAO
     {
         throw new Exception('Getting all links not supported, please use Category::getAll(...)');
     }
+    /** @return int[] */
+    public static function getDeletedIds(Database $db, string $since): array
+    {
+        return array_column($db->selectAll('SELECT id FROM DeletedItems WHERE type = 1 AND delete_date > :D;', ['D' => $since]), 'id');
+    }
 }

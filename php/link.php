@@ -92,8 +92,8 @@ if (isset($_GET['device'])) {
                 }, $cat->getCategories())
             ];
         }, CategoryDAO::getSync($db, $categories, $last_sync)),
-        'deleted_categories' => [], // TODO: Get deleted categories from database
-        'deleted_links' => [] // TODO: Get deleted links from database
+        'deleted_categories' => CategoryDAO::getDeletedIds($db, since: $last_sync),
+        'deleted_links' => LinkDAO::getDeletedIds($db, since: $last_sync)
     ], true);
 } else if (!empty($_POST)) {
     /*

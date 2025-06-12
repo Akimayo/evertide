@@ -179,6 +179,10 @@ class LeafCategoryDAO extends LeafCategory implements DAO
     {
         throw new Exception('Getting leaf categories not supported, please use Category::getAll(...)');
     }
+    /** @return int[] */
+    public static function getDeletedIds(Database $db, string $since): array {
+        return array_column($db->selectAll('SELECT id FROM DeletedItems WHERE type = 0 AND delete_date > :D;', ['D' => $since]), 'id');
+    }
     public function createLink(string $url, string $title, ?string $blurhash, ?string $favicon, ?int $source_id = null): LinkDAO
     {
         $date = date('Y-m-d H:i:s');
