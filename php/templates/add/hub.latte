@@ -2,28 +2,33 @@
 
 {block title}{_'add_title'} | evertide{/block}
 {block body}
-<h2>{_add_title}</h2>
-<form method="POST" action="?type=link" class="bare-form">
-    <input type="url" name="url" />
-    <select name="category">
-        {foreach $categories as $cat}
-        <option value={$cat->getId()}>{$cat->getName()}</option>
-        <option n:foreach="$cat->getCategories() as $c" value={$c->getId()}>&gt; {$c->getName()}</option>
-        {/foreach}
-    </select>
-    <input type="submit" value={_add_title} />
-</form>
-<h2>{_add_category_add}</h2>
-<form method="POST" action="?type=category" class="bare-form">
-    <input type="text" name="name" />
-    <input type="text" name="icon" style="grid-row: 1;grid-column: 2;" />
-    <a href="https://phosphoricons.com/#toolbar" target="_blank"
-    style="grid-column: 2;grid-row: 1;justify-self:end;">{_add_category_icons}</a>
-    <input type="submit" value={_add_category_add} />
-</form>
-<h2>{_add_instance_add}</h2>
-<form method="POST" action="?type=instance" class="bare-form">
-    <input type="url" name="url" />
-    <input type="submit" value={_add_title} />
-</form>
+<div class="link-hub" style="--color-primary: {$instance->getPrimaryColor()|noescape};--color-secondary: {$instance->getSecondaryColor()|noescape};">
+    <form method="POST" action="?type=link" class="link-hub-form hub-link">
+        <h2>{_add_title}</h2>
+        <input type="url" name="url" placeholder="{_add_link_url}..." required />
+        <label for="category-select">
+            {_add_link_category}
+            <select name="category" id="category-select" required>
+                {foreach $categories as $cat}
+                <option value={$cat->getId()}>{$cat->getName()}</option>
+                <option n:foreach="$cat->getCategories() as $c" value={$c->getId()}>&gt; {$c->getName()}</option>
+                {/foreach}
+            </select>
+        </label>
+        <input type="submit" value={_add_title} />
+    </form>
+    <form method="POST" action="?type=category" class="link-hub-form hub-category bare-form">
+        <h2>{_add_category_add}</h2>
+        <input type="text" name="name" />
+        <input type="text" name="icon" style="grid-row: 1;grid-column: 2;" />
+        <a href="https://phosphoricons.com/#toolbar" target="_blank"
+            style="grid-column: 2;grid-row: 1;justify-self:end;">{_add_category_icons}</a>
+        <input type="submit" value={_add_category_add} />
+    </form>
+    <form method="POST" action="?type=instance" class="link-hub-form hub-instance bare-form">
+        <h2>{_add_instance_add}</h2>
+        <input type="url" name="url" />
+        <input type="submit" value={_add_title} />
+    </form>
+</div>
 {/block}

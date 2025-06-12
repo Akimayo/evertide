@@ -5,7 +5,7 @@
 {block body_}
 <header class="main-header">
     <h1>🌊 evertide {_'index_on'} {$instance->getDisplayName()}</h1>
-    <nav>
+    <nav style="--color-primary: {$instance->getPrimaryColor()|noescape};--color-secondary: {$instance->getSecondaryColor()|noescape};">
         <a href="/add" n:if=$authorized><i class={icon(plus)}></i>&nbsp;{_'add_title'}</a>
     </nav>
 </header>
