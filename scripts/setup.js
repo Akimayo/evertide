@@ -26,9 +26,10 @@ const yesno = async (prompt) => {
 };
 const getJSON = (path) =>
   new Promise((resolve, reject) =>
-    fs.readFile(path, "utf8")
-      .then(data => resolve(JSON.parse(data)))
-      .catch(err => reject(err))
+    fs
+      .readFile(path, "utf8")
+      .then((data) => resolve(JSON.parse(data)))
+      .catch((err) => reject(err))
   );
 // #endregion
 
@@ -40,9 +41,10 @@ const WEB_PATH = __dirname + "/../web/",
 async function main() {
   // Generate assets symlink
   if (!exists(PHP_PATH + "assets")) {
-    await fs.symlink(WEB_PATH, PHP_PATH + "assets")
+    await fs
+      .symlink(WEB_PATH, PHP_PATH + "assets")
       .then(() => console.log("Created a symlink php/assets -> web"))
-      .catch(err => {
+      .catch((err) => {
         console.error(
           "evertide could not set up a symlink for serving assets from PHP"
         );
@@ -121,8 +123,8 @@ async function main() {
   const isMultiInstance = await yesno("Are you running multiple instances?");
   let instanceUrl = await question(
     "Please enter the URL where" +
-    (isMultiInstance ? " this instance of" : "") +
-    " evertide will be hosted: "
+      (isMultiInstance ? " this instance of" : "") +
+      " evertide will be hosted: "
   );
 
   // Parse domain out of URL
@@ -146,12 +148,13 @@ async function main() {
     if (dirExists)
       override = await yesno(
         "Are you sure you want to overwrite the configuration for " +
-        domain +
-        "?"
+          domain +
+          "?"
       );
     if (!override) process.exit();
     else if (!dirExists)
-      await fs.mkdir(OPT_GLOBAL_PATH + domainPath)
+      await fs
+        .mkdir(OPT_GLOBAL_PATH + domainPath)
         .then(() => console.log("Instance data directory created"))
         .catch((err) => {
           console.error("evertide could not create instance data directory");
@@ -165,8 +168,8 @@ async function main() {
     secondaryColor = await question("  Secondary color for " + domain + ": ");
   let displayName = await question(
     "  How do you want the instance to be displayed to others? [" +
-    domain +
-    "] "
+      domain +
+      "] "
   );
   if (!displayName && domainPath != domain) displayName = domain;
 
@@ -176,22 +179,27 @@ async function main() {
   obj.scope = instanceUrl;
   obj.share_target.action = instanceUrl + "add";
   obj.background_color = primaryColor;
-  await fs.writeFile(
-    WEB_PATH + domainPath + ".webmanifest",
-    JSON.stringify(obj, null, 2)
-  )
+  await fs
+    .writeFile(
+      WEB_PATH + domainPath + ".webmanifest",
+      JSON.stringify(obj, null, 2)
+    )
     .then(() => console.log("evertide is set up to be hosted at", instanceUrl))
-    .catch(err => {
+    .catch((err) => {
       console.error("Web manifest could not be written");
       console.error(err);
       process.exit(6);
     });
 
   // Write config
-  await fs.writeFile(
-    OPT_GLOBAL_PATH + (isMultiInstance ? domainPath + "/" : "") + "config.yml",
-    `
-# yaml-language-server: $schema=${isMultiInstance ? ".." : "."
+  await fs
+    .writeFile(
+      OPT_GLOBAL_PATH +
+        (isMultiInstance ? domainPath + "/" : "") +
+        "config.yml",
+      `
+# yaml-language-server: $schema=${
+        isMultiInstance ? ".." : "."
       }/config.schema.json
 
 instance:
@@ -200,19 +208,20 @@ instance:
   primary: "${primaryColor}"
   secondary: "${secondaryColor}"
   `.toString()
-  )
+    )
     .then(() => {
       console.log(
         "evertide config file prepared to set up in " +
-        OPT_GLOBAL_PATH +
-        (isMultiInstance ? domainPath + "/" : "") +
-        "config.yml"
+          OPT_GLOBAL_PATH +
+          (isMultiInstance ? domainPath + "/" : "") +
+          "config.yml"
       );
       console.info(
         "Please open the config file above and modify database connection info."
       );
       console.info("By default, evertide will use SQLite");
-    }).catch(err => {
+    })
+    .catch((err) => {
       console.error("Configuration file could not be written");
       console.error(err);
       process.exit(7);

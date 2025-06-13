@@ -31,7 +31,7 @@ class Handler
         $this->latte->setTempDirectory(__DIR__ . '/../cache/');
         $this->latte->setStrictParsing();
         // Instatiate i18n and add translator extension to Latte
-        $i18n = new i18n(__DIR__ . '/../../web/locale/lang_{LANGUAGE}.yml', __DIR__ . '/../cache/locale', 'en');
+        $i18n = new i18n(__DIR__ . '/../assets/locale/lang_{LANGUAGE}.yml', __DIR__ . '/../cache/locale', 'en');
         $i18n->setMergeFallback(true);
         $i18n->init();
         $this->language = $i18n->getAppliedLang();
