@@ -10,11 +10,11 @@
     {var $inst = $cat->getSourceInstance()}
     {var $pos = $spiral($i++)}
     <article id="category_{$cat->getId()}"
-        style="--cat-color-primary: {$inst->getPrimaryColor()|noescape};--cat-color-secondary: {$inst->getSecondaryColor()|noescape};--grid-col: {$pos[0]};--grid-row: {$pos[1]};--exp-top: {$pos[2]};--exp-right: {$pos[3]};--exp-bottom: {$pos[4]};--exp-left: {$pos[5]};">
+        style="{if $inst !== null}--color-primary: {$inst->getPrimaryColor()|noescape};--color-secondary: {$inst->getSecondaryColor()|noescape};{/if}--grid-col: {$pos[0]};--grid-row: {$pos[1]};--exp-top: {$pos[2]};--exp-right: {$pos[3]};--exp-bottom: {$pos[4]};--exp-left: {$pos[5]};">
         <details>
             <summary>
                 <h2><i class={icon($cat->getIcon())}></i>&nbsp;{$cat->getName()}</h2>
-                {if $inst->getId() !== null}
+                {if $inst !== null}
                 <aside>{_'index_from'}&nbsp;<a href={$inst->getLink()} target="_blank">{$inst->getDomainName()}&nbsp;<i
                             class={icon(arrow-square-out)}></i></a></aside>
                 {/if}
@@ -29,7 +29,7 @@
                         </h4>
                         <aside n:if="$link->getName() !== null">{$link->getTitle()}</aside>
                     </a>
-                    <nav n:if="$authorized && $cat->getSourceInstance() === null">
+                    <nav n:if="$authorized && $inst === null">
                         <a href="/add?type=link&id={$link->getId()}"><i class={icon(pencil-simple)}></i></a>
                     </nav>
                 </li>
@@ -50,7 +50,7 @@
                                 </h4>
                                 <aside n:if="$link->getName() !== null">{$link->getTitle()}</aside>
                             </a>
-                            <nav n:if="$authorized && $cat->getSourceInstance() === null">
+                            <nav n:if="$authorized && $inst === null">
                                 <a href="/add?type=link&id={$link->getId()}"><i class={icon(pencil-simple)}></i></a>
                             </nav>
                         </li>
@@ -58,10 +58,10 @@
                 </details>
             </section>
             <nav n:if=$authorized>
-                {if $cat->getSourceInstance() === null}
+                {if $inst === null}
                 <a href="/add?type=category&id={$cat->getId()}"><i class={icon(pencil-simple)}></i></a>
                 {else}
-                <a href="/add?type=instance&id={$cat->getSourceInstance()->getId()}"><i class={icon(gear)}></i></a>
+                <a href="/add?type=instance&id={$inst->getId()}"><i class={icon(gear)}></i></a>
                 {/if}
             </nav>
         </details>

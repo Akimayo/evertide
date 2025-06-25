@@ -6,7 +6,7 @@
 <form method="POST" class="bare-form add-category">
     <input type="hidden" name="id" value={$category->getId()} />
     <fieldset class="add-link-category"
-        style="--cat-color-primary: {$instance->getPrimaryColor()|noescape};--cat-color-secondary: {$instance->getSecondaryColor()|noescape};">
+        style="--color-primary: {$instance->getPrimaryColor()|noescape};--color-secondary: {$instance->getSecondaryColor()|noescape};">
         <legend>{_add_link_category}</legend>
         <div class="category">
             <input type="radio" name="parent" value="" id="cat-null" {if $expand_category===null}checked{/if} />

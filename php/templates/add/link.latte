@@ -8,7 +8,7 @@
 <form method="POST" class="bare-form add-link">
     <input type="hidden" name="id" value={$link->getId()} />
     <fieldset class="add-link-category"
-        style="--cat-color-primary: {$instance->getPrimaryColor()|noescape};--cat-color-secondary: {$instance->getSecondaryColor()|noescape};">
+        style="--color-primary: {$instance->getPrimaryColor()|noescape};--color-secondary: {$instance->getSecondaryColor()|noescape};">
         <legend>{_add_link_category}</legend>
         <details n:foreach="$categories as $cat" {if $cat->getId() === $expand_category}open{/if}>
             <summary class="category">

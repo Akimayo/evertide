@@ -6,7 +6,7 @@
 <form method="POST" class="bare-form add-link">
     <input type="hidden" name="id" value={$remote->getId()} />
     <fieldset class="add-link-category"
-        style="--cat-color-primary: {$remote->getPrimaryColor()|noescape};--cat-color-secondary: {$remote->getSecondaryColor()|noescape};">
+        style="--color-primary: {$remote->getPrimaryColor()|noescape};--color-secondary: {$remote->getSecondaryColor()|noescape};">
         <legend>{_add_link_category}</legend>
         <details n:foreach="$categories as $cat">
             <summary class="category">

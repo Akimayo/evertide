@@ -12,7 +12,7 @@
     <title>{block title}{/block}</title>
 </head>
 
-<body>
+<body style="--color-primary: {$instance->getPrimaryColor()|noescape};--color-secondary: {$instance->getSecondaryColor()|noescape};">
 {block body_}{/block}
 </body>
 
