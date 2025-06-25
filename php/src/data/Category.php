@@ -316,7 +316,7 @@ class CategoryDAO extends LeafCategoryDAO implements DAO
       LEFT JOIN Device dp  ON dp.id = p.from_device
     PHP_EOL;
     public const ORDER = <<<PHP_EOL
-     ORDER BY IFNULL(p.id, c.id) ASC, p.id IS NULL ASC, p.id ASC, c.id ASC, l.id ASC;
+     ORDER BY c.source IS NULL DESC, IFNULL(p.id, c.id) ASC, p.id IS NULL ASC, p.id ASC, c.id ASC, l.id ASC;
     PHP_EOL;
     /** @return Category[] */
     public static function __mapInstances(array $rows, bool $only_non_empty): array
