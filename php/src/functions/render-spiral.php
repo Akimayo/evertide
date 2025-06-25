@@ -80,11 +80,11 @@ return function (int $count): array {
             if ($y < $ymin) $ymin = $y;
             if ($y > $ymax) $ymax = $y;
         }
-        $width = $xmax + $xmin;
-        $height = $ymax + $ymin;
+        $width = $xmax - $xmin;
+        $height = $ymax - $ymin;
         return [$width + 2, $height + 1, function (int $i) use ($spiralSeries, $xmin, $ymin, $offsets, $width, $height): array {
-            $xpos = $spiralSeries[$i][0] + $xmin;
-            $ypos = $spiralSeries[$i][1] + $ymin;
+            $xpos = $spiralSeries[$i][0] - $xmin;
+            $ypos = $spiralSeries[$i][1] - $ymin;
             return $offsets($xpos, $ypos, $width, $height);
         }];
     } else {
