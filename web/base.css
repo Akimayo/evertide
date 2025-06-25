@@ -18,6 +18,7 @@ body {
 .meta-header nav a,
 .main-header nav a {
     text-decoration: none;
+    color: var(--color-primary);
 }
 
 .meta-header {
@@ -351,6 +352,82 @@ body {
 
 /* #endregion */
 
+/* #region Hub */
+.link-hub {
+    display: grid;
+    grid-template-rows: 50vh auto auto;
+    grid-template-columns: auto;
+    margin: 8px -8px;
+}
+
+.link-hub-form {
+    padding: 10pt 12pt;
+}
+
+.link-hub-form.hub-link {
+    position: relative;
+    grid-column: 1 / 3;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.link-hub-form.hub-link::before {
+    content: ' ';
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--color-secondary);
+    opacity: 0.3;
+    z-index: -1;
+}
+
+.link-hub-form.hub-link h2,
+.link-hub-form.hub-link input[type=url] {
+    flex: 1 0 100%;
+}
+
+.link-hub-form.hub-link input[type=url] {
+    border: none;
+    background-color: #ddd;
+    border-radius: 48pt;
+    padding: 24pt;
+    font-size: 32pt;
+}
+
+.link-hub-form.hub-link input[type=submit],
+.link-hub-form.hub-link label,
+.link-hub-form.hub-link select {
+    font-size: 24pt;
+    font-family: 'Original Surfer', display;
+}
+
+.link-hub-form.hub-link input[type=submit],
+.link-hub-form.hub-link input[type=url],
+.link-hub-form.hub-link label {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+.link-hub-form.hub-link select {
+    background-color: transparent;
+    border: none;
+}
+
+.link-hub-form.hub-link input[type=submit],
+.link-hub-form.hub-link label {
+    background-color: #eee;
+    border: none;
+    color: #444;
+    padding: 8pt 24pt;
+    border-radius: 32pt;
+}
+
+/* #endregion */
+
 /* #region Form Categories */
 .add-link-category details {
     border: 1px solid #ddd;
@@ -492,6 +569,15 @@ body {
     .link-grid article>details summary h2>i:first-child {
         font-size: 48pt;
         vertical-align: -12pt;
+    }
+
+    .link-hub {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: 50vh auto;
+    }
+
+    .link-hub-form {
+        padding: 10pt 20vw;
     }
 }
 
