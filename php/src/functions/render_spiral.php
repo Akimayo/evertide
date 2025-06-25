@@ -52,15 +52,15 @@ return function (int $count): array {
         $bottom = 1;
         if ($xpos < 1) {
             $left = 0;
-            if ($xpos < $width - 2) $right++;
-        } else if ($xpos > $width - 2) {
+            if ($xpos < $width - 1) $right++;
+        } else if ($xpos > $width - 1) {
             $right = 0;
             if ($xpos > 1) $left++;
         }
         if ($ypos < 1) {
             $bottom = 0;
-            if ($ypos < $height - 2) $top++;
-        } else if ($ypos > $height - 2) {
+            if ($ypos < $height - 1) $top++;
+        } else if ($ypos > $height - 1) {
             $top = 0;
             if ($ypos > 1) $bottom++;
         }
