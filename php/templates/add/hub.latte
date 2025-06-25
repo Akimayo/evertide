@@ -2,7 +2,7 @@
 
 {block title}{_'add_title'} | evertide{/block}
 {block body}
-<div class="link-hub" style="--color-primary: {$instance->getPrimaryColor()|noescape};--color-secondary: {$instance->getSecondaryColor()|noescape};">
+<div class="link-hub">
     <form method="POST" action="?type=link" class="link-hub-form hub-link">
         <h2>{_add_title}</h2>
         <input type="url" name="url" placeholder="{_add_link_url}..." required />
