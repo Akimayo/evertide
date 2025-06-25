@@ -543,7 +543,7 @@ body {
     }
 
     .link-grid article>details>summary::before {
-        padding: 50pt 40pt 30pt;
+        padding: 36pt 40pt 30pt;
     }
 
     .link-grid article>details summary h2 {
