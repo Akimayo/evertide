@@ -50,7 +50,7 @@ class Handler
             return $weight . ' ph-' . htmlspecialchars($name, ENT_DISALLOWED);
         });
         // Add spiral rendering function
-        $this->latte->addFunction('spiral', require(__DIR__ . '/functions/render-spiral.php'));
+        $this->latte->addFunction('spiral', require(__DIR__ . '/functions/render_spiral.php'));
         // Connect to database
         require_once(__DIR__ . '/database.php');
         $this->db = new ServerDatabase($this);

@@ -52,17 +52,17 @@ return function (int $count): array {
         $bottom = 1;
         if ($xpos < 1) {
             $left = 0;
-            if ($xpos < 2 * $width - 2) $right++;
-        } else if ($xpos > 2 * $width - 2) {
+            if ($xpos < $width - 2) $right++;
+        } else if ($xpos > $width - 2) {
             $right = 0;
-            if ($xpos < 1) $left++;
+            if ($xpos > 1) $left++;
         }
         if ($ypos < 1) {
             $bottom = 0;
             if ($ypos < $height - 2) $top++;
         } else if ($ypos > $height - 2) {
             $top = 0;
-            if ($ypos < 1) $bottom++;
+            if ($ypos > 1) $bottom++;
         }
         // Spiral format: [column, row, expand-top, expand-right, expand-bottom, expand-left]
         return [$xpos + 1, $height - $ypos + 1, $top, $right, $bottom, $left];
@@ -98,7 +98,7 @@ return function (int $count): array {
             if ($ypos & 1 > 0) $ypos *= -1;
             $ypos += $height;
             $xpos = 2 * ((($i + $side) % $width) - $side) + $width;
-            return $offsets($xpos, $ypos, $width, $height);
+            return $offsets($xpos, $ypos, 2 * ($width + 1), $height + 1);
         }];
     }
 };
