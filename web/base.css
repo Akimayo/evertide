@@ -102,7 +102,7 @@ body {
     cursor: pointer;
     color: #444;
     list-style: none;
-    margin-top: 20%;
+    margin-top: 17%;
     margin-left: 10%;
 
     transition-property: margin-top, margin-left;
@@ -539,7 +539,7 @@ body {
 
     .link-grid article>details>summary {
         margin-top: calc((47.5vh - 10pt) / var(--grid-rows) - 32px);
-        margin-left: 20%;
+        margin-left: 5%;
     }
 
     .link-grid article>details>summary::before {
