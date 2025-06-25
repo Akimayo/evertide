@@ -304,8 +304,24 @@ if ($handler->isAuthorized()) {
                 break;
             default:
                 if (isset($_POST['url'])) {
-                    // TODO: Add new link, but to what category?
-                    return $handler->error(HTTP_NOT_IMPLEMENTED);
+                    try {
+                        $category = CategoryDAO::get($db, -1);
+                    } catch (Exception) {
+                        // When the Bookmarks category does not exist
+                        $date = date('Y-m-d H:i:s');
+                        $device = DeviceDAO::getCurrent($db);
+                        $db->insert('INSERT INTO Category (id, name, icon, public, create_date, update_date, from_device) VALUES (-1, :N, `bookmarks`, FALSE, :D, :D, :F);', ['N' => L::add_category_bookmarks, 'D' => $date, 'F' => $device->getId()]);
+                        $category = new CategoryDAO($db, -1, L::add_category_bookmarks, 'bookmarks', null, false, $date, $date, $device, [], []);
+                    }
+                    $_create_link = require(__DIR__ . '/src/functions/fetch_link_data.php');
+                    $link = $_create_link($category);
+                    $id = $link->getId();
+                    $handler->status(HTTP_CREATED);
+                    $handler->render('add/link.latte', [
+                        'category' => $category,
+                        'expand_category' => -1,
+                        'categories' => CategoryDAO::getAllLocal($db, true, true)
+                    ]);
                 } else return $handler->error(HTTP_BAD_REQUEST, 'Invalid type "' . $type . '"');
         }
     } catch (Throwable $ex) {
