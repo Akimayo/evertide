@@ -43,13 +43,14 @@ class Handler
             return L($original, $params);
         });
         $this->latte->addExtension($translator);
-        // Add Phosphor Icons filter
+        // Add Phosphor Icons function
         $this->latte->addFunction('icon', function (string $name, string $weight = ''): string {
             if ($weight === 'fill') $weight = 'ph-fill';
             else $weight = 'ph';
             return $weight . ' ph-' . htmlspecialchars($name, ENT_DISALLOWED);
         });
-
+        // Add spiral rendering function
+        $this->latte->addFunction('spiral', require(__DIR__ . '/functions/render-spiral.php'));
         // Connect to database
         require_once(__DIR__ . '/database.php');
         $this->db = new ServerDatabase($this);
