@@ -21,6 +21,9 @@ Get-ChildItem ($WEB_PATH + "*.js") | ForEach-Object {
         Write-Progress "evertide" -Completed
         Exit
     }
+    If (Test-Path ($_.FullName + ".map") -PathType Leaf) {
+        "//# sourceMappingURL=$($_.Name).map" | Out-File $minPath -Append -Encoding utf8
+    }
 }
 Write-Host "Built and minified JavaScript"
 

@@ -2,7 +2,8 @@
     "compilerOptions": {
         "outDir": "./",
         "allowJs": true,
-        "target": "ES2024"
+        "target": "ES2024",
+        "sourceMap": true
     },
     "compileOnSave": true,
     "include": [

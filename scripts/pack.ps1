@@ -38,6 +38,9 @@ New-Item -Path ($BUILD_PATH + "assets") -ItemType Directory -ErrorAction Silentl
 Get-ChildItem ($WEB_PATH + '*.min.js') | ForEach-Object {
     Copy-Item $_.FullName -Destination ($BUILD_PATH + "assets\" + $_.Name) -Force
 }
+Get-ChildItem ($WEB_PATH + '*.js.map') | ForEach-Object {
+    Copy-Item $_.FullName -Destination ($BUILD_PATH + "assets\" + $_.Name) -Force
+}
 Get-ChildItem ($WEB_PATH + '*.min.css*') | ForEach-Object {
     Copy-Item $_.FullName -Destination ($BUILD_PATH + "assets\" + $_.Name) -Force
 }
