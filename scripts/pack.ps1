@@ -33,6 +33,8 @@ Get-ChildItem ($PHP_PATH + "opt") -Directory | ForEach-Object {
 }
 "deny from all" | Out-File ($BUILD_PATH + "opt\.htaccess") -Force
 
+# Copy over language files
+Copy-Item ($WEB_PATH + "locale") -Destination ($BUILD_PATH + "assets\locale") -Recurse -Force
 # Copy over minified JS and CSS
 New-Item -Path ($BUILD_PATH + "assets") -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
 Get-ChildItem ($WEB_PATH + '*.min.js') | ForEach-Object {
