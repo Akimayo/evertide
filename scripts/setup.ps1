@@ -65,7 +65,7 @@ instance:
   link: "$instanceUrl"
   primary: "$primaryColor"
   secondary: "$secondaryColor"
-"@ | Out-File $configPath
+"@ | Out-File $configPath -Encoding ascii
     Write-Host "evertide config file prepared to set up in $configPath"
     Write-Host "Please open the config file above and modify database connection info."
     Write-Host "By default, evertide will use SQLite."
