@@ -30,6 +30,7 @@ Write-Host "Built and minified JavaScript"
 # Run sass
 Write-Progress "Building CSS"
 Get-ChildItem ($WEB_PATH + "*.scss") | ForEach-Object {
+    If ($_.Name.StartsWith("_")) { Return; }
     $minPath = $_.FullName.Substring(0, $_.FullName.Length - 5) + ".min.css";
     $p = Start-Process "node" -ArgumentList ($WEB_PATH + ".\node_modules\sass\sass.js"), "$($_.FullName):$($minPath)", "--style", "compressed" -WorkingDirectory $WEB_PATH -RedirectStandardError $ERROR_FILE -NoNewWindow -Wait -PassThru
     if ($p.ExitCode -ne 0) {
