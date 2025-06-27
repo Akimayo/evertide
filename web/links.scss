@@ -76,6 +76,11 @@
                 h2 {
                     font-size: 16pt;
                     margin-top: 23pt;
+                    text-align: center;
+                    white-space: nowrap;
+                    overflow: clip;
+                    text-overflow: ellipsis;
+
                     transition:
                         font-size 240ms ease-in-out,
                         margin-top 240ms ease-in-out;
@@ -131,13 +136,13 @@
             }
             & > summary {
                 $top_offset_mobile: calc(4em + 4pt);
-                $top_offset_desktop: calc((47.5vh - 10pt) / var(--grid-rows) - 40pt);
-                padding: $top_offset_mobile 10%;
+                $top_offset_desktop: calc((47.5vh - 10pt) / var(--grid-rows) - 46pt);
+                padding: $top_offset_mobile 4pt;
 
                 transition: padding 240ms ease-in-out;
 
                 @media (min-width: $breakpoint) {
-                    padding: $top_offset_desktop 5%;
+                    padding: $top_offset_desktop 4pt;
                 }
 
                 &::before {
