@@ -1,0 +1,404 @@
+@use "./_variables" as *;
+
+.link-grid {
+    display: grid;
+    grid-template-columns: auto;
+    grid-template-rows: auto;
+    margin: 0 10vw 0;
+    min-height: 95vh;
+    gap: 1em;
+
+    @media (min-width: $breakpoint) {
+        grid-template-columns: repeat(var(--grid-cols), 1fr);
+        grid-template-rows: repeat(var(--grid-rows), 1fr);
+        margin-top: -20pt;
+    }
+
+    article {
+        min-height: 8em;
+        position: relative;
+
+        @media (min-width: $breakpoint) {
+            grid-column: var(--grid-col) / span 2;
+            grid-row: var(--grid-row);
+        }
+
+        & > details {
+            border: 1px solid $light2;
+            border-radius: 1em;
+            background-image: linear-gradient(-30deg, $secondary, $light1 20%, $light1 80%, $primary);
+            background-size: calc(100% + 240px);
+            background-position-x: -80px;
+            box-shadow: 0 0pt 0pt $shadow;
+            overflow-y: hidden;
+
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 0;
+
+            transition:
+                left 240ms ease-out,
+                right 240ms ease-out,
+                top 240ms ease-out,
+                bottom 240ms ease-out,
+                background-position-x 240ms ease-out,
+                box-shadow 240ms ease-out,
+                z-index 240ms step-end;
+
+            @media only screen and (prefers-color-scheme: dark) {
+                border-color: $dark2;
+                background-image: linear-gradient(-30deg, $secondary, $dark1 20%, $dark1 80%, $primary);
+            }
+
+            summary {
+                cursor: pointer;
+                color: $dark1;
+                list-style: none;
+
+                @media only screen and (prefers-color-scheme: dark) {
+                    color: $white;
+                }
+
+                &::-webkit-details-marker {
+                    display: none;
+                }
+
+                h2,
+                h3 {
+                    & > i {
+                        display: inline-block;
+                    }
+                }
+
+                h2 {
+                    font-size: 16pt;
+                    margin-top: 23pt;
+                    transition:
+                        font-size 240ms ease-in-out,
+                        margin-top 240ms ease-in-out;
+
+                    @media (min-width: $breakpoint) {
+                        font-size: 24pt;
+                    }
+
+                    & > i:first-child {
+                        font-size: 24pt;
+                        vertical-align: -6pt;
+                        margin-right: 4pt;
+                        margin-left: 0;
+                        opacity: 1;
+                        color: inherit;
+                        position: relative;
+                        z-index: -1;
+
+                        transition:
+                            font-size 240ms ease-in-out,
+                            vertical-align 240ms ease-in-out,
+                            margin-left 240ms ease-in-out,
+                            margin-right 240ms ease-in-out,
+                            opacity 240ms ease-in-out,
+                            color 240ms ease-in-out;
+
+                        @media (min-width: $breakpoint) {
+                            font-size: 48pt;
+                            vertical-align: -12pt;
+                        }
+                    }
+                }
+                h3 {
+                    margin: unset;
+                    font-size: 22pt;
+                    & > i {
+                        &:first-child {
+                            color: $secondary;
+                            opacity: 0.5;
+                            font-size: 64pt;
+                            vertical-align: -19pt;
+                            margin: 0 -40pt 0 -20pt;
+                            position: relative;
+                            z-index: -1;
+                        }
+                        &:last-child {
+                            margin-left: 32pt;
+                            transform: rotate(-90deg);
+                            transition: transform 120ms ease-out;
+                        }
+                    }
+                }
+            }
+            & > summary {
+                $top_offset_mobile: calc(4em + 4pt);
+                $top_offset_desktop: calc((47.5vh - 10pt) / var(--grid-rows) - 40pt);
+                padding: $top_offset_mobile 10%;
+
+                transition: padding 240ms ease-in-out;
+
+                @media (min-width: $breakpoint) {
+                    padding: $top_offset_desktop 5%;
+                }
+
+                &::before {
+                    font-family: $icon;
+                    font-size: 20pt;
+                    content: $icon-cross;
+                    opacity: 0;
+                    position: absolute;
+                    right: 16pt;
+                    top: $top_offset_mobile;
+
+                    transition:
+                        opacity 240ms ease-in-out,
+                        height 240ms ease-in-out,
+                        top 240ms ease-in-out;
+
+                    @media (min-width: $breakpoint) {
+                        top: $top_offset_desktop;
+                    }
+                }
+
+                aside {
+                    margin-left: -32pt;
+                    margin-top: -18pt;
+                    font-size: 8pt;
+
+                    transition:
+                        margin-left 240ms ease-in-out,
+                        margin-top 240ms ease-in-out,
+                        font-size 240ms ease-in-out;
+
+                    @media (min-width: $breakpoint) {
+                        margin-left: 60pt;
+                        margin-top: -30pt;
+                        font-size: 12pt;
+                    }
+
+                    a {
+                        color: $secondary;
+                    }
+                }
+            }
+
+            .scroll-container {
+                overflow-y: auto;
+                max-height: calc(100% - 64pt);
+                margin-top: -12pt;
+                padding-top: 12pt;
+            }
+
+            ul {
+                display: flex;
+                flex-flow: row wrap;
+                list-style-type: none;
+                gap: 16pt;
+                opacity: 0;
+                transition: opacity 240ms ease-out;
+                padding: 0 8pt;
+
+                @media (min-width: $breakpoint) {
+                    padding: 0 24pt;
+                }
+
+                li {
+                    border: 1px solid $light3;
+                    background-color: $light2;
+                    border-radius: 1em;
+                    overflow: clip;
+                    max-width: 100%;
+                    position: relative;
+
+                    @media only screen and (prefers-color-scheme: dark) {
+                        border-color: $dark3;
+                        background-color: $dark2;
+                    }
+
+                    & > a {
+                        display: block;
+                        color: $black;
+                        text-decoration: none;
+                        white-space: nowrap;
+                        position: relative; // Only to keep it in front of the canvas
+
+                        @media only screen and (prefers-color-scheme: dark) {
+                            color: $white;
+                        }
+
+                        img {
+                            margin-left: 8pt;
+                            margin-right: -8pt;
+                            vertical-align: -8pt;
+                            width: 24pt;
+                            height: 24pt;
+                            border-radius: 0.5em;
+
+                            & ~ span {
+                                max-width: calc(100% - 48pt);
+                                padding-left: 12pt;
+                            }
+                            & ~ aside {
+                                max-width: calc(100% - 64pt);
+                                left: 40pt;
+                            }
+                        }
+
+                        span {
+                            display: inline-block;
+                            padding: 12pt 16pt 13pt;
+                            max-width: calc(100% - 24pt);
+                            overflow: clip;
+                            text-overflow: ellipsis;
+                        }
+
+                        aside {
+                            font-size: 8pt;
+                            color: $dark1;
+                            position: absolute;
+                            top: 27pt;
+                            left: 16pt;
+                            display: block;
+                            max-width: calc(100% - 40pt);
+                            overflow-x: clip;
+                            text-overflow: ellipsis;
+
+                            @media only screen and (prefers-color-scheme: dark) {
+                                color: $light2;
+                            }
+                        }
+                    }
+
+                    canvas {
+                        opacity: 0;
+                        transition: opacity 120ms ease-out;
+                        position: absolute;
+                        width: 100%;
+                        height: 100%;
+                        &.blurhash-ready {
+                            opacity: 0.6;
+
+                            @media only screen and (prefers-color-scheme: dark) {
+                                opacity: 0.4;
+                            }
+                        }
+
+                        & ~ a {
+                            span,
+                            aside {
+                                text-shadow: 0 0 6pt $white;
+                                @media only screen and (prefers-color-scheme: dark) {
+                                    text-shadow: 0 0 6pt $black;
+                                }
+                            }
+                        }
+                    }
+
+                    nav {
+                        padding: 8pt 2pt 0 12pt;
+                        background-image: radial-gradient(circle at 90% 85%, $light2, transparent 70%);
+                        @media only screen and (prefers-color-scheme: dark) {
+                            background-image: radial-gradient(circle at 90% 85%, $dark2, transparent 70%);
+                        }
+                    }
+                }
+            }
+
+            details {
+                & > summary {
+                    margin-left: 5%;
+                }
+                &[open] {
+                    h3 > i:last-child {
+                        transform: rotate(0deg);
+                        transition-timing-function: ease-in;
+                    }
+                }
+            }
+
+            nav {
+                position: absolute;
+                bottom: 0;
+                right: 0;
+                padding-right: 2pt;
+                a {
+                    color: $primary;
+                    text-decoration: none;
+                }
+            }
+
+            &[open] {
+                box-shadow: 0 4pt 12pt $shadow;
+                left: -10vw;
+                right: -10vw;
+                top: 0;
+                bottom: -200%;
+                background-position-x: -240px;
+                z-index: 1;
+                transition:
+                    left 240ms ease-in,
+                    right 240ms ease-in,
+                    top 240ms ease-in,
+                    bottom 240ms ease-in,
+                    background-position-x 240ms ease-in,
+                    box-shadow 240ms ease-in,
+                    z-index 240ms step-start;
+
+                @media (min-width: $breakpoint) {
+                    left: calc(-10vw * var(--exp-left));
+                    right: calc(-10vw * var(--exp-right));
+                    top: calc(-100% * var(--exp-top));
+                    bottom: calc(-100% * var(--exp-bottom));
+                }
+
+                summary {
+                    h2 {
+                        font-size: 24pt;
+                        margin-top: -24pt;
+
+                        @media (min-width: $breakpoint) {
+                            font-size: 28pt;
+                        }
+
+                        & > i:first-child {
+                            font-size: 64pt;
+                            vertical-align: -20pt;
+                            opacity: 0.4;
+                            margin-right: -48pt;
+                            margin-left: -32pt;
+                            color: $primary;
+
+                            @media (min-width: $breakpoint) {
+                                font-size: 92pt;
+                                vertical-align: -34pt;
+                                margin-right: -62pt;
+                                margin-left: -24pt;
+                            }
+                        }
+                    }
+                }
+                & > summary {
+                    padding: 32pt 32pt 0;
+                    &::before {
+                        opacity: 1;
+                        top: 30pt;
+
+                        @media (min-width: $breakpoint) {
+                            top: 40pt;
+                        }
+                    }
+
+                    aside {
+                        margin-left: 14pt;
+                        margin-top: -54pt;
+                        font-size: 16pt;
+                    }
+                }
+
+                ul {
+                    opacity: 1;
+                    transition-timing-function: ease-in;
+                }
+            }
+        }
+    }
+}

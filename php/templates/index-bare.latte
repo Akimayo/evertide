@@ -19,44 +19,46 @@
                             class={icon(arrow-square-out)}></i></a></aside>
                 {/if}
             </summary>
-            <ul>
-                <li n:foreach="$cat->getLinks() as $link" title={$link->getDescription()}>
-                    <canvas n:if="$link->getBlurHash()" data-blurhash={$link->getBlurHash()}></canvas>
-                    <a href={$link->getUrl()} target="_blank">
-                        <img n:if="$link->getFavicon()" src={$link->getFavicon()} />
-                        <h4>
-                            {$link->getName() ?? $link->getTitle()}
-                        </h4>
-                        <aside n:if="$link->getName() !== null">{$link->getTitle()}</aside>
-                    </a>
-                    <nav n:if="$authorized && $inst === null">
-                        <a href="/add?type=link&id={$link->getId()}"><i class={icon(pencil-simple)}></i></a>
-                    </nav>
-                </li>
-            </ul>
-            <section n:foreach="$cat->getCategories() as $incat">
-                <details>
-                    <summary>
-                        <h3><i class={icon($incat->getIcon())}></i>&nbsp;{$incat->getName()}&nbsp;<i
-                                class={icon(caret-down)}></i></h3>
-                    </summary>
-                    <ul>
-                        <li n:foreach="$incat->getLinks() as $link" title={$link->getDescription()}>
-                            <canvas n:if="$link->getBlurHash()" data-blurhash={$link->getBlurHash()}></canvas>
-                            <a href={$link->getUrl()} target="_blank">
-                                <img n:if="$link->getFavicon()" src={$link->getFavicon()} />
-                                <h4>
-                                    {$link->getName() ?? $link->getTitle()}
-                                </h4>
-                                <aside n:if="$link->getName() !== null">{$link->getTitle()}</aside>
-                            </a>
-                            <nav n:if="$authorized && $inst === null">
-                                <a href="/add?type=link&id={$link->getId()}"><i class={icon(pencil-simple)}></i></a>
-                            </nav>
-                        </li>
-                    </ul>
-                </details>
-            </section>
+            <div class="scroll-container">
+                <ul>
+                    <li n:foreach="$cat->getLinks() as $link" title={$link->getDescription()}>
+                        <canvas n:if="$link->getBlurHash()" data-blurhash={$link->getBlurHash()}></canvas>
+                        <a href={$link->getUrl()} target="_blank">
+                            <img n:if="$link->getFavicon()" src={$link->getFavicon()} />
+                            <span>
+                                {$link->getName() ?? $link->getTitle()}
+                            </span>
+                            <aside n:if="$link->getName() !== null">{$link->getTitle()}</aside>
+                        </a>
+                        <nav n:if="$authorized && $inst === null">
+                            <a href="/add?type=link&id={$link->getId()}"><i class={icon(pencil-simple)}></i></a>
+                        </nav>
+                    </li>
+                </ul>
+                <section n:foreach="$cat->getCategories() as $incat">
+                    <details>
+                        <summary>
+                            <h3><i class={icon($incat->getIcon())}></i>&nbsp;{$incat->getName()}&nbsp;<i
+                                    class={icon(caret-down)}></i></h3>
+                        </summary>
+                        <ul>
+                            <li n:foreach="$incat->getLinks() as $link" title={$link->getDescription()}>
+                                <canvas n:if="$link->getBlurHash()" data-blurhash={$link->getBlurHash()}></canvas>
+                                <a href={$link->getUrl()} target="_blank">
+                                    <img n:if="$link->getFavicon()" src={$link->getFavicon()} />
+                                    <span>
+                                        {$link->getName() ?? $link->getTitle()}
+                                    </span>
+                                    <aside n:if="$link->getName() !== null">{$link->getTitle()}</aside>
+                                </a>
+                                <nav n:if="$authorized && $inst === null">
+                                    <a href="/add?type=link&id={$link->getId()}"><i class={icon(pencil-simple)}></i></a>
+                                </nav>
+                            </li>
+                        </ul>
+                    </details>
+                </section>
+            </div>
             <nav n:if=$authorized>
                 {if $inst === null}
                 <a href="/add?type=category&id={$cat->getId()}"><i class={icon(pencil-simple)}></i></a>
