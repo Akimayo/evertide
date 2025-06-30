@@ -136,7 +136,7 @@
                 }
             }
             & > summary {
-                $top_offset_mobile: calc(4em + 4pt);
+                $top_offset_mobile: calc(4em - 31pt);
                 $top_offset_desktop: calc((47.5vh - 10pt) / var(--grid-rows) - 46pt);
                 padding: $top_offset_mobile 4pt;
 
@@ -189,7 +189,7 @@
 
             .scroll-container {
                 overflow-y: auto;
-                max-height: calc(100% - 64pt);
+                max-height: calc(100% - 92pt);
                 margin-top: -12pt;
                 padding-top: 12pt;
                 @media (min-width: $breakpoint) {
