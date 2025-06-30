@@ -234,6 +234,7 @@
                     overflow: clip;
                     max-width: 100%;
                     position: relative;
+                    flex: 1 0 15%;
 
                     @media only screen and (prefers-color-scheme: dark) {
                         border-color: $dark3;
