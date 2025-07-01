@@ -76,7 +76,7 @@
 
                 h2 {
                     font-size: 16pt;
-                    margin-top: 23pt;
+                    margin: 23pt 0 0;
                     text-align: center;
                     white-space: nowrap;
                     overflow: clip;
@@ -166,9 +166,13 @@
                 }
 
                 aside {
-                    margin-left: -32pt;
-                    margin-top: -18pt;
+                    margin-left: 32pt;
+                    margin-top: -4pt;
                     font-size: 8pt;
+                    text-align: center;
+                    white-space: nowrap;
+                    overflow: clip;
+                    text-overflow: ellipsis;
 
                     transition:
                         margin-left 240ms ease-in-out,
@@ -177,7 +181,7 @@
 
                     @media (min-width: $breakpoint) {
                         margin-left: 60pt;
-                        margin-top: -30pt;
+                        margin-top: -12pt;
                         font-size: 12pt;
                     }
 
@@ -191,11 +195,11 @@
                 overflow-y: auto;
                 max-height: calc(100% - 92pt);
                 margin-top: -12pt;
-                padding-top: 12pt;
+                padding-top: 22pt;
                 @media (min-width: $breakpoint) {
                     max-height: calc(100% - 123pt);
                 }
-                
+
                 &::before {
                     content: " ";
                     position: absolute;
@@ -417,9 +421,14 @@
                     }
 
                     aside {
-                        margin-left: 14pt;
-                        margin-top: -54pt;
-                        font-size: 16pt;
+                        margin-left: 10pt;
+                        margin-top: -24pt;
+                        font-size: 14pt;
+
+                        @media (min-width: $breakpoint) {
+                            margin-top: -36pt;
+                            margin-left: 12pt;
+                        }
                     }
                 }
 
