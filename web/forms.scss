@@ -1,1 +1,141 @@
 @use "./variables" as *;
+
+.link-hub {
+    display: grid;
+    grid-template-rows: calc(100vh - 105pt) repeat(2, 50vh);
+    margin: 8px -8px;
+    @media (min-width: $breakpoint) {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: 50vh calc(50vh - 72pt - 8px);
+    }
+}
+.link-hub-form {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    padding: 10pt 12pt;
+    @media (min-width: $breakpoint) {
+        padding: 0 10vw;
+    }
+
+    &.hub-link {
+        position: relative;
+        justify-content: space-around;
+        @media (min-width: $breakpoint) {
+            grid-column: 1 / 3;
+            flex-flow: row wrap;
+            padding: 0 20vw;
+
+            h2,
+            input[type="url"] {
+                flex: 1 0 calc(100% - 64px);
+            }
+        }
+
+        &::before {
+            content: " ";
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            background-color: $secondary;
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+        input[type="url"] {
+            border: none;
+            width: calc(100% - 72pt);
+            font-size: 32pt;
+            font-family: $font;
+            padding: 12pt 48pt 12pt 24pt;
+            border-radius: 48pt;
+            @media (min-width: $breakpoint) {
+                max-width: 80%;
+            }
+
+            & + #paste {
+                cursor: pointer;
+                font-size: 32pt;
+                color: $primary;
+                background: none;
+                border: none;
+                align-self: flex-end;
+                margin: -64pt 16pt 0 0;
+
+                @media (min-width: $breakpoint) {
+                    align-self: center;
+                    margin: 4pt 0 0 -156pt;
+                }
+            }
+        }
+
+        label {
+            white-space: nowrap;
+        }
+
+        select {
+            max-width: 94pt;
+            overflow: clip;
+            text-overflow: ellipsis;
+            @media (min-width: $breakpoint) {
+                max-width: 50vw;
+            }
+        }
+
+        input[type="submit"],
+        label,
+        select {
+            font-size: 16pt;
+            font-family: $font;
+            @media (min-width: $breakpoint) {
+                font-size: 24pt;
+            }
+        }
+
+        input[type="submit"],
+        input[type="url"],
+        label {
+            box-shadow: 0 8px 16px $shadow;
+        }
+
+        input[type="submit"],
+        input[type="url"],
+        label,
+        select {
+            background-color: $light2;
+            color: $black;
+            @media only screen and (prefers-color-scheme: dark) {
+                background-color: $dark2;
+                color: $white;
+            }
+        }
+
+        input[type="submit"],
+        label,
+        select {
+            border: none;
+        }
+
+        input[type="submit"],
+        label {
+            padding: 8pt 24pt;
+            border-radius: 32pt;
+        }
+    }
+
+    &.hub-category {
+        background-color: $light1;
+        @media only screen and (prefers-color-scheme: dark) {
+            background-color: $dark2;
+        }
+    }
+
+    &.hub-instance {
+        background-color: $light2;
+        @media only screen and (prefers-color-scheme: dark) {
+            background-color: $dark1;
+        }
+    }
+}

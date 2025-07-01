@@ -15,6 +15,7 @@ add:
     public: Zobrazovat odkaz veřejně
     save: Uložit změny
     delete: Odstranit odkaz
+    paste: Vložit adresu URL ze schránky
   category:
     add: Přidat skupinu
     edit: Upravit skupinu

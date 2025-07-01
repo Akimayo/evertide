@@ -15,6 +15,7 @@ add:
     public: Make link public
     save: Save Changes
     delete: Delete Link
+    paste: Paste URL from clipboard
   category:
     add: Add category
     edit: Edit category

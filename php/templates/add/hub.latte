@@ -1,4 +1,6 @@
 {layout '../_meta.latte'}
+{var $css = ['base', 'forms']}
+{var $js = ['paste']}
 
 {block title}{_'add_title'} | evertide{/block}
 {block body}
@@ -6,6 +8,9 @@
     <form method="POST" action="?type=link" class="link-hub-form hub-link">
         <h2>{_add_title}</h2>
         <input type="url" name="url" placeholder="{_add_link_url}..." required />
+        <template>
+            <button type="button" id="paste" title={_add_link_paste}><i class={icon(clipboard-text)}></i></button>
+        </template>
         <label for="category-select">
             {_add_link_category}
             <select name="category" id="category-select" required>

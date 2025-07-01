@@ -1,3 +1,11 @@
+{parameters
+array $css = ['base'],
+array $js = [],
+string $language = 'en',
+bool $authorized = false,
+Instance $instance
+}
+
 <!DOCTYPE html>
 <html lang={$language}>
 
@@ -5,17 +13,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="assets/{$instance->getDomainName()}.webmanifest" />
-    <link rel="stylesheet" href="assets/base.min.css" type="text/css" />
-    <link rel="stylesheet" href="assets/links.min.css" type="text/css" />
-    <link rel="stylesheet" href="assets/forms.min.css" type="text/css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css" type="text/css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css" type="text/css" />
-    <script src="assets/index.min.js" type="module" defer></script>
+    <link n:foreach="$css as $c" rel="stylesheet" href="assets/{$c}.min.css" type="text/css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css"
+        type="text/css" />
+    <script n:foreach="$js as $j" src="assets/{$j}.min.js" type="module" defer></script>
     <title>{block title}{/block}</title>
 </head>
 
-<body style="--color-primary: {$instance->getPrimaryColor()|noescape};--color-secondary: {$instance->getSecondaryColor()|noescape};">
-{block body_}{/block}
+<body
+    style="--color-primary: {$instance->getPrimaryColor()|noescape};--color-secondary: {$instance->getSecondaryColor()|noescape};">
+    {block body_}{/block}
 </body>
 
 </html>
