@@ -163,9 +163,11 @@ if (isset($_GET['sync'])) {
                     }
                 }
             }
-            
+
             // Deleted categories and links, as sent in the sync response
-            if (!empty($deleted_links)) $db->delete('DELETE FROM Link WHERE source = :S AND source_id IN (:I);', ['S' => $remote->getId(), 'I' => implode(', ', $deleted_links)]);
+            if (!empty($deleted_links)) $db->delete('DELETE FROM Link WHERE category IN (:S) AND source_id IN (:I);', ['S' => implode(', ', array_map(function (Category $c) {
+                return $c->getId();
+            }, CategoryDAO::getAllFromRemote($db, $remote))), 'I' => implode(', ', $deleted_links)]);
             if (!empty($deleted_categories)) $db->delete('DELETE FROM Category WHERE source = :S AND source_id IN (:I);', ['S' => $remote->getId(), 'I' => implode(', ', $deleted_categories)]);
             $db->commit();
             return true;
@@ -202,6 +204,6 @@ if (isset($_GET['sync'])) {
         $categories[$row['source_id']] = $row['id'];
     }
     if ($lastSourceId >= 0) $changed = $changed || sync($db, $lastSourceId, $lastSourceLink, $categories, $lastSourceDate);
-    if ($changed) $handler->render('index-bare.latte', ['categories' => CategoryDAO::getAll($db, $handler->isAuthorized())]);
+    if ($changed) $handler->render('index-bare.latte', ['categories' => CategoryDAO::getAll($db, includePrivate: $handler->isAuthorized())]);
     else $handler->status(HTTP_NOT_MODIFIED);
-} else $handler->render('index.latte', ['categories' => CategoryDAO::getAll($handler->getDatabase(), $handler->isAuthorized())]);
+} else $handler->render('index.latte', ['categories' => CategoryDAO::getAll($handler->getDatabase(), includePrivate: $handler->isAuthorized())]);
