@@ -52,13 +52,14 @@ if (isset($_GET['sync'])) {
             $remote = InstanceDAO::get($db, $instance_id)->getAccessObject($db);
             if (!$result || ($result = json_decode($result)) === null) {
                 $remote->updateLinkStatus(LinkStatus::UNREACHABLE);
+                $db->commit();
                 return false;
             }
             $status = property_exists($result, 'status') ? $result->status : HTTP_OK;
-            // $message = property_exists($result, 'message') ? $result->message : null;
             if (!property_exists($result, 'instance') || empty($result->instance)) {
                 // In case of fatal errors
                 $remote->updateLinkStatus(LinkStatus::ERROR);
+                $db->commit();
                 return false;
             }
             $link_status = property_exists($result, 'categories') && is_array($result->categories) ? match ($status) {
@@ -68,7 +69,7 @@ if (isset($_GET['sync'])) {
                 HTTP_FORBIDDEN => LinkStatus::BLOCKED,
                 default => LinkStatus::UNREACHABLE
             } : LinkStatus::ERROR;
-            $categories = $result->categories;
+            $categories = @$result->categories;
             $deleted_categories = property_exists($result, 'deleted_categories') ? $result->deleted_categories : [];
             $deleted_links = property_exists($result, 'deleted_links') ? $result->deleted_links : [];
             $result = $result->instance;
@@ -81,6 +82,12 @@ if (isset($_GET['sync'])) {
                 $remote->updateInstance($result->domain, $result->primary, $result->secondary, $link_status);
                 $instance_changed = true;
             } else $remote->updateLinkStatus($link_status);
+            if ($link_status != $link_status::PRELOADED) {
+                // Unless the request was successful, revert the fetch date to try again later
+                // (not doing a rollback to keep the link status)
+                $db->update('UPDATE Instance SET last_fetch_date = :D WHERE id = :S;', ['D' => $original_date, 'S' => $instance_id]);
+                return false;
+            }
 
             if (empty($categories) && empty($deleted_categories) && empty($deleted_links) && !$instance_changed) return false; // Nothing changed
 
@@ -165,13 +172,37 @@ if (isset($_GET['sync'])) {
             }
 
             // Deleted categories and links, as sent in the sync response
-            if (!empty($deleted_links)) $db->delete('DELETE FROM Link WHERE category IN (:S) AND source_id IN (:I);', ['S' => implode(', ', array_map(function (Category $c) {
-                return $c->getId();
-            }, CategoryDAO::getAllFromRemote($db, $remote))), 'I' => implode(', ', $deleted_links)]);
-            if (!empty($deleted_categories)) $db->delete('DELETE FROM Category WHERE source = :S AND source_id IN (:I);', ['S' => $remote->getId(), 'I' => implode(', ', $deleted_categories)]);
+            if (!empty($deleted_links)) {
+                $deleted_links = array_combine(
+                    array_map(function (int $i): string {
+                        return ':I' . $i;
+                    }, array_keys($deleted_links)),
+                    $deleted_links
+                );
+                $remote_categories = CategoryDAO::getAllFromRemote($db, $remote);
+                $remote_categories = array_combine(
+                    array_map(function (int $i): string {
+                        return ':S' . $i;
+                    }, array_keys($remote_categories)),
+                    $remote_categories
+                );
+                $I_ = implode(', ', array_keys($deleted_links));
+                $S_ = implode(', ', array_keys($remote_categories));
+                $db->delete('DELETE FROM Link WHERE category IN (' . $S_ . ') AND source_id IN (' . $I_ . ');', array_merge($deleted_links, $remote_categories));
+            }
+            if (!empty($deleted_categories)) {
+                $deleted_categories = array_combine(
+                    array_map(function (int $i): string {
+                        return ':I' . $i;
+                    }, array_keys($deleted_categories)),
+                    $deleted_categories
+                );
+                $I_ = implode(', ', array_keys($deleted_categories));
+                $db->delete('DELETE FROM Category WHERE source = :S AND source_id IN (' . $I_ . ');', array_merge(['S' => $remote->getId()], $deleted_categories));
+            }
             $db->commit();
             return true;
-        } catch (Exception $ex) {
+        } catch (Throwable $ex) {
             $db->rollback();
             echo 'ERROR: ' . $ex->getMessage() . PHP_EOL;
             echo $ex->getTraceAsString() . PHP_EOL;

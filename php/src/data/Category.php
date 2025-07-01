@@ -180,7 +180,8 @@ class LeafCategoryDAO extends LeafCategory implements DAO
         throw new Exception('Getting leaf categories not supported, please use Category::getAll(...)');
     }
     /** @return int[] */
-    public static function getDeletedIds(Database $db, string $since): array {
+    public static function getDeletedIds(Database $db, string $since): array
+    {
         return array_column($db->selectAll('SELECT id FROM DeletedItems WHERE type = 0 AND delete_date > :D;', ['D' => $since]), 'id');
     }
     public function createLink(string $url, string $title, ?string $blurhash, ?string $favicon, ?int $source_id = null): LinkDAO
@@ -569,7 +570,14 @@ class CategoryDAO extends LeafCategoryDAO implements DAO
     /** @return Category[] */
     public static function getSync(Database $db, array $category_ids, string $last_sync): array
     {
-        $data = $db->selectAll(self::SELECT . ' WHERE c.source IS NULL AND l.public > 0 AND l.update_date > :D AND c.id IN (:I) ' . self::ORDER, ['D' => $last_sync, 'I' => implode(', ', $category_ids)]);
+        $category_ids = array_combine(
+            array_map(function (int $i): string {
+                return ':I' . $i;
+            }, array_keys($category_ids)),
+            $category_ids
+        );
+        $I_ = implode(', ', array_keys($category_ids));
+        $data = $db->selectAll(self::SELECT . ' WHERE c.source IS NULL AND l.public > 0 AND l.update_date > :D AND c.id IN (' . $I_ . ') ' . self::ORDER, array_merge(['D' => $last_sync], $category_ids));
         if ($data) return self::__mapInstances($data, false);
         else return [];
     }

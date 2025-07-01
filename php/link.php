@@ -21,7 +21,7 @@ if (isset($_GET['device'])) {
     $db = new ServerDatabase($handler);
     try {
         $remote = InstanceDAO::getByAddress($db, $_POST['link'])->getAccessObject($db);
-        if ((strtotime('-10 seconds') - strtotime($remote->getLastFetchDate())) < 10) return $handler->error(HTTP_REQUEST_TIMEOUT, 'Too many requests');
+        if ((time() - strtotime($remote->getLastFetchDate())) < 2) return $handler->error(HTTP_REQUEST_TIMEOUT, 'Too many requests');
         $remote->updateFetchDate();
         if ($remote->isBlocked()) return $handler->error(HTTP_FORBIDDEN, 'Blocked');
     } catch (Exception) {
@@ -105,7 +105,7 @@ if (isset($_GET['device'])) {
     try {
         $remote = InstanceDAO::getByAddress($db, $_POST['link']);
         if ($remote->isBlocked()) return $handler->error(HTTP_FORBIDDEN, 'Blocked');
-        if ((strtotime('-10 seconds') - strtotime($remote->getLastFetchDate())) < 10) return $handler->error(HTTP_REQUEST_TIMEOUT, 'Too many requests');
+        if ((time() - strtotime($remote->getLastFetchDate())) < 2) return $handler->error(HTTP_REQUEST_TIMEOUT, 'Too many requests');
     } catch (Exception) {
         /* Intended fail, new instance */
         if (!$instance->isOpen()) return $handler->error(HTTP_FORBIDDEN, 'Federation is not open');
