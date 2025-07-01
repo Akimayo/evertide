@@ -207,6 +207,7 @@
                     background-image: linear-gradient(to bottom, $light1, transparent);
                     @media (min-width: $breakpoint) {
                         top: 111pt;
+                        content: unset;
                     }
                     @media only screen and (prefers-color-scheme: dark) {
                         background-image: linear-gradient(to bottom, $dark1, transparent);
