@@ -24,15 +24,16 @@
     </form>
     <form method="POST" action="?type=category" class="link-hub-form hub-category bare-form">
         <h2>{_add_category_add}</h2>
-        <input type="text" name="name" />
-        <input type="text" name="icon" style="grid-row: 1;grid-column: 2;" />
-        <a href="https://phosphoricons.com/#toolbar" target="_blank"
-            style="grid-column: 2;grid-row: 1;justify-self:end;">{_add_category_icons}</a>
+        <input type="text" name="name" placeholder={_add_category_name} required />
+        <input type="text" name="icon" placeholder={_add_category_icon} required />
+        <a href="https://phosphoricons.com/#toolbar" target="_blank">
+            <i class={icon(phosphor-logo)} title={_add_category_icons}></i>
+        </a>
         <input type="submit" value={_add_category_add} />
     </form>
     <form method="POST" action="?type=instance" class="link-hub-form hub-instance bare-form">
         <h2>{_add_instance_add}</h2>
-        <input type="url" name="url" />
+        <input type="url" name="url" placeholder={_add_link_url} required />
         <input type="submit" value={_add_title} />
     </form>
 </div>
