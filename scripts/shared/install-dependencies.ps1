@@ -1,6 +1,8 @@
+$progressMessage = "Installing dependencies"
+Write-Progress $progressMessage
 # Run Composer
 If (!(Test-Path ($PHP_PATH + "vendor") -PathType Container)) {
-    Write-Progress "Installing PHP dependencies..."
+    Write-Progress $progressMessage -PercentComplete 0 -Status "Running composer"
     $p = Start-Process "composer" -ArgumentList "install" -WorkingDirectory $PHP_PATH -RedirectStandardError $ERROR_FILE -NoNewWindow -Wait -PassThru
     If ($p.ExitCode -ne 0) {
         Write-Error "Composer exitted with error $($p.ExitCode)"
@@ -9,12 +11,11 @@ If (!(Test-Path ($PHP_PATH + "vendor") -PathType Container)) {
         Write-Progress "evertide" -Completed
         Exit
     }
-    Write-Host "Installed PHP dependencies"
 }
 
 # Run yarn
 If (!(Test-Path ($WEB_PATH + "node_modules") -PathType Container)) {
-    Write-Progress "Installing JS dependencies..."
+    Write-Progress $progressMessage -PercentComplete 50 -Status "Running yarn"
     $p = Start-Process "yarn" -WorkingDirectory $WEB_PATH -RedirectStandardError $ERROR_FILE -NoNewWindow -Wait -PassThru
     If ($p.ExitCode -ne 0) {
         Write-Error "yarn exitted with error $($p.ExitCode)"
@@ -23,7 +24,6 @@ If (!(Test-Path ($WEB_PATH + "node_modules") -PathType Container)) {
         Write-Progress "evertide" -Completed
         Exit
     }
-    Write-Host "Installed JS dependencies"
 }
 
 Remove-Item $ERROR_FILE -ErrorAction SilentlyContinue

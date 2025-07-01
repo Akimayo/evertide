@@ -2,7 +2,7 @@
 
 # Run tsc
 $progressMessage = "Building JavaScript"
-Write-Progress $progressMessage
+Write-Progress $progressMessage -PercentComplete 0 -Status "Transpiling TypeScript files"
 $p = Start-Process "node" -ArgumentList ($WEB_PATH + ".\node_modules\typescript\bin\tsc") -WorkingDirectory $WEB_PATH -RedirectStandardError $ERROR_FILE -NoNewWindow -Wait -PassThru
 If ($p.ExitCode -ne 0) {
     Write-Error "tsc exitted with error $($p.ExitCode)"
@@ -39,7 +39,7 @@ $items = Get-ChildItem ($WEB_PATH + "*.scss")
 $itemPercent = 100.0 / $items.Length
 $i = 0
 $items | ForEach-Object {
-    Write-Progress $progressMessage -PercentComplete (($i++) * $itemPercent) -Status "Compiling $($_.Name)"
+    Write-Progress $progressMessage -PercentComplete (($i++) * $itemPercent) -Status "Transpiling $($_.Name)"
     If ($_.Name.StartsWith("_")) { Return; }
     $minPath = $_.FullName.Substring(0, $_.FullName.Length - 5) + ".min.css";
     $p = Start-Process "node" -ArgumentList ($WEB_PATH + ".\node_modules\sass\sass.js"), "$($_.FullName):$($minPath)", "--style", "compressed" -WorkingDirectory $WEB_PATH -RedirectStandardError $ERROR_FILE -NoNewWindow -Wait -PassThru
