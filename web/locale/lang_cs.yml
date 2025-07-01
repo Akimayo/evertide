@@ -1,6 +1,7 @@
 index:
   on: na
   from: z
+  private: Tato skupina není zobrazována veřejně
 add:
   title: Přidat odkaz
   link:

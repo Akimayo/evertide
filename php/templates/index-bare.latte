@@ -61,6 +61,9 @@
             </div>
             <nav n:if=$authorized>
                 {if $inst === null}
+                {if !$cat->isPublic()}
+                <i class={icon(lock)} title={_index_private}></i>
+                {/if}
                 <a href="/add?type=category&id={$cat->getId()}"><i class={icon(pencil-simple)}></i></a>
                 {else}
                 <a href="/add?type=instance&id={$inst->getId()}"><i class={icon(gear)}></i></a>

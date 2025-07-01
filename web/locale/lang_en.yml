@@ -1,6 +1,7 @@
 index:
   on: 'on'
   from: from
+  private: This category is not publicly visible
 add:
   title: Add link
   link:
