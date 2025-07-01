@@ -1,14 +1,15 @@
 {layout '_html.latte'}
 {block body_}
-    <header class="meta-header">
-        <h1>evertide</h1>
-        <nav>
-            <a href="/"><i class={icon(link)}></i>&nbsp;{_'nav_base'}</a>
-            <a href="/about"><i class={icon(info)}></i>&nbsp;{_'nav_about'}</a>
-            <a href="/link" n:if=$authorized><i class={icon(devices)}></i>&nbsp;{_'nav_devices'}</a>
-        </nav>
-    </header>
-    <main>
-        {block body}{/block}
-    </main>
+<header class="meta-header">
+    <h1>evertide</h1>
+    <nav>
+        <a href="/add" n:if=$authorized><i class={icon(plus)}></i>&nbsp;{_add_title}</a>
+        <a href="/"><i class={icon(link)}></i>&nbsp;{_nav_base}</a>
+        <a href="/about"><i class={icon(info)}></i>&nbsp;{_nav_about}</a>
+        <a href="/link" n:if=$authorized><i class={icon(devices)}></i>&nbsp;{_nav_devices}</a>
+    </nav>
+</header>
+<main>
+    {block body}{/block}
+</main>
 {/block}
