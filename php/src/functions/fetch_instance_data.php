@@ -57,7 +57,7 @@ return function (ReadWriteDatabase $db, ?int $instance_id = null, bool $retry_un
         HTTP_FORBIDDEN => LinkStatus::BLOCKED,
         default => LinkStatus::UNREACHABLE
     } : LinkStatus::ERROR;
-    $categories = $result->categories;
+    $categories = @$result->categories;
     $result = $result->instance;
     try {
         $remote = InstanceDAO::getByAddress($db, $result->link)->getAccessObject($db); // This is in case the instance is a redirect - fetch by the new address

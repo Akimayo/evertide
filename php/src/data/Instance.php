@@ -182,6 +182,13 @@ class InstanceDAO extends Instance implements DAO
             return $this;
         } else throw new Exception('Updating Instance.last_fetch_date failed');
     }
+    public function resetFetchDate(): self
+    {
+        if ($this->db->update('UPDATE Instance SET last_fetch_date = NULL WHERE id = :I;', ['I' => $this->id])) {
+            $this->last_fetch_date = null;
+            return $this;
+        } else throw new Exception('Updating Instance.last_fetch_date failed');
+    }
 
     public static function get(Database $db, int|string $key): Instance
     {

@@ -234,6 +234,7 @@ if ($handler->isAuthorized()) {
                         $remote = InstanceDAO::get($db, $id);
                         $c_local = CategoryDAO::getAllFromRemote($db, $remote);
                         $_probe_instance = require(__DIR__ . '/src/functions/fetch_instance_data.php');
+                        /** @var InstanceDAO|false $remote */
                         [$remote, $c_available] = $_probe_instance($db, instance_id: $id);
 
                         // Go through local categories and delete unselected
@@ -284,14 +285,14 @@ if ($handler->isAuthorized()) {
                                     }
                                 }
                             }
-                        }
-
-                        $handler->render('add/instance.latte', [
-                            'remote' => $remote,
-                            'categories' => $c_available,
-                            'local_categories' => $c_selected,
-                            'responded' => $remote !== false
-                        ]);
+                            $remote->resetFetchDate();
+                            $handler->render('add/instance.latte', [
+                                'remote' => $remote,
+                                'categories' => $c_available,
+                                'local_categories' => $c_selected,
+                                'responded' => $remote !== false
+                            ]);
+                        } else return $handler->error(HTTP_INTERNAL_SERVER_ERROR, $c_available);
                         break;
                     case 'delete':
                         if (!isset($_POST['id'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "id" in POST body');

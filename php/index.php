@@ -10,14 +10,14 @@ if (isset($_GET['sync'])) {
     $date_limit = date('Y-m-d H:i:s', strtotime('-4 hours'));
     // Select categories of a single instance that has had the longest time since last sync
     $to_refresh = $db->selectAll(<<<PHP_EOL
-    SELECT c.id, c.source, c.source_id, s.link, s.last_link_date
+    SELECT c.id, c.source, c.source_id, s.link, s.last_fetch_date
       FROM Category c
      INNER JOIN Instance s ON s.id = c.source
      WHERE c.source IS NOT NULL
        AND s.last_link_status < 65
-       AND (s.last_link_date < :D OR s.last_link_date IS NULL)
-       AND c.source = (SELECT id FROM Instance ORDER BY last_link_date IS NULL DESC, last_link_date ASC LIMIT 1)
-     ORDER BY s.last_link_date IS NULL DESC, s.last_link_date ASC;
+       AND (s.last_fetch_date < :D OR s.last_fetch_date IS NULL)
+       AND c.source = (SELECT id FROM Instance ORDER BY last_fetch_date IS NULL DESC, last_fetch_date ASC LIMIT 1)
+     ORDER BY s.last_fetch_date IS NULL DESC, s.last_fetch_date ASC;
     PHP_EOL, ['D' => $date_limit]);
     if (empty($to_refresh)) return $handler->status(HTTP_NOT_MODIFIED);
 
@@ -29,7 +29,7 @@ if (isset($_GET['sync'])) {
         $date = date('Y-m-d H:i:s');
         // Race condition prevention: Set the date as current straigth away.
         // If another sync request comes during execution, it will get a different instance from the query above.
-        $db->update('UPDATE Instance SET last_link_date = :D WHERE id = :S;', ['D' => $date, 'S' => $instance_id]);
+        $db->update('UPDATE Instance SET last_fetch_date = :D WHERE id = :S;', ['D' => $date, 'S' => $instance_id]);
         $instance = Config::get_config()->instance;
         try {
             $db->begin();
@@ -173,8 +173,8 @@ if (isset($_GET['sync'])) {
             $db->rollback();
             echo 'ERROR: ' . $ex->getMessage() . PHP_EOL;
             echo $ex->getTraceAsString() . PHP_EOL;
-            // If the sync fails, write back the original last_link_date so that it is available for another sync
-            $db->update('UPDATE Instance SET last_link_date = :D WHERE id = :S;', ['D' => $original_date, 'S' => $instance_id]);
+            // If the sync fails, write back the original last_fetch_date so that it is available for another sync
+            $db->update('UPDATE Instance SET last_fetch_date = :D WHERE id = :S;', ['D' => $original_date, 'S' => $instance_id]);
             return false;
         } finally {
             echo '</pre>';
@@ -197,7 +197,7 @@ if (isset($_GET['sync'])) {
             }
             $lastSourceId = $row['source'];
             $lastSourceLink = $row['link'];
-            $lastSourceDate = $row['last_link_date'];
+            $lastSourceDate = $row['last_fetch_date'];
         }
         $categories[$row['source_id']] = $row['id'];
     }
