@@ -13,7 +13,7 @@ if ($handler->isAuthorized()) {
     try {
         switch ($type) {
             case false:
-                $handler->render('add/hub.latte', ['categories' => CategoryDAO::getAll($handler->getDatabase(), true, true)]);
+                $handler->render('add/hub.latte', ['categories' => CategoryDAO::getAllLocal($handler->getDatabase(), true, true)]);
                 break;
             case 'link':
                 if (!$action && isset($_POST['url'])) $action = 'create';
