@@ -53,6 +53,10 @@ Get-ChildItem ($WEB_PATH + '*.js.map') | ForEach-Object {
 Get-ChildItem ($WEB_PATH + '*.min.css*') | ForEach-Object {
     Copy-Item $_.FullName -Destination ($BUILD_PATH + "assets\" + $_.Name) -Force
 }
+Get-ChildItem ($WEB_PATH + '*.webmanifest') | ForEach-Object {
+    If ($_.Name.EndsWith('.template.webmanifest')) { Return }
+    Copy-Item $_.FullName -Destination ($BUILD_PATH + "assets\" + $_.Name) -Force
+}
 # Copy selected `node_modules` packages, limit to only *dist/esm* or *dist* when available
 Write-Progress $progressMessage -PercentComplete 100 -Status "Copying JavaScript dependencies"
 New-Item -Path ($BUILD_PATH + "assets\node_modules") -ItemType Directory -ErrorAction SilentlyContinue | Out-Null
