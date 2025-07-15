@@ -24,7 +24,7 @@
                     <li n:foreach="$cat->getLinks() as $link" title={$link->getDescription()}>
                         <canvas n:if="$link->getBlurHash()" data-blurhash={$link->getBlurHash()}></canvas>
                         <a href={$link->getUrl()} target="_blank">
-                            <img n:if="$link->getFavicon()" src={$link->getFavicon()} />
+                            <img n:if="$link->getFavicon()" src={$link->getFavicon()} loading="lazy" />
                             <span>
                                 {$link->getName() ?? $link->getTitle()}
                             </span>
@@ -45,7 +45,7 @@
                             <li n:foreach="$incat->getLinks() as $link" title={$link->getDescription()}>
                                 <canvas n:if="$link->getBlurHash()" data-blurhash={$link->getBlurHash()}></canvas>
                                 <a href={$link->getUrl()} target="_blank">
-                                    <img n:if="$link->getFavicon()" src={$link->getFavicon()} />
+                                    <img n:if="$link->getFavicon()" src={$link->getFavicon()} loading="lazy" />
                                     <span>
                                         {$link->getName() ?? $link->getTitle()}
                                     </span>

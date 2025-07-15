@@ -17,6 +17,7 @@ Instance $instance
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css"
         type="text/css" />
     <script n:foreach="$js as $j" src="assets/{$j}.min.js" type="module" defer></script>
+    <script src="assets/lazy.min.js" async></script>
     <title>{block title}{/block}</title>
 </head>
 
