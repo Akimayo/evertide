@@ -61,7 +61,7 @@
                 background: none;
                 border: none;
                 align-self: flex-end;
-                margin: -64pt 16pt 0 0;
+                margin: calc(-24vh + 10%) 16pt 0 0;
 
                 @media (min-width: $breakpoint) {
                     align-self: center;
@@ -157,7 +157,7 @@
         cursor: pointer;
         width: auto;
         box-shadow:
-            0 0 8px $primary,
+            inset 0 0 16px $primary,
             0 8px 16px $shadow;
     }
 }
