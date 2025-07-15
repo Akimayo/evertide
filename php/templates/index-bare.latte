@@ -9,6 +9,7 @@
     {foreach $categories as $cat}
     {var $inst = $cat->getSourceInstance()}
     {var $pos = $spiral($i++)}
+    {var $public = false}
     <article id="category_{$cat->getId()}"
         style="{if $inst !== null}--color-primary: {$inst->getPrimaryColor()|noescape};--color-secondary: {$inst->getSecondaryColor()|noescape};{/if}--grid-col: {$pos[0]};--grid-row: {$pos[1]};--exp-top: {$pos[2]};--exp-right: {$pos[3]};--exp-bottom: {$pos[4]};--exp-left: {$pos[5]};">
         <details>
@@ -22,6 +23,7 @@
             <div class="scroll-container">
                 <ul>
                     <li n:foreach="$cat->getLinks() as $link" title={$link->getDescription()}>
+                        {do $public |= $link->isPublic()}
                         <canvas n:if="$link->getBlurHash()" data-blurhash={$link->getBlurHash()}></canvas>
                         <a href={$link->getUrl()} target="_blank">
                             <img n:if="$link->getFavicon()" src={$link->getFavicon()} loading="lazy" />
@@ -43,6 +45,7 @@
                         </summary>
                         <ul>
                             <li n:foreach="$incat->getLinks() as $link" title={$link->getDescription()}>
+                                {do $public |= $link->isPublic()}
                                 <canvas n:if="$link->getBlurHash()" data-blurhash={$link->getBlurHash()}></canvas>
                                 <a href={$link->getUrl()} target="_blank">
                                     <img n:if="$link->getFavicon()" src={$link->getFavicon()} loading="lazy" />
@@ -61,7 +64,7 @@
             </div>
             <nav n:if=$authorized>
                 {if $inst === null}
-                {if !$cat->isPublic()}
+                {if !$public}
                 <i class={icon(lock)} title={_index_private}></i>
                 {/if}
                 <a href="/add?type=category&id={$cat->getId()}"><i class={icon(pencil-simple)}></i></a>
