@@ -245,6 +245,9 @@
                         border-color: $dark3;
                         background-color: $dark2;
                     }
+                    @media (min-width: $breakpoint) {
+                        flex: 0 0 15%;
+                    }
 
                     & > a {
                         display: block;
