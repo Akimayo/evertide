@@ -28,7 +28,7 @@ return function (?string $link = null): void {
             'domain' => $domain,
             'secure' => true,
             'httponly' => false,
-            'samesite' => 'Strict'
+            'samesite' => 'Lax'
         ]);
     }
 };
