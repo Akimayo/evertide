@@ -16,8 +16,14 @@
             <summary>
                 <h2><i class={icon($cat->getIcon())}></i>&nbsp;{$cat->getName()}</h2>
                 {if $inst !== null}
-                <aside>{_'index_from'}&nbsp;<a href={$inst->getLink()} target="_blank">{$inst->getDomainName()}&nbsp;<i
-                            class={icon(arrow-square-out)}></i></a></aside>
+                <aside>
+                    {_'index_from'}&nbsp;
+                    <a href={$inst->getLink()} target="_blank">
+                        {$inst->getDomainName()}&nbsp;
+                        <i class={icon(arrow-square-out)}></i>
+                    </a>
+                    <span aria-hidden="true" class="source-align">{$cat->getName()}</span>
+                </aside>
                 {/if}
             </summary>
             <div class="scroll-container">
