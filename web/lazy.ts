@@ -7,22 +7,19 @@ function removeImgSrc() {
 }
 removeImgSrc();
 window.addEventListener("load", () => {
-    console.debug("lazyloading");
     removeImgSrc();
     document
         .querySelectorAll("article>details")
-        .forEach((elmt: HTMLDetailsElement) => {
-            console.debug(elmt);
+        .forEach((elmt: HTMLDetailsElement) =>
             elmt.addEventListener(
                 "toggle",
                 () =>
                     elmt.open &&
                     elmt
-                        .querySelectorAll("li img[data-src]")
-                        .forEach(img => {
-                            console.debug(img);
-                            img.setAttribute("src", img.getAttribute("data-src"));
-                        })
+                        .querySelectorAll("li img[data-src][src='']")
+                        .forEach(img =>
+                            img.setAttribute("src", img.getAttribute("data-src"))
+                        )
             )
-        });
+        );
 });
