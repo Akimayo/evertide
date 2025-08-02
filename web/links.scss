@@ -397,8 +397,8 @@
             &[open] {
                 left: -10vw;
                 right: -10vw;
-                top: -40vh;
-                bottom: -40vh;
+                top: -36vh;
+                bottom: -36vh;
                 background-position-x: -240px;
                 z-index: 1;
                 transition:
@@ -487,21 +487,21 @@
         @media (max-width: $breakpoint) {
             &:nth-child(1)>details[open] {
                 top: 0;
-                bottom: -80vh;
+                bottom: -72vh;
             }
 
             &:nth-child(2)>details[open] {
-                top: -20vh;
-                bottom: -60vh;
+                top: -18vh;
+                bottom: -54vh;
             }
 
             &:nth-last-child(2)>details[open] {
-                top: -60vh;
-                bottom: -20vh;
+                top: -54h;
+                bottom: -18vh;
             }
 
             &:nth-last-child(1)>details[open] {
-                top: -80vh;
+                top: -72vh;
                 bottom: 0;
             }
         }
