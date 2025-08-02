@@ -49,6 +49,10 @@ body {
 
 .main-header h1 {
     font-size: 8pt;
+    
+    @media (min-width: $breakpoint) {
+        max-width: calc(10vw - 16px);
+    }
 
     &>a {
         text-decoration: none;
