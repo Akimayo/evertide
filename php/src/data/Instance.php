@@ -247,7 +247,7 @@ class InstanceDAO extends Instance implements DAO
     /** @return Instance[] */
     public static function getAll(Database $db): array
     {
-        $data = $db->select('SELECT i.id, i.link, i.`primary`, i.secondary, i.first_link_date, i.last_link_date, i.last_link_status, i.from_device, i.last_fetch_date, i.blocked, d.name, d.first_login, d.last_login FROM Instance i INNER JOIN Device d ON d.id = i.from_device;');
+        $data = $db->selectAll('SELECT i.id, i.domain, i.link, i.`primary`, i.secondary, i.first_link_date, i.last_link_date, i.last_link_status, i.from_device, i.last_fetch_date, i.blocked, d.name, d.first_login, d.last_login FROM Instance i INNER JOIN Device d ON d.id = i.from_device;');
         return array_map(function (array $row) {
             return Instance::raw(
                 id: $row['id'],

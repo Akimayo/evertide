@@ -1,6 +1,105 @@
 {layout '_meta.latte'}
+{var $css = ['base', 'about']}
 
-{block title}{_'nav_about'} | evertide{/block}
+{block title}{_nav_about} | evertide{/block}
 {block body}
-    <h2>{_'nav_about'}</h2>
+<section id="about">
+    <h2>{_about_evertide_h}</h2>
+    <p>{_about_evertide_p_0|stripHtml}</p>
+    <p>{_about_evertide_p_1|stripHtml}</p>
+    <p>{_about_evertide_p_2|stripHtml}</p>
+</section>
+{if $authorized}
+<aside id="tips">
+    {var $tips = ["about_tips_items_0", "about_tips_items_1", "about_tips_items_2"]}
+    <i class={icon(megaphone)}></i> {_about_tips_title}: {_($tips|random)}
+</aside>
+{/if}
+<section id="federation">
+    <h2>{_about_federation_h}</h2>
+    <p>{_about_federation_p_0|stripHtml}</p>
+    <p>{_about_federation_p_1|stripHtml}</p>
+    <aside>
+        {if $instance->isOpen()}
+        <i class={icon(cloud-check)}></i> {_about_federation_open}
+        {else}
+        <i class={icon(cloud-slash)}></i> {_about_federation_closed}
+        {/if}
+    </aside>
+    <h3>{_about_federation_instances_h}</h3>
+    <p>{_about_federation_instances_p_0|stripHtml}</p>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">{_about_federation_instances_name}</th>
+                    <th scope="col">{_about_federation_instances_link}</th>
+                    <th scope="col">{_about_federation_instances_last}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">{$instance->getDisplayName()}</th>
+                    <td><a href={$instance->getLink()} target="_blank">{$instance->getLink()}</a></td>
+                    <td>{_about_federation_instances_this}</td>
+                </tr>
+                <tr n:foreach="$instances as $inst"
+                    n:if="($authorized || !$inst->isBlocked()) && $inst->getLastLinkStatus()->value < 66">
+                    <th scope="row">
+                        {if $inst->isBlocked()}
+                        <del>{$inst->getDisplayName()}</del>
+                        {else}
+                        {$inst->getDisplayName()}
+                        {/if}
+                    </th>
+                    <td
+                        style="--color-primary:{$inst->getPrimaryColor()|noescape};--color-secondary:{$inst->getSecondaryColor()|noescape};">
+                        <a href={$inst->getLink()} target="_blank">{$inst->getLink()}</a>
+                    </td>
+                    <td>{$inst->getLastFetchDate()} <i class={icon(warning)}
+                            title={_about_federation_instances_unreachable}
+                            n:if="$inst->getLastLinkStatus()->value > 2"></i></td>
+                    <td n:if="$authorized">
+                        <a><i class={icon(arrows-clockwise)}
+                                title={_about_federation_instances_actions_refetch}></i></a>
+                        {if $inst->isBlocked()}
+                        <a><i class={icon(check-circle)} title={_about_federation_instances_actions_allow}></i></a>
+                        {else}
+                        <a><i class={icon(prohibit)} title={_about_federation_instances_actions_block}></i></a>
+                        {/if}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <aside>{_about_federation_instances_p_1|stripHtml}</aside>
+</section>
+<section id="credits">
+    <h2>{_about_development_h}</h2>
+    <p>{_about_development_p_0|stripHtml}</p>
+    <p>{_about_development_p_1|stripHtml}</p>
+    {var $links = [['GitHub', 'github-logo', 'https://github.com/Akimayo/evertide']]}
+    <nav>
+        <a n:foreach="$links as [$name, $icon, $url]" href={$url} target="_blank" rel="noopener noreferrer">
+            <i class={icon($icon)}></i> {$name}
+        </a>
+    </nav>
+    <h3>{_about_development_credits_h}</h3>
+    <p>{_about_development_credits_p_0|stripHtml}</p>
+    <ul>
+        {var $libraries = [
+        ['Phosphor Icons','https://phosphoricons.com/'],
+        ['Original Surfer Font', 'https://fonts.bunny.net/family/original-surfer'],
+        ['BlurHash', 'https://blurha.sh/'],
+        ['Latte template engine', 'https://latte.nette.org/'],
+        ['php-i18n', 'https://github.com/Philipp15b/php-i18n'],
+        ['php-qrcode', 'https://github.com/chillerlan/php-qrcode'],
+        ['jsmin', 'https://www.npmjs.com/package/jsmin'],
+        ['Sass', 'https://sass-lang.com/'],
+        ['TypeScript', 'https://www.typescriptlang.org/']
+        ]}
+        <li n:foreach="$libraries as [$name, $url]"><a href={$url} target="_blank" rel="noopener noreferrer">{$name}</a>
+        </li>
+    </ul>
+</section>
 {/block}

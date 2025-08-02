@@ -1,0 +1,154 @@
+@use 'variables' as *;
+
+section {
+    margin: 0 -8px;
+    padding: 8pt 10vw 16pt;
+
+    &>p:first-of-type {
+        font-size: 16pt;
+    }
+
+    p {
+        font-size: 14pt;
+    }
+
+    a {
+        text-decoration: none;
+        color: $primary;
+    }
+}
+
+section#about {
+    display: flex;
+    flex-flow: row wrap;
+    column-gap: 64pt;
+    position: relative;
+
+    &::before {
+        content: '';
+        display: block;
+        position: absolute;
+        z-index: -1;
+        left: 4vw;
+        right: 0;
+        top: 0;
+        bottom: -10pt;
+        background-image: url('https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Water%20wave/Color/water_wave_color.svg');
+        background-repeat: no-repeat;
+        background-size: auto 100%;
+        opacity: 0.18;
+    }
+
+    p {
+        flex: 1 1 40%;
+    }
+
+    h1,
+    p:first-of-type {
+        flex-basis: 100%;
+    }
+}
+
+aside#tips {
+    margin: 8pt 5vw;
+    padding: 4pt 8pt;
+    border-radius: 1em;
+    border: 1px solid $light2;
+    background-color: $light1;
+    box-shadow: 0 0 4pt $secondary;
+
+    @media (min-width: $breakpoint) {
+        margin: 16pt 30vw;
+    }
+}
+
+section#federation {
+    background-color: $light2;
+
+    .ph-cloud-check {
+        color: $primary;
+    }
+
+    .ph-cloud-slash {
+        color: $secondary;
+    }
+
+    .table-wrapper {
+        max-width: 100%;
+        overflow: auto;
+
+        // Margin+padding to make box-shadow of table visible
+        margin: -12pt;
+        padding: 12pt 12pt 16pt;
+    }
+
+    table {
+        background-color: $light1;
+        border: 1px solid $light2;
+        border-radius: 1em;
+        box-shadow: 0 4pt 12pt $shadow;
+
+        thead {
+            opacity: 0.4;
+        }
+
+        tbody {
+            max-height: 400pt;
+            overflow-y: auto;
+
+            td,
+            th {
+                padding: 8pt 16pt;
+            }
+
+            td:nth-child(2) {
+                background-image: linear-gradient(-30deg, $secondary, transparent 40%);
+                border-radius: 1em;
+                box-shadow: inset -8pt -4pt 12pt $light1;
+            }
+
+            td>.ph-warning {
+                color: $secondary;
+                vertical-align: -1.5pt;
+            }
+        }
+    }
+
+    aside {
+        opacity: 0.6;
+    }
+}
+
+section#credits {
+    ul {
+        display: flex;
+        flex-flow: row wrap;
+
+        li {
+            flex: 1 0 auto;
+        }
+    }
+}
+
+@media only screen and (prefers-color-scheme: dark) {
+    section#about {}
+
+    section#federation {
+        background-color: $dark3;
+
+        table {
+            background-color: $dark1;
+            border-color: $dark2;
+
+            thead {
+                opacity: 0.7;
+            }
+
+            tbody td:nth-child(2) {
+                box-shadow: inset -8pt 0 12pt $dark1;
+            }
+        }
+    }
+
+    section#credits {}
+}

@@ -31,6 +31,74 @@ add:
     add: Add link to another evertide instance
     edit: Select instance categories
 about:
+  evertide:
+    h: What is evertide?
+    p:
+      ->
+        🌊 evertide is a self-hosted single-user bookmark manager.
+      ->
+        It's purpose is twofold, though. Not only does it serve as a categorized bookmark manager for yourself,
+        it can also be used for portfolios or curated collections &ndash; each bookmark can be set to be publicly visible.
+        Present links to your projects, favourite movies, social media or fun Internet places alongside
+        keeping private bookmarks to articles you want to read, videos you want to watch or recipes you want to cook
+        from anywhere on the Internet.
+      ->
+        evertide is trying to uphold the culture of Web 1.0 and promote &ldquo;online gardens&rdquo; (small websites run by
+        individuals) without the need for search engine. The evertide app is made with simple technologies, which makes it
+        small, fast, reliable and easy to understand. Instances of evertide can link together in a process known
+        as &ldquo;federation&rdquo; to make a network of links pointing to many corners of the Internet that search engines
+        may not know or tell you about.
+  tips:
+    title: Tip
+    items:
+      - evertide can be installed as a Progressive Web App (PWA) on your phone and links can then be added from the share menu!
+      - evertide has a very pretty dark mode!
+      - Try adding some links to small online projects. You'll make someones day and make the internet a better place!
+  federation:
+    h: Federation
+    p:
+      ->
+        🌊 evertide instance owners can choose to present links from a different evertide instance in a process known
+        as &ldquo;federation.&rdquo;
+      ->
+        Federation is opt-in for instance owners. When they enable federation, any category (or rather public links within
+        any category) can be synced to any other evertide instance and be shown there. For example, if instance A wants to
+        promote recipes from instance B (and instance B is open for federation), instance A can choose to present the
+        category &ldquo;Recipes&rdquo; hosted on instance B and have it shown on instance A's main page along with their
+        categories. These &ldquo;remote&rdquo; categories also update automatically, so new links will appear (or disappear)
+        as they are added (or removed) on the remote instance.
+    open: This instance is open for federation.
+    closed: This instance does not allow federation. 
+    instances:
+      h: Instances
+      p:
+        ->
+          This evertide instance knows of and federates with the following instances&colon;
+        ->
+          Disclaimer&colon; Instances listed here are not actively endorsed by the owner of this instance. If this instance
+          has federation enabled, any other evertide instance can link to it and therefore be listed here. Endorsed are only
+          selected categories from remote instances with cards on the main page. 
+      name: Instance name
+      link: URL
+      last: Last seen
+      this: (this instance)
+      unreachable: The instance returned a fatal error during the last fetch attempt. It may mean that this instance is no longer online.
+      actions:
+        refetch: Re-fetch
+        block: Block this instance
+        allow: Re-approve this instance
+  development:
+    h: Development
+    p:
+      ->
+        🌊 evertide is free, open-source software.
+      ->
+        You can get evertide for yourself from the project repository, as well report issues, suggest improvements, or fork the project. 
+    credits:
+      h: Credits
+      p:
+        ->
+          We use the following libraries to bring you a pretty look and simplify development&colon;
 devices:
   list:
     added: Added
