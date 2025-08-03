@@ -12,7 +12,12 @@
 {if $authorized}
 <aside id="tips">
     {var $tips = ["about_tips_items_0", "about_tips_items_1", "about_tips_items_2"]}
-    <i class={icon(megaphone)}></i> {_about_tips_title}: {_($tips|random)}
+    <strong>
+        <i class={icon(megaphone)}></i> {_about_tips_title}:
+    </strong>
+    <span>
+        {_($tips|random)}
+    </span>
 </aside>
 {/if}
 <section id="federation">
