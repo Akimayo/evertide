@@ -94,6 +94,11 @@ about:
         🌊 evertide is free, open-source software.
       ->
         You can get evertide for yourself from the project repository, as well report issues, suggest improvements, or fork the project. 
+    localization:
+      h: Translation
+      author: English localization provided by
+      authorNames: Michal Ciesla
+      authorUrls: https://mciesla.cz/
     credits:
       h: Credits
       p:

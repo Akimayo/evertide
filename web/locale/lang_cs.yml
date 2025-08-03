@@ -95,6 +95,11 @@ about:
       ->
         evertide si můžete stáhnout z repozitáře projektu, kde také můžete nahlašovat chyby, přidávat návrhy na zlepšení nebo
         si přizpůsobit zdrojový kód pro sebe.
+    localization:
+      h: Překlad
+      author: Český překlad poskytl
+      authorNames: Michal Ciesla
+      authorUrls: https://mciesla.cz/
     credits:
       h: Credits
       p:

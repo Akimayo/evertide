@@ -89,6 +89,14 @@
             <i class={icon($icon)}></i> {$name}
         </a>
     </nav>
+    <h3>{_about_development_localization_h}</h3>
+    <p>
+        {_about_development_localization_author}:
+        {var $a = count($authors)}
+        {foreach $authors as [$name, $url]}
+        {if $url === null}
+        {$name}{if $a > 1}, {/if} {else} <a href={$url} target="_blank" rel="noopener noreferrer">{$name}</a>{if $a >
+        1}, {/if} {/if} {do $a--} {/foreach} </p>
     <h3>{_about_development_credits_h}</h3>
     <p>{_about_development_credits_p_0|stripHtml}</p>
     <ul>
