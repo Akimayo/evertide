@@ -44,7 +44,7 @@ about:
         from anywhere on the Internet.
       ->
         evertide is trying to uphold the culture of Web 1.0 and promote &ldquo;online gardens&rdquo; (small websites run by
-        individuals) without the need for search engine. The evertide app is made with simple technologies, which makes it
+        individuals) without the need for search engines. The evertide app is made with simple technologies, which makes it
         small, fast, reliable and easy to understand. Instances of evertide can link together in a process known
         as &ldquo;federation&rdquo; to make a network of links pointing to many corners of the Internet that search engines
         may not know or tell you about.
@@ -53,7 +53,7 @@ about:
     items:
       - evertide can be installed as a Progressive Web App (PWA) on your phone and links can then be added from the share menu!
       - evertide has a very pretty dark mode!
-      - Try adding some links to small online projects. You'll make someones day and make the internet a better place!
+      - Try adding some links to small online projects. You'll make someones day and make the Internet a better place!
   federation:
     h: Federation
     p:
@@ -62,8 +62,8 @@ about:
         as &ldquo;federation.&rdquo;
       ->
         Federation is opt-in for instance owners. When they enable federation, any category (or rather public links within
-        any category) can be synced to any other evertide instance and be shown there. For example, if instance A wants to
-        promote recipes from instance B (and instance B is open for federation), instance A can choose to present the
+        a given category) can be synced to any other evertide instance and be shown there. For example, if instance A wants
+        to promote recipes from instance B (and instance B is open for federation), instance A can choose to present the
         category &ldquo;Recipes&rdquo; hosted on instance B and have it shown on instance A's main page along with their
         categories. These &ldquo;remote&rdquo; categories also update automatically, so new links will appear (or disappear)
         as they are added (or removed) on the remote instance.
