@@ -16,24 +16,23 @@ Requirements:
 - NodeJS
 - Smart editor (like VSCode, to help you edit YAML files)
 
-Run `node scripts/setup.js` and follow the instructions.
+Run `.\scripts\setup.ps1` and follow the instructions.
 
 By default, **evertide** will store its data in a SQLite database. If you wish to change the database, make sure to change the generated `config.yml` file (the schema will help you).
+
+After you are done with tweaking the configuration, run `.\scripts\pack.ps1`. This will create a _`build/`_ folder, copy its contents to your hosting.
 
 ### Development/testing setup
 Requirements:
 - NodeJS (`node`)
-- TypeScript compiler (`tsc`)
 - PHP (`php`)
+- Smart editor
 
-Proceed by instructions for [automated setup](#automated-setup).
+Run `.\scripts\setup-dev.ps1` and follow the instructions.
 
-If you make any changes to the JS code in _`web/index.ts`_, you will need to run `tsc` in the _`web`_ directory. All other changes to the code take effect immediately.
+If you make any changes to the SCSS or TS files in the _`web/`_ folder, `.\scripts\build.ps1`. All other changes to the code take effect immediately.
 
-Run the development server by running
-```cmd
-php -S localhost[:<port>] ./php/src/router.php
-```
+Run the development server by running `.\scripts\launch.ps1`.
 
 ### Multiple instances
 **evertide** supports running multiple instances on the same infrastructure. If you want to run multiple instances, proceed as normal, but in the automated setup, make sure to respond _yes_ to the multiple instance prompt.
@@ -48,31 +47,21 @@ In production, this will be done in the Apache config file
 </>
 ```
 
-In development, set it in your shell by running
-```sh
-EVERTIDE_INSTANCE=<domain> php -S ...
-```
-or
-```ps1
-New-Item Env:/EVERTIDE_INSTANCE -Value <domain>
-php -S ...
-```
+In development, run the launch script in a terminal for every instance and give each the appropriate domain name and port.
 
 <details>
 <summary>Full PowerShell example</summary>
 
 Shell 1:
 ```ps1
-node .\scripts\setup.js # Multiple instances: yes, URL: localhost
-New-Item Env:/EVERTIDE_INSTANCE -Value "localhost"
-php -S localhost:80 .\php\src\router.php
+.\scripts\setup-dev.ps1 # Multiple instances: yes, URL: localhost
+.\scripts\launch.ps1 # Instance: localhost, port: (default)
 ```
 
 Shell 2:
 ```ps1
-node .\scripts\setup.js # Multiple instances: yes, URL: localhost:81
-New-Item Env:/EVERTIDE_INSTANCE -Value "localhost:81"
-php -S localhost:80 .\php\src\router.php
+.\scripts\setup-dev.ps1 # Multiple instances: yes, URL: localhost:81
+.\scripts\launch.ps1 # Instance: localhost:81, port: 81
 ```
 
 </details>
