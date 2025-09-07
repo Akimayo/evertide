@@ -5,13 +5,16 @@
 {block title}{_'add_title'} | evertide{/block}
 {block body}
 <div class="link-hub">
-    <form method="POST" action="?type=link" class="link-hub-form hub-link">
-        <h2>{_add_title}</h2>
-        <input type="url" name="url" placeholder="{_add_link_url}..." required />
-        <template>
-            <button type="button" id="paste" title={_add_link_paste}><i class={icon(clipboard-text)}></i></button>
-        </template>
-        <label for="category-select">
+    <form method="POST" action="?type=link" class="link-hub-form hub-link hub-item">
+        <h2 class="hub-item">{_add_title}</h2>
+        <label for="hub-link-url" class="hub-item">
+            <input type="url" id="hub-link-url" class="hub-control" name="url" placeholder="{_add_link_url}..."
+                required />
+            <template>
+                <button type="button" id="paste" title={_add_link_paste} class="hub-control-float"><i class={icon(clipboard-text)}></i></button>
+            </template>
+        </label>
+        <label for="category-select" class="hub-item hub-control">
             {_add_link_category}
             <select name="category" id="category-select" required>
                 {foreach $categories as $cat}
@@ -20,21 +23,29 @@
                 {/foreach}
             </select>
         </label>
-        <input type="submit" value={_add_title} />
+        <input type="submit" value={_add_title} class="hub-item hub-control" />
     </form>
     <form method="POST" action="?type=category" class="link-hub-form hub-category bare-form">
-        <h2>{_add_category_add}</h2>
-        <input type="text" name="name" placeholder={_add_category_name} required />
-        <input type="text" name="icon" placeholder={_add_category_icon} required />
-        <a href="https://phosphoricons.com/#toolbar" target="_blank">
-            <i class={icon(phosphor-logo)} title={_add_category_icons}></i>
-        </a>
-        <input type="submit" value={_add_category_add} />
+        <h2 class="hub-item">{_add_category_add}</h2>
+        <label for="hub-category-name" class="hub-item">
+            <input type="text" id="hub-category-name" class="hub-control" name="name" placeholder={_add_category_name}
+                required />
+        </label>
+        <label for="hub-category-icon" class="hub-item">
+            <input type="text" id="hub-category-icon" class="hub-control" name="icon" placeholder={_add_category_icon}
+                required />
+            <a href="https://phosphoricons.com/#toolbar" target="_blank" class="hub-control-float">
+                <i class={icon(phosphor-logo)} title={_add_category_icons}></i>
+            </a>
+        </label>
+        <input type="submit" value={_add_category_add} class="hub-item hub-control" />
     </form>
     <form method="POST" action="?type=instance" class="link-hub-form hub-instance bare-form">
-        <h2>{_add_instance_add}</h2>
-        <input type="url" name="url" placeholder={_add_link_url} required />
-        <input type="submit" value={_add_title} />
+        <h2 class="hub-item">{_add_instance_add}</h2>
+        <label for="hub-instance-url" class="hub-item">
+            <input type="url" id="hub-instance-url" class="hub-control" name="url" placeholder={_add_link_url} required />
+        </label>
+        <input type="submit" value={_add_title} class="hub-item hub-control" />
     </form>
 </div>
 {/block}
