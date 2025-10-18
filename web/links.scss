@@ -24,7 +24,7 @@
             grid-row: var(--grid-row);
         }
 
-        &>details {
+        & > details {
             border: 1px solid $light2;
             border-radius: 1em;
             background-image: linear-gradient(-30deg, $secondary, $light1 20%, $light1 80%, $primary);
@@ -69,52 +69,55 @@
 
                 h2,
                 h3 {
-                    &>i {
-                        display: inline-block;
-                    }
-                }
-
-                h2 {
-                    margin: 23pt 0 0;
-                    text-align: center;
+                    margin: unset;
                     white-space: nowrap;
                     overflow: clip;
                     text-overflow: ellipsis;
+                }
+
+                h2 {
+                    text-align: center;
+                    font-size: 16pt;
+
+                    transition: font-size 240ms ease-in-out;
+
+                    @media (min-width: $breakpoint) {
+                        font-size: 24pt;
+                    }
+                }
+
+                hgroup > i,
+                h3 > i:first-child {
+                    display: inline-block;
+                    font-size: 24pt;
+                    margin-right: 4pt;
+                    margin-left: 0;
+                    opacity: 1;
+                    color: inherit;
+                    position: relative;
+                    z-index: -1;
 
                     transition:
                         font-size 240ms ease-in-out,
-                        margin-top 240ms ease-in-out;
+                        margin-left 240ms ease-in-out,
+                        margin-right 240ms ease-in-out,
+                        opacity 240ms ease-in-out,
+                        color 240ms ease-in-out;
 
-                    &>i:first-child {
-                        font-size: 24pt;
-                        vertical-align: -6pt;
-                        margin-right: 4pt;
-                        margin-left: 0;
-                        opacity: 1;
-                        color: inherit;
-                        position: relative;
-                        z-index: -1;
-
-                        transition:
-                            font-size 240ms ease-in-out,
-                            vertical-align 240ms ease-in-out,
-                            margin-left 240ms ease-in-out,
-                            margin-right 240ms ease-in-out,
-                            opacity 240ms ease-in-out,
-                            color 240ms ease-in-out;
-
-                        @media (min-width: $breakpoint) {
-                            font-size: 48pt;
-                            vertical-align: -12pt;
-                        }
+                    @media (min-width: $breakpoint) {
+                        font-size: 48pt;
                     }
                 }
 
                 h3 {
-                    margin: unset;
-                    font-size: 22pt;
+                    font-size: 16pt;
+                    padding-left: 20pt;
 
-                    &>i {
+                    @media (min-width: $breakpoint) {
+                        font-size: 22pt;
+                    }
+
+                    i {
                         &:first-child {
                             color: $secondary;
                             opacity: 0.5;
@@ -129,114 +132,119 @@
                             margin-left: 32pt;
                             transform: rotate(-90deg);
                             transition: transform 120ms ease-out;
+                            display: inline-block;
                         }
                     }
                 }
-
-                h2,
-                .source-align {
-                    font-size: 16pt;
-
-                    @media (min-width: $breakpoint) {
-                        font-size: 24pt;
-                    }
-                }
-
-                .source-align {
-                    visibility: hidden;
-                    transition: font-size 240ms ease-in-out;
-                }
             }
 
-            &>summary {
-                $top_offset_mobile: calc(4em - 31pt);
-                $top_offset_desktop: calc((47.5vh - 10pt) / var(--grid-rows) - 46pt);
-                padding: $top_offset_mobile 4pt;
+            & > summary {
+                height: 100%;
+                transition: height 240ms ease-in-out;
 
-                transition: padding 240ms ease-in-out;
+                hgroup {
+                    display: grid;
+                    grid-template-columns: 1fr auto auto 1fr;
+                    grid-template-rows: 1fr auto auto 1fr;
+                    gap: 4pt;
+                    height: 100%;
+                    align-items: center;
+                    justify-items: start;
 
-                @media (min-width: $breakpoint) {
-                    padding: $top_offset_desktop 4pt;
+                    &::before {
+                        font-family: $icon;
+                        font-size: 14pt;
+                        content: $icon-cross;
+                        opacity: 0;
+                        margin-right: 8pt;
+
+                        grid-column: 4;
+                        grid-row: 2 / 4;
+                        align-self: center;
+                        justify-self: end;
+
+                        transition: opacity 240ms ease-in-out;
+
+                        @media (min-width: $breakpoint) {
+                            font-size: 20pt;
+                            margin-right: 20pt;
+                        }
+                    }
+                    & > i {
+                        grid-row: 2 / 4;
+                        grid-column: 2;
+                    }
+                    h2 {
+                        grid-column: 3;
+                        grid-row: 2;
+                        align-self: end;
+                        &:last-child {
+                            grid-row: 2 / 4;
+                            align-self: center;
+                        }
+                    }
+                    aside {
+                        grid-column: 3;
+                        grid-row: 3;
+                        align-self: start;
+                    }
                 }
 
                 &:focus {
                     outline: none;
                 }
 
-                &::before {
-                    font-family: $icon;
-                    font-size: 20pt;
-                    content: $icon-cross;
-                    opacity: 0;
-                    position: absolute;
-                    right: 16pt;
-                    top: $top_offset_mobile;
-
-                    transition:
-                        opacity 240ms ease-in-out,
-                        height 240ms ease-in-out,
-                        top 240ms ease-in-out;
-
-                    @media (min-width: $breakpoint) {
-                        top: $top_offset_desktop;
-                    }
-                }
-
                 aside {
-                    margin-left: 32pt;
-                    margin-top: -12pt;
                     font-size: 8pt;
-                    text-align: center;
                     white-space: nowrap;
                     overflow: clip;
                     text-overflow: ellipsis;
 
-                    transition:
-                        margin-left 240ms ease-in-out,
-                        margin-top 240ms ease-in-out,
-                        font-size 240ms ease-in-out;
+                    transition: font-size 240ms ease-in-out;
 
                     @media (min-width: $breakpoint) {
-                        margin-left: 172pt;
-                        margin-top: -24pt;
                         font-size: 12pt;
                     }
 
                     a {
                         color: $secondary;
+                        i {
+                            font-size: inherit !important;
+                        }
                     }
                 }
             }
 
             .scroll-container {
                 overflow-y: auto;
-                max-height: calc(100% - 92pt);
-                margin-top: -12pt;
-                padding-top: 22pt;
+                max-height: calc(100% - 72pt);
+                position: absolute;
+                left: 0;
+                right: 0;
 
                 @media (min-width: $breakpoint) {
-                    max-height: calc(100% - 123pt);
+                    max-height: calc(100% - 96pt);
                 }
 
-                &::before {
-                    content: " ";
-                    position: absolute;
-                    top: 64pt;
-                    left: 0;
-                    width: 100%;
-                    height: 16pt;
-                    z-index: 2;
-                    background-image: linear-gradient(to bottom, $light1, transparent);
+                // &::before {
+                //     content: " ";
+                //     position: absolute;
+                //     top: 78pt;
+                //     left: 0;
+                //     width: 100%;
+                //     height: 16pt;
+                //     z-index: 2;
+                //     background-image: linear-gradient(to bottom, $light1, transparent);
 
-                    @media (min-width: $breakpoint) {
-                        top: 111pt;
-                        content: unset;
-                    }
+                //     @media (min-width: $breakpoint) {
+                //         top: 102pt;
+                //         content: unset;
+                //     }
 
-                    @media only screen and (prefers-color-scheme: dark) {
-                        background-image: linear-gradient(to bottom, $dark1, transparent);
-                    }
-                }
+                //     @media only screen and (prefers-color-scheme: dark) {
+                //         background-image: linear-gradient(to bottom, $dark1, transparent);
+                //     }
+                // }
             }
 
             ul {
@@ -270,7 +278,7 @@
                         flex: 0 0 15%;
                     }
 
-                    &>a {
+                    & > a {
                         display: block;
                         color: $black;
                         text-decoration: none;
@@ -293,12 +301,12 @@
                             height: 24pt;
                             border-radius: 0.5em;
 
-                            &~span {
+                            & ~ span {
                                 max-width: calc(100% - 48pt);
                                 padding-left: 12pt;
                             }
 
-                            &~aside {
+                            & ~ aside {
                                 max-width: calc(100% - 64pt);
                                 left: 40pt;
                             }
@@ -345,8 +353,7 @@
                             }
                         }
 
-                        &~a {
-
+                        & ~ a {
                             span,
                             aside {
                                 text-shadow: 0 0 6pt $white;
@@ -370,12 +377,12 @@
             }
 
             details {
-                &>summary {
-                    margin-left: 5%;
+                & > summary {
+                    margin-left: 16pt;
                 }
 
                 &[open] {
-                    h3>i:last-child {
+                    h3 > i:last-child {
                         transform: rotate(0deg);
                         transition-timing-function: ease-in;
                     }
@@ -417,13 +424,20 @@
                     bottom: calc(-100% * var(--exp-bottom));
                 }
 
-                summary {
-                    h2 {
-                        margin-top: -24pt;
+                & > summary {
+                    height: 72pt;
 
-                        &>i:first-child {
+                    @media (min-width: $breakpoint) {
+                        height: 96pt;
+                    }
+
+                    hgroup {
+                        &::before {
+                            opacity: 1;
+                        }
+
+                        & > i {
                             font-size: 64pt;
-                            vertical-align: -20pt;
                             opacity: 0.4;
                             margin-right: -48pt;
                             margin-left: 0pt;
@@ -431,43 +445,13 @@
 
                             @media (min-width: $breakpoint) {
                                 font-size: 92pt;
-                                vertical-align: -34pt;
                                 margin-right: -62pt;
                                 margin-left: -24pt;
                             }
                         }
-                    }
 
-                    h2,
-                    .source-align {
-                        font-size: 24pt;
-
-                        @media (min-width: $breakpoint) {
-                            font-size: 28pt;
-                        }
-                    }
-                }
-
-                &>summary {
-                    padding: 32pt 32pt 0;
-
-                    &::before {
-                        opacity: 1;
-                        top: 30pt;
-
-                        @media (min-width: $breakpoint) {
-                            top: 40pt;
-                        }
-                    }
-
-                    aside {
-                        margin-left: 16pt;
-                        margin-top: -34pt;
-                        font-size: 14pt;
-
-                        @media (min-width: $breakpoint) {
-                            margin-top: -48pt;
-                            margin-left: 142pt;
+                        aside {
+                            font-size: 12pt;
                         }
                     }
                 }
@@ -485,22 +469,22 @@
         }
 
         @media (max-width: $breakpoint) {
-            &:nth-child(1)>details[open] {
+            &:nth-child(1) > details[open] {
                 top: 0;
                 bottom: -72vh;
             }
 
-            &:nth-child(2)>details[open] {
+            &:nth-child(2) > details[open] {
                 top: -18vh;
                 bottom: -54vh;
             }
 
-            &:nth-last-child(2)>details[open] {
+            &:nth-last-child(2) > details[open] {
                 top: -54h;
                 bottom: -18vh;
             }
 
-            &:nth-last-child(1)>details[open] {
+            &:nth-last-child(1) > details[open] {
                 top: -72vh;
                 bottom: 0;
             }

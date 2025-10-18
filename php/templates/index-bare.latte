@@ -14,17 +14,19 @@
         style="{if $inst !== null}--color-primary: {$inst->getPrimaryColor()|noescape};--color-secondary: {$inst->getSecondaryColor()|noescape};{/if}--grid-col: {$pos[0]};--grid-row: {$pos[1]};--exp-top: {$pos[2]};--exp-right: {$pos[3]};--exp-bottom: {$pos[4]};--exp-left: {$pos[5]};">
         <details>
             <summary>
-                <h2><i class={icon($cat->getIcon())}></i>&nbsp;{$cat->getName()}</h2>
-                {if $inst !== null}
-                <aside>
-                    {_'index_from'}&nbsp;
-                    <a href={$inst->getLink()} target="_blank">
-                        {$inst->getDomainName()}&nbsp;
-                        <i class={icon(arrow-square-out)}></i>
-                    </a>
-                    <span aria-hidden="true" class="source-align">{$cat->getName()}</span>
-                </aside>
-                {/if}
+                <hgroup>
+                    <i class={icon($cat->getIcon())}></i>
+                    <h2>{$cat->getName()}</h2>
+                    {if $inst !== null}
+                    <aside>
+                        {_'index_from'}
+                        <a href={$inst->getLink()} target="_blank">
+                            {$inst->getDomainName()}
+                            <i class={icon(arrow-square-out)}></i>
+                        </a>
+                    </aside>
+                    {/if}
+                </hgroup>
             </summary>
             <div class="scroll-container">
                 <ul>
