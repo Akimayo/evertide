@@ -78,8 +78,10 @@
                 h2 {
                     text-align: center;
                     font-size: 16pt;
+                    margin-bottom: 0;
 
-                    transition: font-size 240ms ease-in-out;
+                    transition: font-size 240ms ease-in-out,
+                                margin-bottom 240ms ease-in-out;
 
                     @media (min-width: $breakpoint) {
                         font-size: 24pt;
@@ -445,8 +447,16 @@
 
                             @media (min-width: $breakpoint) {
                                 font-size: 92pt;
-                                margin-right: -62pt;
+                                margin-right: -57pt;
                                 margin-left: -24pt;
+                            }
+                        }
+
+                        h2:not(:last-child) {
+                            margin-bottom: -8pt;
+                            
+                            @media (min-width: $breakpoint) {
+                                margin-bottom: -12pt;
                             }
                         }
 
