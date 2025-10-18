@@ -58,6 +58,12 @@
           "type": "string",
           "pattern": "#([0-9a-fA-F]{3}){1,2}"
         },
+        "sticker": {
+          "title": "Path to a sticker image file",
+          "description": "Optional path, relative to the `link` field, specifying an image (sticker) that remote instances can display.",
+          "type": ["string", "null"],
+          "default": null
+        },
         "open": {
           "title": "Whether to open this instance to federation.",
           "description": "This can be changed at any time, but keep in mind already linked instances will still be allowed to fetch.",

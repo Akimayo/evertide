@@ -81,12 +81,15 @@ about:
       name: Instance name
       link: URL
       last: Last seen
+      sticker: Sticker
       this: (this instance)
       unreachable: The instance returned a fatal error during the last fetch attempt. It may mean that this instance is no longer online.
       actions:
         refetch: Re-fetch
         block: Block this instance
         allow: Re-approve this instance
+        displaysticker: Add this sticker to the main page
+        removesticker: Remove this sticker from the main page
   development:
     h: Development
     p:

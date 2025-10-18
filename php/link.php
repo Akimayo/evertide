@@ -32,12 +32,14 @@ if (isset($_GET['device'])) {
     if (!isset($_POST['link'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "link" in POST body');
     if (!isset($_POST['primary'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "primary" in POST body');
     if (!isset($_POST['secondary'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "secondary" in POST body');
+    if (!isset($_POST['sticker'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "sticker" in POST body');
 
     if (
         $remote->getDisplayName() != $_POST['domain'] ||
         $remote->getPrimaryColor() != $_POST['primary'] ||
-        $remote->getSecondaryColor() != $_POST['secondary']
-    ) $remote->updateInstance($_POST['domain'], $_POST['primary'], $_POST['secondary'], LinkStatus::SUCCESS);
+        $remote->getSecondaryColor() != $_POST['secondary'] ||
+        $remote->getStickerPath() != $_POST['sticker']
+    ) $remote->updateInstance($_POST['domain'], $_POST['primary'], $_POST['secondary'], $_POST['sticker'], LinkStatus::SUCCESS);
 
     if (!isset($_POST['categories'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "categories" in POST body');
     if (!isset($_POST['last_sync'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "last_sync" in POST body');
@@ -114,7 +116,8 @@ if (isset($_GET['device'])) {
             domain: $_POST['domain'],
             link: $_POST['link'],
             primary: $_POST['primary'],
-            secondary: $_POST['secondary']
+            secondary: $_POST['secondary'],
+            sticker_path: $_POST['sticker']
         );
     }
     $remote->getAccessObject($db)->updateFetchDate();

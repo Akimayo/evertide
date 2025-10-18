@@ -40,6 +40,10 @@
                     <th scope="col">{_about_federation_instances_name}</th>
                     <th scope="col">{_about_federation_instances_link}</th>
                     <th scope="col">{_about_federation_instances_last}</th>
+                    {if $authorized}
+                    <th scope="col">{_about_federation_instances_sticker}</th>
+                    {* <th scope="col">{_about_federation_instances_actions}</th> *}
+                    {/if}
                 </tr>
             </thead>
             <tbody>
@@ -64,7 +68,18 @@
                     <td>{$inst->getLastFetchDate()} <i class={icon(warning)}
                             title={_about_federation_instances_unreachable}
                             n:if="$inst->getLastLinkStatus()->value > 2"></i></td>
-                    <td n:if="$authorized">
+                    {if $authorized}
+                    <td>
+                        {if $inst->getStickerPath() != null}
+                        <!-- TODO: Add sticker preview -->
+                        {if $inst->isStickerDisplayed()}
+                        <a><i class={icon(push-pin-slash)} title={_about_federation_instances_actions_removesticker}></i></a>
+                        {else}
+                        <a><i class={icon(push-pin)} title={_about_federation_instances_actions_displaysticker}></i></a>
+                        {/if}
+                        {/if}
+                    </td>
+                    <td>
                         <a><i class={icon(arrows-clockwise)}
                                 title={_about_federation_instances_actions_refetch}></i></a>
                         {if $inst->isBlocked()}
@@ -73,6 +88,7 @@
                         <a><i class={icon(prohibit)} title={_about_federation_instances_actions_block}></i></a>
                         {/if}
                     </td>
+                    {/if}
                 </tr>
             </tbody>
         </table>
