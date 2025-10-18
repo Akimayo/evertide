@@ -20,7 +20,6 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
 {
     protected ?int $id = null;
     protected string $domain;
-    protected ?string $display; // This is only available for the local instance as we need the $domain variable to be a safe file path. Other instances can have anything in $domain.
     protected string $link;
     protected string $primary;
     protected string $secondary;
@@ -30,10 +29,20 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
     protected Device $from_device;
     protected ?string $last_fetch_date;
     protected bool $blocked = false;
-    protected bool $open = false;
 
-    public static function raw(?int $id, string $domain, string $link, string $primary, string $secondary, string $first_link_date, ?string $last_link_date, int $last_link_status, Device $from_device, ?string $last_fetch_date, bool $blocked): static
-    {
+    public static function raw(
+        ?int $id,
+        string $domain,
+        string $link,
+        string $primary,
+        string $secondary,
+        string $first_link_date,
+        ?string $last_link_date,
+        int $last_link_status,
+        Device $from_device,
+        ?string $last_fetch_date,
+        bool $blocked
+    ): static {
         $inst = new self();
         $inst->id = $id;
         $inst->domain = $domain;
@@ -59,7 +68,7 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
     }
     public function getDisplayName(): string
     {
-        return $this->display ?? $this->domain;
+        return $this->domain;
     }
     public function getPrimaryColor(): string
     {
@@ -97,15 +106,10 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
     {
         return $this->blocked;
     }
-    public function isOpen(): bool
-    {
-        return $this->open;
-    }
 
     /** @return InstanceDAO */
     public function getAccessObject(Database $db): DAO
     {
-        if ($this->id === null) throw new Exception('Cannot create an InstanceDAO for the local instance');
         return new InstanceDAO(
             db: $db,
             id: $this->id,
@@ -122,11 +126,43 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
         );
     }
 }
+class LocalInstance extends Instance
+{
+    protected ?string $display; // This is only available for the local instance as we need the $domain variable to be a safe file path. Other instances can have anything in $domain.
+    protected bool $open = false;
+
+    public function getDisplayName(): string
+    {
+        return $this->display ?? $this->domain;
+    }
+
+    public function isOpen(): bool
+    {
+        return $this->open;
+    }
+    
+    public function getAccessObject(Database $db): DAO
+    {
+        throw new Exception('Cannot create an InstanceDAO for the local instance');
+    }
+}
 class InstanceDAO extends Instance implements DAO
 {
     private Database $db;
-    public function __construct(Database $db, int $id, string $domain, string $link, string $primary, string $secondary, string $first_link_date, ?string $last_link_date, LinkStatus $last_link_status, DeviceDAO $from_device, ?string $last_fetch_date, bool $blocked)
-    {
+    public function __construct(
+        Database $db,
+        int $id,
+        string $domain,
+        string $link,
+        string $primary,
+        string $secondary,
+        string $first_link_date,
+        ?string $last_link_date,
+        LinkStatus $last_link_status,
+        DeviceDAO $from_device,
+        ?string $last_fetch_date,
+        bool $blocked
+    ) {
         $this->db = $db;
         $this->id = $id;
         $this->domain = $domain;

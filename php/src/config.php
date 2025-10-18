@@ -67,7 +67,7 @@ final class Config extends SettingsContainerCustomAbstract
 
     // Variables filled by SettingsContainer
     protected Config__Database $database;
-    public Instance $instance;
+    public LocalInstance $instance;
 
     private function __construct()
     {
