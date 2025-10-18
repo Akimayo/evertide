@@ -20,7 +20,6 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
 {
     protected ?int $id = null;
     protected string $domain;
-    protected ?string $display; // This is only available for the local instance as we need the $domain variable to be a safe file path. Other instances can have anything in $domain.
     protected string $link;
     protected string $primary;
     protected string $secondary;
@@ -59,7 +58,7 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
     }
     public function getDisplayName(): string
     {
-        return $this->display ?? $this->domain;
+        return $this->domain;
     }
     public function getPrimaryColor(): string
     {
@@ -105,7 +104,6 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
     /** @return InstanceDAO */
     public function getAccessObject(Database $db): DAO
     {
-        if ($this->id === null) throw new Exception('Cannot create an InstanceDAO for the local instance');
         return new InstanceDAO(
             db: $db,
             id: $this->id,
@@ -120,6 +118,19 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
             last_fetch_date: $this->last_fetch_date,
             blocked: $this->blocked
         );
+    }
+}
+class LocalInstance extends Instance
+{
+    protected ?string $display; // This is only available for the local instance as we need the $domain variable to be a safe file path. Other instances can have anything in $domain.
+
+    public function getDisplayName(): string
+    {
+        return $this->display ?? $this->domain;
+    }
+    public function getAccessObject(Database $db): DAO
+    {
+        throw new Exception('Cannot create an InstanceDAO for the local instance');
     }
 }
 class InstanceDAO extends Instance implements DAO
