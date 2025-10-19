@@ -84,6 +84,7 @@ about:
       last: Naposledy synchronizováno
       sticker: Nálepka
       unreachable: Tato instance při posledním pokusu o synchronizaci navrátila chybu. Je možné, že tato instance již není v provozu.
+      this: (tato instance)
       actions:
         title: Akce
         refetch: Synchronizovat
