@@ -23,6 +23,7 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
     protected string $link;
     protected string $primary;
     protected string $secondary;
+    protected bool $valid_link = true;
     protected string $first_link_date;
     protected ?string $last_link_date;
     protected LinkStatus $last_link_status;
@@ -40,6 +41,7 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
         string $link,
         string $primary,
         string $secondary,
+        bool $valid_link,
         string $first_link_date,
         ?string $last_link_date,
         int $last_link_status,
@@ -57,6 +59,7 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
         $inst->link = $link;
         $inst->primary = $primary;
         $inst->secondary = $secondary;
+        $inst->valid_link = $valid_link;
         $inst->first_link_date = $first_link_date;
         $inst->last_link_date = $last_link_date;
         $inst->last_link_status = LinkStatus::from($last_link_status);
@@ -89,6 +92,10 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
     public function getSecondaryColor(): string
     {
         return $this->secondary;
+    }
+    public function isLinkValid(): bool
+    {
+        return $this->valid_link;
     }
     public function getLink(): string
     {
@@ -145,6 +152,7 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
             link: $this->link,
             primary: $this->primary,
             secondary: $this->secondary,
+            valid_link: $this->valid_link,
             first_link_date: $this->first_link_date,
             last_link_date: $this->last_link_date,
             last_link_status: $this->last_link_status,
@@ -177,6 +185,15 @@ class LocalInstance extends Instance
     {
         return $this->open;
     }
+    private ?bool $validation_result = null;
+    public function isLinkValid(): bool
+    {
+        if (is_null($this->validation_result)) {
+            $_normalize_url = require(__DIR__ . '/../functions/normalize_url.php');
+            $this->validation_result = $_normalize_url($this->link)['valid_link'];
+        }
+        return $this->validation_result;
+    }
 
     public function getAccessObject(Database $db): DAO
     {
@@ -193,6 +210,7 @@ class InstanceDAO extends Instance implements DAO
         string $link,
         string $primary,
         string $secondary,
+        bool $valid_link,
         string $first_link_date,
         ?string $last_link_date,
         LinkStatus $last_link_status,
@@ -210,6 +228,7 @@ class InstanceDAO extends Instance implements DAO
         $this->link = $link;
         $this->primary = $primary;
         $this->secondary = $secondary;
+        $this->valid_link = $valid_link;
         $this->first_link_date = $first_link_date;
         $this->last_link_date = $last_link_date;
         $this->last_link_status = $last_link_status;
@@ -287,7 +306,7 @@ class InstanceDAO extends Instance implements DAO
     public static function get(Database $db, int|string $key): Instance
     {
         $data = $db->select(
-            'SELECT i.domain, i.link, i.`primary`, i.secondary, i.first_link_date, i.last_link_date, i.last_link_status, i.from_device, i.last_fetch_date, i.last_edit_date, i.blocked, i.sticker_path, i.sticker_link, i.display_sticker, d.name, d.first_login, d.last_login FROM Instance i INNER JOIN Device d ON d.id = i.from_device WHERE i.id = :I;',
+            'SELECT i.domain, i.link, i.`primary`, i.secondary, i.valid_link, i.first_link_date, i.last_link_date, i.last_link_status, i.from_device, i.last_fetch_date, i.last_edit_date, i.blocked, i.sticker_path, i.sticker_link, i.display_sticker, d.name, d.first_login, d.last_login FROM Instance i INNER JOIN Device d ON d.id = i.from_device WHERE i.id = :I;',
             ['I' => $key]
         );
         if ($data)
@@ -297,6 +316,7 @@ class InstanceDAO extends Instance implements DAO
                 link: $data['link'],
                 primary: $data['primary'],
                 secondary: $data['secondary'],
+                valid_link: boolval($data['valid_link']),
                 first_link_date: $data['first_link_date'],
                 last_link_date: $data['last_link_date'],
                 last_link_status: $data['last_link_status'],
@@ -318,7 +338,7 @@ class InstanceDAO extends Instance implements DAO
     public static function getByAddress(Database $db, string $link_url): Instance
     {
         $data = $db->select(
-            'SELECT i.id AS instance_id, i.domain, i.`primary`, i.secondary, i.first_link_date, i.last_link_date, i.last_link_status, i.from_device, i.last_fetch_date, i.last_edit_date, i.blocked, i.sticker_path, i.sticker_link, i.display_sticker, d.name, d.first_login, d.last_login FROM Instance i INNER JOIN Device d ON d.id = i.from_device WHERE i.link = :L;',
+            'SELECT i.id AS instance_id, i.domain, i.`primary`, i.secondary, i.valid_link, i.first_link_date, i.last_link_date, i.last_link_status, i.from_device, i.last_fetch_date, i.last_edit_date, i.blocked, i.sticker_path, i.sticker_link, i.display_sticker, d.name, d.first_login, d.last_login FROM Instance i INNER JOIN Device d ON d.id = i.from_device WHERE i.link = :L;',
             ['L' => $link_url]
         );
         if ($data)
@@ -328,6 +348,7 @@ class InstanceDAO extends Instance implements DAO
                 link: $link_url,
                 primary: $data['primary'],
                 secondary: $data['secondary'],
+                valid_link: boolval($data['valid_link']),
                 first_link_date: $data['first_link_date'],
                 last_link_date: $data['last_link_date'],
                 last_link_status: $data['last_link_status'],
@@ -347,9 +368,9 @@ class InstanceDAO extends Instance implements DAO
         else throw new Exception('Instance with the given link does not exist');
     }
     /** @return Instance[] */
-    public static function getAll(Database $db): array
+    public static function getAll(Database $db, bool $only_valid_links = false): array
     {
-        $data = $db->selectAll('SELECT i.id, i.domain, i.link, i.`primary`, i.secondary, i.first_link_date, i.last_link_date, i.last_link_status, i.from_device, i.last_fetch_date, i.last_edit_date, i.blocked, i.sticker_path, i.sticker_link, i.display_sticker, d.name, d.first_login, d.last_login FROM Instance i INNER JOIN Device d ON d.id = i.from_device;');
+        $data = $db->selectAll('SELECT i.id, i.domain, i.link, i.`primary`, i.secondary, i.valid_link, i.first_link_date, i.last_link_date, i.last_link_status, i.from_device, i.last_fetch_date, i.last_edit_date, i.blocked, i.sticker_path, i.sticker_link, i.display_sticker, d.name, d.first_login, d.last_login FROM Instance i INNER JOIN Device d ON d.id = i.from_device;');
         return array_map(function (array $row) {
             return Instance::raw(
                 id: $row['id'],
@@ -357,6 +378,7 @@ class InstanceDAO extends Instance implements DAO
                 link: $row['link'],
                 primary: $row['primary'],
                 secondary: $row['secondary'],
+                valid_link: boolval($row['valid_link']),
                 first_link_date: $row['first_link_date'],
                 last_link_date: $row['last_link_date'],
                 last_link_status: $row['last_link_status'],
@@ -375,13 +397,13 @@ class InstanceDAO extends Instance implements DAO
             );
         }, $data);
     }
-    public static function create(Database $db, string $domain, string $link, string $primary, string $secondary, ?string $sticker_path, ?string $sticker_link, ?LinkStatus $status = null): Instance
+    public static function create(Database $db, string $domain, string $link, string $primary, string $secondary, bool $valid_link, ?string $sticker_path, ?string $sticker_link, ?LinkStatus $status = null): Instance
     {
         $device = DeviceDAO::getCurrent($db) ?? DeviceDAO::getRemote($db);
         $date = date('Y-m-d H:i:s');
         $id = $db->insert(
-            'INSERT INTO Instance (domain, link, `primary`, secondary, sticker_path, sticker_link, first_link_date, from_device, last_edit_date) VALUES (:D, :N, :P, :S, :H, :N, :L, :F, :L);',
-            ['D' => $domain, 'N' => $link, 'P' => $primary, 'S' => $secondary, 'H' => $sticker_path, 'N' => $sticker_link, 'L' => $date, 'F' => $device->getId()],
+            'INSERT INTO Instance (domain, link, `primary`, secondary, i.valid_link, sticker_path, sticker_link, first_link_date, from_device, last_edit_date) VALUES (:D, :N, :P, :S, :H, :N, :L, :F, :L);',
+            ['D' => $domain, 'N' => $link, 'P' => $primary, 'S' => $secondary, 'V' => $valid_link, 'H' => $sticker_path, 'N' => $sticker_link, 'L' => $date, 'F' => $device->getId()],
             'Instance'
         );
         return Instance::raw(
@@ -390,6 +412,7 @@ class InstanceDAO extends Instance implements DAO
             link: $link,
             primary: $primary,
             secondary: $secondary,
+            valid_link: $valid_link,
             first_link_date: $date,
             last_link_date: null,
             last_link_status: $status->value ?? -1,

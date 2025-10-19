@@ -178,17 +178,18 @@
                     }
                     h2 {
                         grid-column: 3;
-                        grid-row: 2;
-                        align-self: end;
-                        &:last-child {
-                            grid-row: 2 / 4;
-                            align-self: center;
+                        grid-row: 2 / 4;
+                        &:not(:last-child) {
+                            grid-row: 2;
+                            align-self: end;
+                            margin-bottom: -4pt;
                         }
                     }
                     aside {
                         grid-column: 3;
                         grid-row: 3;
                         align-self: start;
+                        margin-bottom: -8pt;
                     }
                 }
 
@@ -452,13 +453,13 @@
                             }
                         }
 
-                        h2:not(:last-child) {
-                            margin-bottom: -8pt;
+                        // h2:not(:last-child) {
+                        //     margin-bottom: -8pt;
                             
-                            @media (min-width: $breakpoint) {
-                                margin-bottom: -12pt;
-                            }
-                        }
+                        //     @media (min-width: $breakpoint) {
+                        //         margin-bottom: -12pt;
+                        //     }
+                        // }
 
                         aside {
                             font-size: 12pt;

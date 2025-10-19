@@ -3,9 +3,10 @@
 declare(strict_types=1);
 
 return function (ReadWriteDatabase $db, ?int $instance_id = null, bool $retry_unreachable = false): array {
+    $valid_link = true;
     if (is_null($instance_id)) {
         $_normalize_url = require(__DIR__ . '/normalize_url.php');
-        ['domain' => $domain, 'path' => $path] = $_normalize_url($_POST['url']);
+        ['domain' => $domain, 'path' => $path, 'valid_link' => $valid_link] = $_normalize_url($_POST['url']);
 
         $url = $domain . $path;
         $remote = null;
@@ -79,6 +80,7 @@ return function (ReadWriteDatabase $db, ?int $instance_id = null, bool $retry_un
             link: $result->link,
             primary: $result->primary,
             secondary: $result->secondary,
+            valid_link: $valid_link,
             sticker_path: $result->sticker,
             sticker_link: $result->sticker_link,
             status: $link_status
