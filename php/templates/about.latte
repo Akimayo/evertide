@@ -40,6 +40,10 @@
                     <th scope="col">{_about_federation_instances_name}</th>
                     <th scope="col">{_about_federation_instances_link}</th>
                     <th scope="col">{_about_federation_instances_last}</th>
+                    {if $authorized}
+                    <th scope="col">{_about_federation_instances_sticker}</th>
+                    <th scope="col">{_about_federation_instances_actions_title}</th>
+                    {/if}
                 </tr>
             </thead>
             <tbody>
@@ -47,6 +51,14 @@
                     <th scope="row">{$instance->getDisplayName()}</th>
                     <td><a href={$instance->getLink()} target="_blank">{$instance->getLink()}</a></td>
                     <td>{_about_federation_instances_this}</td>
+                    <td>
+                        {if $instance->getStickerPath() != null}
+                        <a href={$instance->getStickerLink()} target="_blank" rel="noopener noreferrer">
+                            <img src={$instance->getLink() . $instance->getStickerPath()}
+                            alt="{_about_federation_instances_sticker} {$instance->getDisplayName()}" />
+                        </a>
+                        {/if}
+                    </td>
                 </tr>
                 <tr n:foreach="$instances as $inst"
                     n:if="($authorized || !$inst->isBlocked()) && $inst->getLastLinkStatus()->value < 66">
@@ -64,7 +76,23 @@
                     <td>{$inst->getLastFetchDate()} <i class={icon(warning)}
                             title={_about_federation_instances_unreachable}
                             n:if="$inst->getLastLinkStatus()->value > 2"></i></td>
-                    <td n:if="$authorized">
+                    {if $authorized}
+                    <td>
+                        {if $inst->getStickerPath() != null}
+                        <a href={$inst->getStickerLink()} target="_blank" rel="noopener noreferrer">
+                            <img src={$inst->getLink() . $inst->getStickerPath()}
+                            alt="{_about_federation_instances_sticker} {$inst->getDisplayName()}" />
+                        </a>
+                        {if $inst->isStickerDisplayed()}
+                        <a href="/link?instance={$inst->getId()}&action=unpin"><i class={icon(push-pin-slash)}
+                                title={_about_federation_instances_actions_removesticker}></i></a>
+                        {else}
+                        <a href="/link?instance={$inst->getId()}&action=pin"><i class={icon(push-pin)}
+                                title={_about_federation_instances_actions_displaysticker}></i></a>
+                        {/if}
+                        {/if}
+                    </td>
+                    <td>
                         <a><i class={icon(arrows-clockwise)}
                                 title={_about_federation_instances_actions_refetch}></i></a>
                         {if $inst->isBlocked()}
@@ -73,6 +101,7 @@
                         <a><i class={icon(prohibit)} title={_about_federation_instances_actions_block}></i></a>
                         {/if}
                     </td>
+                    {/if}
                 </tr>
             </tbody>
         </table>

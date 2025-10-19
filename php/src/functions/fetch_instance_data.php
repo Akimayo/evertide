@@ -3,9 +3,10 @@
 declare(strict_types=1);
 
 return function (ReadWriteDatabase $db, ?int $instance_id = null, bool $retry_unreachable = false): array {
+    $valid_link = true;
     if (is_null($instance_id)) {
         $_normalize_url = require(__DIR__ . '/normalize_url.php');
-        ['domain' => $domain, 'path' => $path] = $_normalize_url($_POST['url']);
+        ['domain' => $domain, 'path' => $path, 'valid_link' => $valid_link] = $_normalize_url($_POST['url']);
 
         $url = $domain . $path;
         $remote = null;
@@ -32,7 +33,9 @@ return function (ReadWriteDatabase $db, ?int $instance_id = null, bool $retry_un
                 'domain' => $instance->getDisplayName(),
                 'link' => $instance->getLink(),
                 'primary' => $instance->getPrimaryColor(),
-                'secondary' => $instance->getSecondaryColor()
+                'secondary' => $instance->getSecondaryColor(),
+                'sticker_path' => $instance->getStickerPath(),
+                'sticker_link' => $instance->getStickerLink()
             ]),
             'ignore_errors' => true
         ]
@@ -64,8 +67,10 @@ return function (ReadWriteDatabase $db, ?int $instance_id = null, bool $retry_un
         if (
             $remote->getDomainName() != $result->domain ||
             $remote->getPrimaryColor() != $result->primary ||
-            $remote->getSecondaryColor() != $result->secondary
-        ) $remote->updateInstance($result->domain, $result->primary, $result->secondary, $link_status);
+            $remote->getSecondaryColor() != $result->secondary ||
+            $remote->getStickerPath() != $result->sticker_path ||
+            $remote->getStickerLink() != $result->sticker_link
+        ) $remote->updateInstance($result->domain, $result->primary, $result->secondary, $result->sticker_path, $result->sticker_link, $link_status);
         else $remote->updateLinkStatus($link_status);
     } catch (Exception) {
         /* Intended fail, new instance */
@@ -75,6 +80,9 @@ return function (ReadWriteDatabase $db, ?int $instance_id = null, bool $retry_un
             link: $result->link,
             primary: $result->primary,
             secondary: $result->secondary,
+            valid_link: $valid_link,
+            sticker_path: $result->sticker,
+            sticker_link: $result->sticker_link,
             status: $link_status
         );
     }

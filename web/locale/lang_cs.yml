@@ -82,11 +82,15 @@ about:
       name: Jméno instance
       link: Adresa URL
       last: Naposledy synchronizováno
+      sticker: Nálepka
       unreachable: Tato instance při posledním pokusu o synchronizaci navrátila chybu. Je možné, že tato instance již není v provozu.
       actions:
+        title: Akce
         refetch: Synchronizovat
         block: Zablokovat instanci
         allow: Povolit přístup instanci
+        displaysticker: Přidat nálepku na hlavní stránku
+        removesticker: Odebrat nálepku z hlavní stránky
   development:
     h: Development
     p:

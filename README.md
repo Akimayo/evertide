@@ -1,5 +1,8 @@
 # 🌊 evertide<br /><font size="4">surf the web with hyperlinks again</font>
 
+> [!CAUTION]
+> evertide is pre-alpha software. Functionality can be broken in between versions and federation compatibility is not guaranteed between versions. Migration guides will not be provided in between releases. Use at your own risk of data loss.
+
 ## Setting up
 
 > [!WARNING]

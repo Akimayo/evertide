@@ -16,6 +16,9 @@ foreach ($authorNames as $i => $name) {
 }
 
 $handler->render('about.latte', [
-    'instances' => InstanceDAO::getAll($handler->getDatabase()),
+    'instances' => InstanceDAO::getAll(
+        $handler->getDatabase(),
+        only_valid_links: Config::get_config()->instance->isLinkValid() // Only display locally-hosted instances if this instance itself is locally hosted
+    ),
     'authors' => $authors
 ]);

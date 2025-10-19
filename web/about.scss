@@ -1,10 +1,10 @@
-@use 'variables' as *;
+@use "variables" as *;
 
 section {
     margin: 0 -8px;
     padding: 8pt 10vw 16pt;
 
-    &>p:first-of-type {
+    & > p:first-of-type {
         font-size: 16pt;
     }
 
@@ -25,7 +25,7 @@ section#about {
     position: relative;
 
     &::before {
-        content: '';
+        content: "";
         display: block;
         position: absolute;
         z-index: -1;
@@ -33,7 +33,7 @@ section#about {
         right: 0;
         top: 0;
         bottom: -10pt;
-        background-image: url('https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Water%20wave/Color/water_wave_color.svg');
+        background-image: url("https://raw.githubusercontent.com/microsoft/fluentui-emoji/main/assets/Water%20wave/Color/water_wave_color.svg");
         background-repeat: no-repeat;
         background-size: auto 100%;
         opacity: 0.18;
@@ -67,7 +67,9 @@ aside#tips {
     }
 
     @media (min-width: $breakpoint) {
-        margin: 16pt 30vw;
+        margin: 16pt auto;
+        width: fit-content;
+        max-width: 40vw;
         flex-direction: row;
     }
 }
@@ -117,9 +119,15 @@ section#federation {
                 box-shadow: inset -8pt -4pt 12pt $light1;
             }
 
-            td>.ph-warning {
+            td > .ph-warning {
                 color: $secondary;
                 vertical-align: -1.5pt;
+            }
+
+            img {
+                height: 1.25em;
+                max-width: 12em;
+                vertical-align: bottom;
             }
         }
     }
@@ -141,7 +149,13 @@ section#credits {
 }
 
 @media only screen and (prefers-color-scheme: dark) {
-    section#about {}
+    section#about {
+    }
+
+    aside#tips {
+        border-color: $dark2;
+        background-color: $dark1;
+    }
 
     section#federation {
         background-color: $dark3;
@@ -160,5 +174,6 @@ section#credits {
         }
     }
 
-    section#credits {}
+    section#credits {
+    }
 }
