@@ -43,7 +43,7 @@ about:
         soukromé záložky na články, které si chcete přečíst, videa, která chcete shlédnout, nebo recepty, které chcete
         uvařit, odkudkoli z Internetu.
       ->
-        evertide se snaží udržovat kulturu &lbquo;Webu 1.0&rdquo; a pomáhat propagovat &lbquo;Internetové zahrádky&rdquo;
+        evertide se snaží udržovat kulturu &bdquo;Webu 1.0&ldquo; a pomáhat propagovat &bdquo;Internetové zahrádky&ldquo;
         (malé webové projekty provozované jednotlivci) bez potřeby vyhledávačů. Aplikace evertide je postavena na
         jednoduchých technologiích, což jí dělá malou, rychlou, spolehlivou a srozumitelnou. Instance evertide se navíc
         mohou navzájem propojit pomocí takzvané federace a vytvořit tak síť obsahující odkazy na mnoho míst na Internetu,
@@ -51,21 +51,21 @@ about:
   tips:
     title: Věděli jste, že
     items:
-      - evertide můžete nainstalovat do svého telefonu jako &lbquo;progresivní webovou aplikaci&rdquo; (PWA) a přidávat si záložky stejně, jako byste sdíleli odkazy např. do chatovacích služeb.
+      - evertide můžete nainstalovat do svého telefonu jako &bdquo;progresivní webovou aplikaci&ldquo; (PWA) a přidávat si záložky stejně, jako byste sdíleli odkazy např. do chatovacích služeb.
       - evertide má moc hezký tmavý režim!
       - Zkuste přidat odkazy na malé webové projekty. Jejich tvůrcům uděláte radost a Internetu prospějete odkazem na zajímavou věc!
   federation:
     h: Federování
     p:
       ->
-        🌊 evertide umí zobrazovat odkazy z jiných instancí pomocí &lbquo;federování.&rdquo;
+        🌊 evertide umí zobrazovat odkazy z jiných instancí pomocí &bdquo;federování.&ldquo;
       ->
         Federování je volitelná funkce a vlastník instance si může vybrat, zda chce umožnit zobrazovat své veřejné záložky na
         jiných instancích. Máte-li federování zapnuté, může si provozovatel jiné instance vystavit jakoukoli skupinu odkazů
         (resp. veřejné odkazy z dané skupiny) z Vaší instance mezi odkazy svými. Například pokud bude instance A chtít sdílet
         recepty z instance B (a instance B má otevřené federování), instance A může přidat skupinu
-        odkazů &lbquo;Recepty&rdquo; na instanci B a tato skupina odkazů se bude zobrazovat na hlavní stránce instance A
-        spolu s ostatními skupinami odkazů. Tyto &lbquo;vzdálené&rdquo; skupiny odkazů se také automaticky aktualizují, takže
+        odkazů &bdquo;Recepty&ldquo; na instanci B a tato skupina odkazů se bude zobrazovat na hlavní stránce instance A
+        spolu s ostatními skupinami odkazů. Tyto &bdquo;vzdálené&ldquo; skupiny odkazů se také automaticky aktualizují, takže
         nové odkazy ze vzdálených instancí se budou objevovat (a odstaněné naopak mizet) automaticky.
     open: Tato instance má otevřené federování.
     closed: Tato instance nefederuje.

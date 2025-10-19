@@ -16,7 +16,7 @@
         <i class={icon(megaphone)}></i> {_about_tips_title}:
     </strong>
     <span>
-        {_($tips|random)}
+        {_($tips|random)|stripHtml}
     </span>
 </aside>
 {/if}
