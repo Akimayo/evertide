@@ -534,5 +534,9 @@ aside#stickers {
         display: block;
         width: fit-content;
         height: fit-content;
+
+        @media (min-width: $breakpoint) {
+            transform: rotate(var(--s-rot)) translateX(var(--s-pos)) translateY(calc(var(--s-pos) * -3));
+        }
     }
 }
