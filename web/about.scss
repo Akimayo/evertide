@@ -67,13 +67,10 @@ aside#tips {
     }
 
     @media (min-width: $breakpoint) {
-        margin: 16pt 30vw;
+        margin: 16pt auto;
+        width: fit-content;
+        max-width: 40vw;
         flex-direction: row;
-    }
-
-    @media only screen and (prefers-color-scheme: dark) {
-        border-color: $dark2;
-        background-color: $dark1;
     }
 }
 
@@ -153,6 +150,11 @@ section#credits {
 
 @media only screen and (prefers-color-scheme: dark) {
     section#about {
+    }
+
+    aside#tips {
+        border-color: $dark2;
+        background-color: $dark1;
     }
 
     section#federation {
