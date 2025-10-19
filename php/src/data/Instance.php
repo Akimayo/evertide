@@ -16,6 +16,17 @@ enum LinkStatus: int
     case UNREACHABLE = 65;
     case BLOCKED = 66;
 }
+enum RichDisplayInstanceType: int
+{
+    // In rich display mode, render the remote instance as...
+    case TRAIN = 0; // a ground vehicle
+    case SHIP = 1; // a naval vehicle
+    case PLANE = 2; // an aerial vehicle
+    case NEIGHBOUR = 3; // a neighbouring settlement
+    case MERCHANT = 4; // a merchant stall
+    case CIRCUS = 5; // an entertainment establishment
+    case WIZARD = 6; // a magical construct
+}
 class Instance extends SettingsContainerAbstract implements DaoAccessible
 {
     protected ?int $id = null;
@@ -23,6 +34,7 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
     protected string $link;
     protected string $primary;
     protected string $secondary;
+    protected RichDisplayInstanceType $render;
     protected bool $valid_link = true;
     protected string $first_link_date;
     protected ?string $last_link_date;
@@ -34,6 +46,8 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
     protected ?string $sticker_path = null;
     protected ?string $sticker_link = null;
     protected bool $display_sticker = false;
+    protected ?string $public_key = null;
+    protected ?string $private_key = null;
 
     public static function raw(
         ?int $id,
@@ -41,6 +55,7 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
         string $link,
         string $primary,
         string $secondary,
+        RichDisplayInstanceType $render,
         bool $valid_link,
         string $first_link_date,
         ?string $last_link_date,
@@ -51,7 +66,9 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
         bool $blocked,
         ?string $sticker_path,
         ?string $sticker_link,
-        bool $display_sticker
+        bool $display_sticker,
+        ?string $public_key = null,
+        ?string $private_key = null
     ): static {
         $inst = new self();
         $inst->id = $id;
@@ -59,6 +76,7 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
         $inst->link = $link;
         $inst->primary = $primary;
         $inst->secondary = $secondary;
+        $inst->render = $render;
         $inst->valid_link = $valid_link;
         $inst->first_link_date = $first_link_date;
         $inst->last_link_date = $last_link_date;
@@ -70,6 +88,8 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
         $inst->sticker_path = $sticker_path;
         $inst->sticker_link = $sticker_link;
         $inst->display_sticker = $display_sticker;
+        $inst->public_key = $public_key;
+        $inst->private_key = $private_key;
         return $inst;
     }
 
@@ -92,6 +112,10 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
     public function getSecondaryColor(): string
     {
         return $this->secondary;
+    }
+    public function getRenderType(): RichDisplayInstanceType
+    {
+        return $this->render;
     }
     public function isLinkValid(): bool
     {
@@ -141,6 +165,64 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
     {
         return !is_null($this->sticker_path) && $this->display_sticker;
     }
+    public function getPublicKey(): ?string
+    {
+        return $this->public_key;
+    }
+
+    public function getFederationInfo(): array
+    {
+        return [
+            'domain' => $this->getDisplayName(),
+            'link' => $this->link,
+            'primary' => $this->primary,
+            'secondary' => $this->secondary,
+            'sticker_path' => $this->sticker_path,
+            'sticker_link' => $this->sticker_link,
+            'render' => $this->render->name
+        ];
+    }
+    private static function getSignatureHash(array $federation_info): string
+    {
+        return sha1($federation_info['domain'] .
+            $federation_info['link'] .
+            $federation_info['primary'] .
+            $federation_info['secondary'] .
+            $federation_info['render']);
+    }
+    public function getSignature(string $remote_public_key): string
+    {
+        $time = strval(time());
+        $len = str_pad(dechex(strlen($time)), 4, '0', STR_PAD_LEFT);
+        openssl_public_encrypt(
+            $len . $time . self::getSignatureHash($this->getFederationInfo()),
+            $signature,
+            $remote_public_key
+        );
+        return $signature;
+    }
+    public function getSignedFederationInfo(string $remote_public_key): array
+    {
+        $info = $this->getFederationInfo();
+
+        $info['signature'] = $this->getSignature($remote_public_key);
+        return $info;
+    }
+    public function validateSignature(array $signed_federation_info): bool
+    {
+        // Decrypt signature
+        if (!openssl_private_decrypt($signed_federation_info['signature'], $signature, $this->private_key)) return false; // Wrong signing key, fail
+        // Extract and check signature time
+        $len = hexdec(substr($signature, 0, 4));
+        $time = substr($signature, 4, $len);
+        if (abs($time - time()) > 30) return false; // Old signature, fail
+        // Compare data hashes
+        $local_hash = self::getSignatureHash($signed_federation_info);
+        $remote_hash = substr($signature, 4 + $len);
+        if ($local_hash !== $remote_hash) return false; // Invalid hash of values, fail
+        // Success
+        return true;
+    }
 
     /** @return InstanceDAO */
     public function getAccessObject(Database $db): DAO
@@ -152,6 +234,7 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
             link: $this->link,
             primary: $this->primary,
             secondary: $this->secondary,
+            render: $this->render,
             valid_link: $this->valid_link,
             first_link_date: $this->first_link_date,
             last_link_date: $this->last_link_date,
@@ -210,6 +293,7 @@ class InstanceDAO extends Instance implements DAO
         string $link,
         string $primary,
         string $secondary,
+        RichDisplayInstanceType $render,
         bool $valid_link,
         string $first_link_date,
         ?string $last_link_date,
@@ -228,6 +312,7 @@ class InstanceDAO extends Instance implements DAO
         $this->link = $link;
         $this->primary = $primary;
         $this->secondary = $secondary;
+        $this->render = $render;
         $this->valid_link = $valid_link;
         $this->first_link_date = $first_link_date;
         $this->last_link_date = $last_link_date;
@@ -259,17 +344,18 @@ class InstanceDAO extends Instance implements DAO
             return $this;
         } else throw new Exception('Updating Instance.last_link_date and Instance.last_link_status failed');
     }
-    public function updateInstance(string $domain, string $primary, string $secondary, ?string $sticker_path, ?string $sticker_link, LinkStatus $status): self
+    public function updateInstance(string $domain, string $primary, string $secondary, RichDisplayInstanceType $render, ?string $sticker_path, ?string $sticker_link, LinkStatus $status): self
     {
         $date = date('Y-m-d H:i:s');
         $display_sticker_new = $this->display_sticker && $this->sticker_link == $sticker_link; // Hide sticker when link changes to prevent malicious link changes
         if ($this->db->update(
-            'UPDATE Instance SET domain = :D, `primary` = :P, secondary = :S, sticker_path = :H, sticker_link = :N, display_sticker = :C, last_link_date = :L, last_link_status = :T, from_device = :V WHERE id = :I;',
-            ['D' => $domain, 'P' => $primary, 'S' => $secondary, 'H' => $sticker_path, 'N' => $sticker_link, 'C' => $display_sticker_new, 'L' => $date, 'T' => $status->value, 'I' => $this->id, 'V' => $this->from_device?->getId()]
+            'UPDATE Instance SET domain = :D, `primary` = :P, secondary = :S, render = :R, sticker_path = :H, sticker_link = :N, display_sticker = :C, last_link_date = :L, last_link_status = :T, from_device = :V WHERE id = :I;',
+            ['D' => $domain, 'P' => $primary, 'S' => $secondary, 'R' => $render->value, 'H' => $sticker_path, 'N' => $sticker_link, 'C' => $display_sticker_new, 'L' => $date, 'T' => $status->value, 'I' => $this->id, 'V' => $this->from_device?->getId()]
         )) {
             $this->domain = $domain;
             $this->primary = $primary;
             $this->secondary = $secondary;
+            $this->render = $render;
             $this->sticker_path = $sticker_path;
             $this->sticker_link = $sticker_link;
             $this->display_sticker = $display_sticker_new;
@@ -306,7 +392,7 @@ class InstanceDAO extends Instance implements DAO
     public static function get(Database $db, int|string $key): Instance
     {
         $data = $db->select(
-            'SELECT i.domain, i.link, i.`primary`, i.secondary, i.valid_link, i.first_link_date, i.last_link_date, i.last_link_status, i.from_device, i.last_fetch_date, i.last_edit_date, i.blocked, i.sticker_path, i.sticker_link, i.display_sticker, d.name, d.first_login, d.last_login FROM Instance i INNER JOIN Device d ON d.id = i.from_device WHERE i.id = :I;',
+            'SELECT i.domain, i.link, i.`primary`, i.secondary, i.render, i.valid_link, i.first_link_date, i.last_link_date, i.last_link_status, i.from_device, i.last_fetch_date, i.last_edit_date, i.blocked, i.sticker_path, i.sticker_link, i.display_sticker, d.name, d.first_login, d.last_login FROM Instance i INNER JOIN Device d ON d.id = i.from_device WHERE i.id = :I;',
             ['I' => $key]
         );
         if ($data)
@@ -316,6 +402,7 @@ class InstanceDAO extends Instance implements DAO
                 link: $data['link'],
                 primary: $data['primary'],
                 secondary: $data['secondary'],
+                render: RichDisplayInstanceType::from($data['render']),
                 valid_link: boolval($data['valid_link']),
                 first_link_date: $data['first_link_date'],
                 last_link_date: $data['last_link_date'],
@@ -338,7 +425,7 @@ class InstanceDAO extends Instance implements DAO
     public static function getByAddress(Database $db, string $link_url): Instance
     {
         $data = $db->select(
-            'SELECT i.id AS instance_id, i.domain, i.`primary`, i.secondary, i.valid_link, i.first_link_date, i.last_link_date, i.last_link_status, i.from_device, i.last_fetch_date, i.last_edit_date, i.blocked, i.sticker_path, i.sticker_link, i.display_sticker, d.name, d.first_login, d.last_login FROM Instance i INNER JOIN Device d ON d.id = i.from_device WHERE i.link = :L;',
+            'SELECT i.id AS instance_id, i.domain, i.`primary`, i.secondary, i.render, i.valid_link, i.first_link_date, i.last_link_date, i.last_link_status, i.from_device, i.last_fetch_date, i.last_edit_date, i.blocked, i.sticker_path, i.sticker_link, i.display_sticker, d.name, d.first_login, d.last_login FROM Instance i INNER JOIN Device d ON d.id = i.from_device WHERE i.link = :L;',
             ['L' => $link_url]
         );
         if ($data)
@@ -348,6 +435,7 @@ class InstanceDAO extends Instance implements DAO
                 link: $link_url,
                 primary: $data['primary'],
                 secondary: $data['secondary'],
+                render: RichDisplayInstanceType::from($data['render']),
                 valid_link: boolval($data['valid_link']),
                 first_link_date: $data['first_link_date'],
                 last_link_date: $data['last_link_date'],
@@ -370,7 +458,7 @@ class InstanceDAO extends Instance implements DAO
     /** @return Instance[] */
     public static function getAll(Database $db, bool $only_valid_links = false): array
     {
-        $data = $db->selectAll('SELECT i.id, i.domain, i.link, i.`primary`, i.secondary, i.valid_link, i.first_link_date, i.last_link_date, i.last_link_status, i.from_device, i.last_fetch_date, i.last_edit_date, i.blocked, i.sticker_path, i.sticker_link, i.display_sticker, d.name, d.first_login, d.last_login FROM Instance i INNER JOIN Device d ON d.id = i.from_device' . ($only_valid_links ? ' WHERE i.valid_link = 1' : '') . ';');
+        $data = $db->selectAll('SELECT i.id, i.domain, i.link, i.`primary`, i.secondary, i.render, i.valid_link, i.first_link_date, i.last_link_date, i.last_link_status, i.from_device, i.last_fetch_date, i.last_edit_date, i.blocked, i.sticker_path, i.sticker_link, i.display_sticker, d.name, d.first_login, d.last_login FROM Instance i INNER JOIN Device d ON d.id = i.from_device' . ($only_valid_links ? ' WHERE i.valid_link = 1' : '') . ';');
         return array_map(function (array $row) {
             return Instance::raw(
                 id: $row['id'],
@@ -378,6 +466,7 @@ class InstanceDAO extends Instance implements DAO
                 link: $row['link'],
                 primary: $row['primary'],
                 secondary: $row['secondary'],
+                render: RichDisplayInstanceType::from($row['render']),
                 valid_link: boolval($row['valid_link']),
                 first_link_date: $row['first_link_date'],
                 last_link_date: $row['last_link_date'],
@@ -408,6 +497,7 @@ class InstanceDAO extends Instance implements DAO
                 link: $row['link'],
                 primary: $row['primary'],
                 secondary: $row['secondary'],
+                render: $row['render'],
                 valid_link: boolval($row['valid_link']),
                 first_link_date: $row['first_link_date'],
                 last_link_date: $row['last_link_date'],
@@ -427,13 +517,19 @@ class InstanceDAO extends Instance implements DAO
             );
         }, $data);
     }
-    public static function create(Database $db, string $domain, string $link, string $primary, string $secondary, bool $valid_link, ?string $sticker_path, ?string $sticker_link, ?LinkStatus $status = null): Instance
+    public static function create(Database $db, string $domain, string $link, string $primary, string $secondary, RichDisplayInstanceType $render, bool $valid_link, ?string $sticker_path, ?string $sticker_link, ?LinkStatus $status = null, ?string $public_key = null): Instance
     {
         $device = DeviceDAO::getCurrent($db) ?? DeviceDAO::getRemote($db);
+        $private_key = null;
+        if (is_null($public_key)) {
+            $rsa = openssl_pkey_new(['digest_alg' => 'sha512', 'private_key_bits' => 4096, 'private_key_type' => OPENSSL_KEYTYPE_RSA]);
+            openssl_pkey_export($rsa, $private_key);
+            $public_key = openssl_pkey_get_details($rsa)['key'];
+        }
         $date = date('Y-m-d H:i:s');
         $id = $db->insert(
-            'INSERT INTO Instance (domain, link, `primary`, secondary, i.valid_link, sticker_path, sticker_link, first_link_date, from_device, last_edit_date) VALUES (:D, :N, :P, :S, :H, :N, :L, :F, :L);',
-            ['D' => $domain, 'N' => $link, 'P' => $primary, 'S' => $secondary, 'V' => $valid_link, 'H' => $sticker_path, 'N' => $sticker_link, 'L' => $date, 'F' => $device->getId()],
+            'INSERT INTO Instance (domain, link, `primary`, secondary, render, valid_link, sticker_path, sticker_link, first_link_date, from_device, last_edit_date) VALUES (:D, :N, :P, :S, :R, :H, :N, :L, :F, :L);',
+            ['D' => $domain, 'N' => $link, 'P' => $primary, 'S' => $secondary, 'R' => $render->value, 'V' => $valid_link, 'H' => $sticker_path, 'N' => $sticker_link, 'L' => $date, 'F' => $device->getId()],
             'Instance'
         );
         return Instance::raw(
@@ -442,6 +538,7 @@ class InstanceDAO extends Instance implements DAO
             link: $link,
             primary: $primary,
             secondary: $secondary,
+            render: $render,
             valid_link: $valid_link,
             first_link_date: $date,
             last_link_date: null,
@@ -452,7 +549,26 @@ class InstanceDAO extends Instance implements DAO
             blocked: false,
             sticker_path: $sticker_path,
             sticker_link: $sticker_link,
-            display_sticker: false
+            display_sticker: false,
+            public_key: $public_key,
+            private_key: $private_key
+        );
+    }
+    public static function createFromFederationInfo(Database $db, array $federation_info, ?LinkStatus $status = null): Instance
+    {
+        $_normalize_url = require(__DIR__ . '/../functions/normalize_url.php');
+        return self::create(
+            db: $db,
+            domain: $federation_info['domain'],
+            link: $federation_info['link'],
+            primary: $federation_info['primary'],
+            secondary: $federation_info['secondary'],
+            render: RichDisplayInstanceType::from($federation_info['render']),
+            valid_link: $_normalize_url($federation_info['link'])['valid_link'],
+            sticker_path: $federation_info['sticker_path'],
+            sticker_link: $federation_info['sticker_link'],
+            status: $status,
+            public_key: array_key_exists('key', $federation_info) ? $federation_info['key'] : null
         );
     }
 }
