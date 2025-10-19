@@ -146,15 +146,23 @@ if (isset($_GET['device'])) {
         }, $all_categories)
     ], true);
 } else if ($handler->isAuthorized()) {
-    /**
-     * LIST DEVICE MANAGEMENT
-     */
     $db = $handler->getDatabase();
-    $handler->render(
-        'link/device_list.latte',
-        [
-            'devices' => DeviceDAO::getAll($db),
-            'current' => DeviceDAO::getCurrent($db)->getId()
-        ]
-    );
+    if (!isset($_GET['action'])) $_GET['action'] = 'devices';
+    else if (!isset($_GET['instance'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "instance" query parameter');
+    else $instance = InstanceDAO::get($db, $_GET['instance']);
+    switch ($_GET['action']) {
+        case 'devices':
+            /**
+             * LIST DEVICE MANAGEMENT
+             */
+            return $handler->render(
+                'link/device_list.latte',
+                [
+                    'devices' => DeviceDAO::getAll($db),
+                    'current' => DeviceDAO::getCurrent($db)->getId()
+                ]
+            );
+        default:
+            return $handler->error(HTTP_BAD_REQUEST, 'Unknown action');
+    }
 } else $handler->error(HTTP_UNAUTHORIZED);
