@@ -42,6 +42,8 @@ if (isset($_GET['sync'])) {
                         'link' => $instance->getLink(),
                         'primary' => $instance->getPrimaryColor(),
                         'secondary' => $instance->getSecondaryColor(),
+                        'sticker_path' => $instance->getStickerPath(),
+                        'sticker_link' => $instance->getStickerLink(),
                         'categories' => array_keys($category_map),
                         'last_sync' => $original_date ?? ''
                     ]),
@@ -77,9 +79,11 @@ if (isset($_GET['sync'])) {
             if (
                 $remote->getDomainName() != $result->domain ||
                 $remote->getPrimaryColor() != $result->primary ||
-                $remote->getSecondaryColor() != $result->secondary
+                $remote->getSecondaryColor() != $result->secondary ||
+                $remote->getStickerPath() != $result->sticker_path ||
+                $remote->getStickerLink() != $result->sticker_link
             ) {
-                $remote->updateInstance($result->domain, $result->primary, $result->secondary, $link_status);
+                $remote->updateInstance($result->domain, $result->primary, $result->secondary, $result->sticker_path, $result->sticker_link, $link_status);
                 $instance_changed = true;
             } else $remote->updateLinkStatus($link_status);
             if ($link_status != $link_status::PRELOADED) {
@@ -235,6 +239,12 @@ if (isset($_GET['sync'])) {
         $categories[$row['source_id']] = $row['id'];
     }
     if ($lastSourceId >= 0) $changed = $changed || sync($db, $lastSourceId, $lastSourceLink, $categories, $lastSourceDate);
-    if ($changed) $handler->render('index-bare.latte', ['categories' => CategoryDAO::getAll($db, includePrivate: $handler->isAuthorized())]);
+    if ($changed) $handler->render('index-bare.latte', [
+        'categories' => CategoryDAO::getAll($db, includePrivate: $handler->isAuthorized()),
+        'stickers' => InstanceDAO::getStickers($handler->getDatabase())
+    ]);
     else $handler->status(HTTP_NOT_MODIFIED);
-} else $handler->render('index.latte', ['categories' => CategoryDAO::getAll($handler->getDatabase(), includePrivate: $handler->isAuthorized())]);
+} else $handler->render('index.latte', [
+    'categories' => CategoryDAO::getAll($handler->getDatabase(), includePrivate: $handler->isAuthorized()),
+    'stickers' => InstanceDAO::getStickers($handler->getDatabase())
+]);

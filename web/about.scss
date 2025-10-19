@@ -123,6 +123,12 @@ section#federation {
                 color: $secondary;
                 vertical-align: -1.5pt;
             }
+
+            img {
+                height: 1.25em;
+                max-width: 12em;
+                vertical-align: bottom;
+            }
         }
     }
 
