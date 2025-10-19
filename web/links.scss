@@ -536,9 +536,12 @@ aside#stickers {
         display: block;
         width: fit-content;
         height: fit-content;
+        background-color: $light3;
+        border-radius: 4pt;
 
         @media (min-width: $breakpoint) {
             transform: rotate(var(--s-rot)) translateX(var(--s-pos)) translateY(calc(var(--s-pos) * -3));
+            border-radius: 1em;
         }
     }
 }
