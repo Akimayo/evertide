@@ -239,6 +239,12 @@ if (isset($_GET['sync'])) {
         $categories[$row['source_id']] = $row['id'];
     }
     if ($lastSourceId >= 0) $changed = $changed || sync($db, $lastSourceId, $lastSourceLink, $categories, $lastSourceDate);
-    if ($changed) $handler->render('index-bare.latte', ['categories' => CategoryDAO::getAll($db, includePrivate: $handler->isAuthorized())]);
+    if ($changed) $handler->render('index-bare.latte', [
+        'categories' => CategoryDAO::getAll($db, includePrivate: $handler->isAuthorized()),
+        'stickers' => InstanceDAO::getStickers($handler->getDatabase())
+    ]);
     else $handler->status(HTTP_NOT_MODIFIED);
-} else $handler->render('index.latte', ['categories' => CategoryDAO::getAll($handler->getDatabase(), includePrivate: $handler->isAuthorized())]);
+} else $handler->render('index.latte', [
+    'categories' => CategoryDAO::getAll($handler->getDatabase(), includePrivate: $handler->isAuthorized()),
+    'stickers' => InstanceDAO::getStickers($handler->getDatabase())
+]);

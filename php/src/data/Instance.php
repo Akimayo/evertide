@@ -370,7 +370,37 @@ class InstanceDAO extends Instance implements DAO
     /** @return Instance[] */
     public static function getAll(Database $db, bool $only_valid_links = false): array
     {
-        $data = $db->selectAll('SELECT i.id, i.domain, i.link, i.`primary`, i.secondary, i.valid_link, i.first_link_date, i.last_link_date, i.last_link_status, i.from_device, i.last_fetch_date, i.last_edit_date, i.blocked, i.sticker_path, i.sticker_link, i.display_sticker, d.name, d.first_login, d.last_login FROM Instance i INNER JOIN Device d ON d.id = i.from_device;');
+        $data = $db->selectAll('SELECT i.id, i.domain, i.link, i.`primary`, i.secondary, i.valid_link, i.first_link_date, i.last_link_date, i.last_link_status, i.from_device, i.last_fetch_date, i.last_edit_date, i.blocked, i.sticker_path, i.sticker_link, i.display_sticker, d.name, d.first_login, d.last_login FROM Instance i INNER JOIN Device d ON d.id = i.from_device' . ($only_valid_links ? ' WHERE i.valid_link = 1' : '') . ';');
+        return array_map(function (array $row) {
+            return Instance::raw(
+                id: $row['id'],
+                domain: $row['domain'],
+                link: $row['link'],
+                primary: $row['primary'],
+                secondary: $row['secondary'],
+                valid_link: boolval($row['valid_link']),
+                first_link_date: $row['first_link_date'],
+                last_link_date: $row['last_link_date'],
+                last_link_status: $row['last_link_status'],
+                from_device: new Device(
+                    id: $row['from_device'],
+                    name: $row['name'],
+                    first_login: $row['first_login'],
+                    last_login: $row['last_login']
+                ),
+                last_fetch_date: $row['last_fetch_date'],
+                last_edit_date: $row['last_edit_date'],
+                blocked: boolval($row['blocked']),
+                sticker_path: $row['sticker_path'],
+                sticker_link: $row['sticker_link'],
+                display_sticker: boolval($row['display_sticker'])
+            );
+        }, $data);
+    }
+    /** @return Instance[] */
+    public static function getStickers(Database $db): array
+    {
+        $data = $db->selectAll('SELECT i.id, i.domain, i.link, i.`primary`, i.secondary, i.valid_link, i.first_link_date, i.last_link_date, i.last_link_status, i.from_device, i.last_fetch_date, i.last_edit_date, i.blocked, i.sticker_path, i.sticker_link, i.display_sticker, d.name, d.first_login, d.last_login FROM Instance i INNER JOIN Device d ON d.id = i.from_device WHERE i.display_sticker = 1;');
         return array_map(function (array $row) {
             return Instance::raw(
                 id: $row['id'],
