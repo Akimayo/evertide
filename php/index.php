@@ -33,35 +33,34 @@ if (isset($_GET['sync'])) {
         $instance = Config::get_config()->instance;
         try {
             $db->begin();
+            $remote = InstanceDAO::get($db, $instance_id)->getAccessObject($db);
             $context = stream_context_create([
                 'http' => [
                     'header' => "Content-type: application/x-www-form-urlencoded\r\nAccept: application/json\r\n",
                     'method' => 'POST',
-                    'content' => http_build_query([
-                        'domain' => $instance->getDisplayName(),
-                        'link' => $instance->getLink(),
-                        'primary' => $instance->getPrimaryColor(),
-                        'secondary' => $instance->getSecondaryColor(),
-                        'sticker_path' => $instance->getStickerPath(),
-                        'sticker_link' => $instance->getStickerLink(),
-                        'categories' => array_keys($category_map),
-                        'last_sync' => $original_date ?? ''
-                    ]),
+                    'content' => http_build_query(array_merge(
+                        $instance->getSignedFederationInfo($remote->getPublicKey()),
+                        [
+                            'categories' => array_keys($category_map),
+                            'last_sync' => $original_date ?? ''
+                        ]
+                    )),
                     'ignore_errors' => true
                 ]
             ]);
             $result = file_get_contents($link . 'link?sync', false, $context);
-            $remote = InstanceDAO::get($db, $instance_id)->getAccessObject($db);
             if (!$result || ($result = json_decode($result)) === null) {
                 $remote->updateLinkStatus(LinkStatus::UNREACHABLE);
                 $db->commit();
+                echo '  Server unreachable' . PHP_EOL;
                 return false;
             }
             $status = property_exists($result, 'status') ? $result->status : HTTP_OK;
-            if (!property_exists($result, 'instance') || empty($result->instance)) {
+            if (!property_exists($result, 'instance') || empty($result->instance) || $status >= 400) {
                 // In case of fatal errors
                 $remote->updateLinkStatus(LinkStatus::ERROR);
                 $db->commit();
+                echo '  Server returned an error: ' . $result->message . PHP_EOL;
                 return false;
             }
             $link_status = property_exists($result, 'categories') && is_array($result->categories) ? match ($status) {
@@ -80,10 +79,10 @@ if (isset($_GET['sync'])) {
                 $remote->getDomainName() != $result->domain ||
                 $remote->getPrimaryColor() != $result->primary ||
                 $remote->getSecondaryColor() != $result->secondary ||
-                $remote->getStickerPath() != $result->sticker_path ||
-                $remote->getStickerLink() != $result->sticker_link
+                (isset($result->stciker_path) && $remote->getStickerPath() != $result->sticker_path) ||
+                (isset($result->sticker_link) && $remote->getStickerLink() != $result->sticker_link)
             ) {
-                $remote->updateInstance($result->domain, $result->primary, $result->secondary, $result->sticker_path, $result->sticker_link, $link_status);
+                $remote->updateInstance($result->domain, $result->primary, $result->secondary, RichDisplayInstanceType::from(intval($result->render)), $result->sticker_path ?? null, $result->sticker_link ?? null, $link_status);
                 $instance_changed = true;
             } else $remote->updateLinkStatus($link_status);
             if ($link_status != $link_status::PRELOADED) {
@@ -183,7 +182,9 @@ if (isset($_GET['sync'])) {
                     }, array_keys($deleted_links)),
                     $deleted_links
                 );
-                $remote_categories = CategoryDAO::getAllFromRemote($db, $remote);
+                $remote_categories = array_map(function (Category $c) {
+                    return $c->getId();
+                }, CategoryDAO::getAllFromRemote($db, $remote));
                 $remote_categories = array_combine(
                     array_map(function (int $i): string {
                         return ':S' . $i;

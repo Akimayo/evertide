@@ -1,6 +1,7 @@
 <?php
 
 /** @var Handler $handler */
+
 $handler = require(__DIR__ . "/src/handler.php");
 require_once(__DIR__ . "/src/data/Category.php");
 
@@ -32,16 +33,18 @@ if (isset($_GET['device'])) {
     if (!isset($_POST['link'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "link" in POST body');
     if (!isset($_POST['primary'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "primary" in POST body');
     if (!isset($_POST['secondary'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "secondary" in POST body');
-    if (!isset($_POST['sticker_path'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "sticker_path" in POST body');
-    if (!isset($_POST['sticker_link'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "sticker_link" in POST body');
+    if (!isset($_POST['render'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "render" in POST body');
+    if (!isset($_POST['signature'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "signature" in POST body');
+    if (!$remote->validateSignature($_POST)) return $handler->error(HTTP_UNAUTHORIZED, 'Invalid signature');
 
     if (
         $remote->getDisplayName() != $_POST['domain'] ||
         $remote->getPrimaryColor() != $_POST['primary'] ||
         $remote->getSecondaryColor() != $_POST['secondary'] ||
-        $remote->getStickerPath() != $_POST['sticker_path'] ||
-        $remote->getStickerLink() != $_POST['sticker_link']
-    ) $remote->updateInstance($_POST['domain'], $_POST['primary'], $_POST['secondary'], $_POST['sticker_path'], $_POST['sticker_link'], LinkStatus::SUCCESS);
+        $remote->getRenderType()->value != $_POST['render'] ||
+        (isset($_POST['sticker_path']) && $remote->getStickerPath() != $_POST['sticker_path']) ||
+        (isset($_POST['sticker_link']) && $remote->getStickerLink() != $_POST['sticker_link'])
+    ) $remote->updateInstance($_POST['domain'], $_POST['primary'], $_POST['secondary'], RichDisplayInstanceType::from(intval($_POST['render'])), $_POST['sticker_path'] ?? null, $_POST['sticker_link'] ?? null, LinkStatus::SUCCESS);
 
     if (!isset($_POST['categories'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "categories" in POST body');
     if (!isset($_POST['last_sync'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "last_sync" in POST body');
@@ -104,47 +107,46 @@ if (isset($_GET['device'])) {
      * INSTANCE FETCH REQUEST
      */
     if (!isset($_POST['domain'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "domain" in POST body');
+    if (!isset($_POST['link'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "link" in POST body');
+    if (!isset($_POST['primary'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "primary" in POST body');
+    if (!isset($_POST['secondary'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "secondary" in POST body');
+    if (!isset($_POST['render'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "render" in POST body');
+
     $instance = Config::get_config()->instance;
     $db = new ServerDatabase($handler);
+    $response = [];
     try {
         $remote = InstanceDAO::getByAddress($db, $_POST['link']);
         if ($remote->isBlocked()) return $handler->error(HTTP_FORBIDDEN, 'Blocked');
         if ((time() - strtotime($remote->getLastFetchDate())) < 2) return $handler->error(HTTP_REQUEST_TIMEOUT, 'Too many requests');
+        if (!isset($_POST['signature'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "signature" in POST body');
+        if (!$remote->validateSignature($_POST)) return $handler->error(HTTP_UNAUTHORIZED, 'Invalid signature');
     } catch (Exception) {
         /* Intended fail, new instance */
         if (!$instance->isOpen()) return $handler->error(HTTP_FORBIDDEN, 'Federation is not open');
-        $_normalize_url = require(__DIR__ . '/../functions/normalize_url.php');
-        $remote = InstanceDAO::create(
-            $db,
-            domain: $_POST['domain'],
-            link: $_POST['link'],
-            primary: $_POST['primary'],
-            secondary: $_POST['secondary'],
-            valid_link: $_normalize_url($_POST['link'])['valid_link'],
-            sticker_path: $_POST['sticker_path'],
-            sticker_link: $_POST['sticker_link']
-        );
+        $_normalize_url = require(__DIR__ . '/src/functions/normalize_url.php');
+        $remote = InstanceDAO::createFromFederationInfo($db, $_POST, $_normalize_url($_POST['link'])['valid_link']);
+        $response['key'] = $remote->getPublicKey();
     }
     $remote->getAccessObject($db)->updateFetchDate();
     $all_categories = CategoryDAO::getAll($db);
-    $handler->render('', [
-        'categories' => array_map(function (Category $cat): array {
-            return [
-                'id' => $cat->getId(),
-                'name' => $cat->getName(),
-                'icon' => $cat->getIcon(),
-                'link_count' => count($cat->getLinks()),
-                'categories' => array_map(function (LeafCategory $cat): array {
-                    return [
-                        'id' => $cat->getId(),
-                        'name' => $cat->getName(),
-                        'icon' => $cat->getIcon(),
-                        'link_count' => count($cat->getLinks())
-                    ];
-                }, $cat->getCategories())
-            ];
-        }, $all_categories)
-    ], true);
+    $response['categories'] = array_map(function (Category $cat): array {
+        return [
+            'id' => $cat->getId(),
+            'name' => $cat->getName(),
+            'icon' => $cat->getIcon(),
+            'link_count' => count($cat->getLinks()),
+            'categories' => array_map(function (LeafCategory $cat): array {
+                return [
+                    'id' => $cat->getId(),
+                    'name' => $cat->getName(),
+                    'icon' => $cat->getIcon(),
+                    'link_count' => count($cat->getLinks())
+                ];
+            }, $cat->getCategories())
+        ];
+    }, $all_categories);
+    $handler->render('', $response, true);
 } else if ($handler->isAuthorized()) {
     $db = $handler->getDatabase();
     if (!isset($_GET['action'])) $_GET['action'] = 'devices';

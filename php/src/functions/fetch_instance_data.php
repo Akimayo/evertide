@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 return function (ReadWriteDatabase $db, ?int $instance_id = null, bool $retry_unreachable = false): array {
     $valid_link = true;
+    // Check whether instance is already known and is not unreachable or blocked
     if (is_null($instance_id)) {
         $_normalize_url = require(__DIR__ . '/normalize_url.php');
         ['domain' => $domain, 'path' => $path, 'valid_link' => $valid_link] = $_normalize_url($_POST['url']);
@@ -25,99 +26,92 @@ return function (ReadWriteDatabase $db, ?int $instance_id = null, bool $retry_un
     $cfg = Config::get_config();
     $instance = $cfg->instance;
 
+    // Request federation from the remote instance
     $context = stream_context_create([
         'http' => [
             'header' => "Content-type: application/x-www-form-urlencoded\r\nAccept: application/json\r\n",
             'method' => 'POST',
-            'content' => http_build_query([
-                'domain' => $instance->getDisplayName(),
-                'link' => $instance->getLink(),
-                'primary' => $instance->getPrimaryColor(),
-                'secondary' => $instance->getSecondaryColor(),
-                'sticker_path' => $instance->getStickerPath(),
-                'sticker_link' => $instance->getStickerLink()
-            ]),
+            // If the remote is known, sign the request with its public key, otherwise send unsigned
+            'content' => http_build_query(is_null($remote) ? $instance->getFederationInfo() : $instance->getSignedFederationInfo($remote->getPublicKey())),
             'ignore_errors' => true
         ]
     ]);
-
     $result = file_get_contents($url, false, $context);
-    if (!$result || ($result = json_decode($result)) === null) {
+
+    // Check whether request did not fail on HTTP layer
+    if (!$result || ($result = json_decode($result, true)) === null) {
         if ($remote !== null) $remote->getAccessObject($db)->updateLinkStatus(LinkStatus::UNREACHABLE);
         return [false, 'Remote unreachable (invalid response)'];
     }
-    $status = property_exists($result, 'status') ? $result->status : HTTP_OK;
-    $message = property_exists($result, 'message') ? $result->message : null;
-    if (!property_exists($result, 'instance') || empty($result->instance)) {
+    // Check whether remote is an evertide instance
+    $status = array_key_exists('status', $result) ? $result['status'] : HTTP_OK;
+    $message = array_key_exists('message', $result) ? $result['message'] : null;
+    if (!array_key_exists('instance', $result) || empty($result['instance'])) {
         // In case of fatal errors
         if ($remote !== null) $remote->getAccessObject($db)->updateLinkStatus(LinkStatus::ERROR);
         return [false, 'Remote error (missing instance)'];
     }
-    $link_status = property_exists($result, 'categories') && is_array($result->categories) ? match ($status) {
+    // Check whether remote instance returned success
+    $link_status = array_key_exists('categories', $result) && is_array($result['categories']) ? match ($status) {
         HTTP_OK => LinkStatus::PRELOADED,
         HTTP_REQUEST_TIMEOUT => LinkStatus::TIMED_OUT,
         HTTP_BAD_REQUEST => LinkStatus::ERROR,
         HTTP_FORBIDDEN => LinkStatus::BLOCKED,
         default => LinkStatus::UNREACHABLE
     } : LinkStatus::ERROR;
-    $categories = @$result->categories;
-    $result = $result->instance;
+    $categories = $result['categories'] ?? [];
+    $public_key = array_key_exists('key', $result) ? $result['key'] : null; // On first contact the remote server will send a public key
+    $result = $result['instance'];
     try {
-        $remote = InstanceDAO::getByAddress($db, $result->link)->getAccessObject($db); // This is in case the instance is a redirect - fetch by the new address
+        // If instance is known, update
+        $remote = InstanceDAO::getByAddress($db, $result['link'])->getAccessObject($db); // This is in case the instance is a redirect - fetch by the new address
         if (
-            $remote->getDomainName() != $result->domain ||
-            $remote->getPrimaryColor() != $result->primary ||
-            $remote->getSecondaryColor() != $result->secondary ||
-            $remote->getStickerPath() != $result->sticker_path ||
-            $remote->getStickerLink() != $result->sticker_link
-        ) $remote->updateInstance($result->domain, $result->primary, $result->secondary, $result->sticker_path, $result->sticker_link, $link_status);
+            $remote->getDomainName() != $result['domain'] ||
+            $remote->getPrimaryColor() != $result['primary'] ||
+            $remote->getSecondaryColor() != $result['secondary'] ||
+            $remote->getRenderType()->value != $result['render'] ||
+            (isset($result['sticker_path']) && $remote->getStickerPath() != $result['sticker_path']) ||
+            (isset($result['sticker_link']) && $remote->getStickerLink() != $result['sticker_link'])
+        ) $remote->updateInstance($result['domain'], $result['primary'], $result['secondary'], RichDisplayInstanceType::from(intval($result['render'])), $result['sticker_path'], $result['sticker_link'], $link_status);
         else $remote->updateLinkStatus($link_status);
     } catch (Exception) {
         /* Intended fail, new instance */
-        $remote = InstanceDAO::create(
-            $db,
-            domain: $result->domain,
-            link: $result->link,
-            primary: $result->primary,
-            secondary: $result->secondary,
-            valid_link: $valid_link,
-            sticker_path: $result->sticker,
-            sticker_link: $result->sticker_link,
-            status: $link_status
-        );
+        $remote = InstanceDAO::createFromFederationInfo($db, $result, $valid_link, $public_key, $link_status);
     }
 
+    // Return preloaded categories for selection by user
     $device = DeviceDAO::getCurrent($db);
     if ($link_status == LinkStatus::PRELOADED) return [
         $remote,
-        array_map(function (stdClass $category) use ($device, $remote): Category {
+        array_map(function (array $category) use ($device, $remote): Category {
             return new Category(
                 id: -1,
-                name: $category->name,
-                icon: $category->icon,
+                name: $category['name'],
+                icon: $category['icon'],
                 source: $remote,
                 public: true,
                 create_date: '',
                 update_date: '',
                 from_device: $device,
                 links: [],
-                categories: array_map(function (stdClass $category) use ($device, $remote): LeafCategory {
+                categories: array_map(function (array $category) use ($device, $remote): LeafCategory {
                     return new LeafCategory(
                         id: -1,
-                        name: $category->name,
-                        icon: $category->icon,
+                        name: $category['name'],
+                        icon: $category['icon'],
                         source: $remote,
                         public: true,
                         create_date: '',
                         update_date: '',
                         from_device: $device,
                         links: [],
-                        source_id: $category->id
+                        source_id: $category['id']
                     );
-                }, $category->categories),
-                source_id: $category->id
+                }, $category['categories']),
+                source_id: $category['id']
             );
         }, $categories)
     ];
+    // Return error message when something goes wrong
     else return [false, $message ?? $link_status->name];
 };

@@ -303,7 +303,7 @@ class CategoryDAO extends LeafCategoryDAO implements DAO
            dl.name AS link_device_name, dl.first_login AS link_device_first_login, dl.last_login AS link_device_last_login,
            c.id AS category_id, c.name AS category_name, c.icon AS category_icon, c.source AS category_source, c.create_date AS category_create_date, c.update_date AS category_update_date, c.from_device AS category_device, c.public AS category_public, c.source_id AS category_source_id,
            dc.name AS category_device_name, dc.first_login AS category_device_first_login, dc.last_login AS category_device_last_login,
-           i.domain, i.link, i.`primary`, i.secondary, i.valid_link, i.first_link_date, i.last_link_date, i.last_link_status, i.from_device AS instance_device, i.last_fetch_date, i.last_edit_date, i.blocked, i.sticker_path, i.sticker_link, i.display_sticker,
+           i.domain, i.link, i.`primary`, i.secondary, i.render, i.valid_link, i.first_link_date, i.last_link_date, i.last_link_status, i.from_device AS instance_device, i.last_fetch_date, i.last_edit_date, i.blocked, i.sticker_path, i.sticker_link, i.display_sticker,
            di.name AS instance_device_name, di.first_login AS instance_device_first_login, di.last_login AS instance_device_last_login,
            p.id AS parent_id, p.name AS parent_name, p.icon AS parent_icon, p.create_date AS parent_create_date, p.update_date AS parent_update_date, p.from_device AS parent_device, p.public AS parent_public, p.source_id AS parent_source_id,
            dp.name AS parent_device_name, dp.first_login AS parent_device_first_login, dp.last_login AS parent_device_last_login
@@ -427,6 +427,7 @@ class CategoryDAO extends LeafCategoryDAO implements DAO
                     link: $sourceRow['link'],
                     primary: $sourceRow['primary'],
                     secondary: $sourceRow['secondary'],
+                    render: RichDisplayInstanceType::from($sourceRow['render']),
                     valid_link: boolval($sourceRow['valid_link']),
                     first_link_date: $sourceRow['first_link_date'],
                     last_link_date: $sourceRow['last_link_date'],

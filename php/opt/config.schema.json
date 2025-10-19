@@ -58,6 +58,28 @@
           "type": "string",
           "pattern": "#([0-9a-fA-F]{3}){1,2}"
         },
+        "richRenderOnRemote": {
+          "title": "Rich display type of this instance on remote instances",
+          "description": "When a remote instance uses rich rendering mode, this option specifies in which way your instance will be rendered.",
+          "type": "string",
+          "enum": [
+            "train",
+            "ship",
+            "plane",
+            "neighbour",
+            "merchant",
+            "circus",
+            "wizard"
+          ],
+          "default": "neighbour"
+        },
+        "richRenderEra": {
+          "title": "Rich display type for your instance",
+          "description": "When your instance uses rich rendering, this option specifies the style of an era in which your instance will be rendered.",
+          "type": "string",
+          "enum": ["prehistoric", "roman", "medieval", "present", "future"],
+          "default": "present"
+        },
         "sticker_path": {
           "title": "Path to a sticker image file",
           "description": "Optional path, relative to the `link` field, specifying an image (sticker) that remote instances can display.",
