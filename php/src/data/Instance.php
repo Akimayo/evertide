@@ -31,6 +31,7 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
     protected string $last_edit_date;
     protected bool $blocked = false;
     protected ?string $sticker_path;
+    protected ?string $sticker_link;
     protected bool $display_sticker = false;
 
     public static function raw(
@@ -47,6 +48,7 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
         string $last_edit_date,
         bool $blocked,
         ?string $sticker_path,
+        ?string $sticker_link,
         bool $display_sticker
     ): static {
         $inst = new self();
@@ -63,6 +65,7 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
         $inst->last_edit_date = $last_edit_date;
         $inst->blocked = $blocked;
         $inst->sticker_path = $sticker_path;
+        $inst->sticker_link = $sticker_link;
         $inst->display_sticker = $display_sticker;
         return $inst;
     }
@@ -123,6 +126,10 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
     {
         return $this->sticker_path;
     }
+    public function getStickerLink(): string
+    {
+        return $this->sticker_link ?? $this->link;
+    }
     public function isStickerDisplayed(): bool
     {
         return !is_null($this->sticker_path) && $this->display_sticker;
@@ -146,6 +153,7 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
             last_edit_date: $this->last_edit_date,
             blocked: $this->blocked,
             sticker_path: $this->sticker_path,
+            sticker_link: $this->sticker_link,
             display_sticker: $this->display_sticker
         );
     }
@@ -193,6 +201,7 @@ class InstanceDAO extends Instance implements DAO
         string $last_edit_date,
         bool $blocked,
         ?string $sticker_path,
+        ?string $sticker_link,
         bool $display_sticker
     ) {
         $this->db = $db;
@@ -209,6 +218,7 @@ class InstanceDAO extends Instance implements DAO
         $this->last_edit_date = $last_edit_date;
         $this->blocked = $blocked;
         $this->sticker_path = $sticker_path;
+        $this->sticker_link = $sticker_link;
         $this->display_sticker = $display_sticker;
     }
 
@@ -230,17 +240,20 @@ class InstanceDAO extends Instance implements DAO
             return $this;
         } else throw new Exception('Updating Instance.last_link_date and Instance.last_link_status failed');
     }
-    public function updateInstance(string $domain, string $primary, string $secondary, ?string $sticker_path, LinkStatus $status): self
+    public function updateInstance(string $domain, string $primary, string $secondary, ?string $sticker_path, ?string $sticker_link, LinkStatus $status): self
     {
         $date = date('Y-m-d H:i:s');
+        $display_sticker_new = $this->display_sticker && $this->sticker_link == $sticker_link; // Hide sticker when link changes to prevent malicious link changes
         if ($this->db->update(
-            'UPDATE Instance SET domain = :D, `primary` = :P, secondary = :S, sticker_path = :H, last_link_date = :L, last_link_status = :T, from_device = :V WHERE id = :I;',
-            ['D' => $domain, 'P' => $primary, 'S' => $secondary, 'H' => $sticker_path, 'L' => $date, 'T' => $status->value, 'I' => $this->id, 'V' => $this->from_device?->getId()]
+            'UPDATE Instance SET domain = :D, `primary` = :P, secondary = :S, sticker_path = :H, sticker_link = :N, display_sticker = :C, last_link_date = :L, last_link_status = :T, from_device = :V WHERE id = :I;',
+            ['D' => $domain, 'P' => $primary, 'S' => $secondary, 'H' => $sticker_path, 'N' => $sticker_link, 'C' => $display_sticker_new, 'L' => $date, 'T' => $status->value, 'I' => $this->id, 'V' => $this->from_device?->getId()]
         )) {
             $this->domain = $domain;
             $this->primary = $primary;
             $this->secondary = $secondary;
             $this->sticker_path = $sticker_path;
+            $this->sticker_link = $sticker_link;
+            $this->display_sticker = $display_sticker_new;
             $this->last_link_date = $date;
             $this->last_link_status = $status;
             return $this;
@@ -274,7 +287,7 @@ class InstanceDAO extends Instance implements DAO
     public static function get(Database $db, int|string $key): Instance
     {
         $data = $db->select(
-            'SELECT i.domain, i.link, i.`primary`, i.secondary, i.first_link_date, i.last_link_date, i.last_link_status, i.from_device, i.last_fetch_date, i.last_edit_date, i.blocked, i.sticker_path, i.display_sticker, d.name, d.first_login, d.last_login FROM Instance i INNER JOIN Device d ON d.id = i.from_device WHERE i.id = :I;',
+            'SELECT i.domain, i.link, i.`primary`, i.secondary, i.first_link_date, i.last_link_date, i.last_link_status, i.from_device, i.last_fetch_date, i.last_edit_date, i.blocked, i.sticker_path, i.sticker_link, i.display_sticker, d.name, d.first_login, d.last_login FROM Instance i INNER JOIN Device d ON d.id = i.from_device WHERE i.id = :I;',
             ['I' => $key]
         );
         if ($data)
@@ -297,6 +310,7 @@ class InstanceDAO extends Instance implements DAO
                 last_edit_date: $data['last_edit_date'],
                 blocked: boolval($data['blocked']),
                 sticker_path: $data['sticker_path'],
+                sticker_link: $data['sticker_link'],
                 display_sticker: boolval($data['display_sticker'])
             );
         else throw new Exception('Instance with the given id does not exist');
@@ -304,7 +318,7 @@ class InstanceDAO extends Instance implements DAO
     public static function getByAddress(Database $db, string $link_url): Instance
     {
         $data = $db->select(
-            'SELECT i.id AS instance_id, i.domain, i.`primary`, i.secondary, i.first_link_date, i.last_link_date, i.last_link_status, i.from_device, i.last_fetch_date, i.last_edit_date, i.blocked, i.sticker_path, i.display_sticker, d.name, d.first_login, d.last_login FROM Instance i INNER JOIN Device d ON d.id = i.from_device WHERE i.link = :L;',
+            'SELECT i.id AS instance_id, i.domain, i.`primary`, i.secondary, i.first_link_date, i.last_link_date, i.last_link_status, i.from_device, i.last_fetch_date, i.last_edit_date, i.blocked, i.sticker_path, i.sticker_link, i.display_sticker, d.name, d.first_login, d.last_login FROM Instance i INNER JOIN Device d ON d.id = i.from_device WHERE i.link = :L;',
             ['L' => $link_url]
         );
         if ($data)
@@ -327,6 +341,7 @@ class InstanceDAO extends Instance implements DAO
                 last_edit_date: $data['last_edit_date'],
                 blocked: boolval($data['blocked']),
                 sticker_path: $data['sticker_path'],
+                sticker_link: $data['sticker_link'],
                 display_sticker: boolval($data['display_sticker'])
             );
         else throw new Exception('Instance with the given link does not exist');
@@ -334,7 +349,7 @@ class InstanceDAO extends Instance implements DAO
     /** @return Instance[] */
     public static function getAll(Database $db): array
     {
-        $data = $db->selectAll('SELECT i.id, i.domain, i.link, i.`primary`, i.secondary, i.first_link_date, i.last_link_date, i.last_link_status, i.from_device, i.last_fetch_date, i.last_edit_date, i.blocked, i.sticker_path, i.display_sticker, d.name, d.first_login, d.last_login FROM Instance i INNER JOIN Device d ON d.id = i.from_device;');
+        $data = $db->selectAll('SELECT i.id, i.domain, i.link, i.`primary`, i.secondary, i.first_link_date, i.last_link_date, i.last_link_status, i.from_device, i.last_fetch_date, i.last_edit_date, i.blocked, i.sticker_path, i.sticker_link, i.display_sticker, d.name, d.first_login, d.last_login FROM Instance i INNER JOIN Device d ON d.id = i.from_device;');
         return array_map(function (array $row) {
             return Instance::raw(
                 id: $row['id'],
@@ -355,17 +370,18 @@ class InstanceDAO extends Instance implements DAO
                 last_edit_date: $row['last_edit_date'],
                 blocked: boolval($row['blocked']),
                 sticker_path: $row['sticker_path'],
+                sticker_link: $row['sticker_link'],
                 display_sticker: boolval($row['display_sticker'])
             );
         }, $data);
     }
-    public static function create(Database $db, string $domain, string $link, string $primary, string $secondary, ?string $sticker_path, ?LinkStatus $status = null): Instance
+    public static function create(Database $db, string $domain, string $link, string $primary, string $secondary, ?string $sticker_path, ?string $sticker_link, ?LinkStatus $status = null): Instance
     {
         $device = DeviceDAO::getCurrent($db) ?? DeviceDAO::getRemote($db);
         $date = date('Y-m-d H:i:s');
         $id = $db->insert(
-            'INSERT INTO Instance (domain, link, `primary`, secondary, sticker_path, first_link_date, from_device, last_edit_date) VALUES (:D, :N, :P, :S, :H, :L, :F, :L);',
-            ['D' => $domain, 'N' => $link, 'P' => $primary, 'S' => $secondary, 'H' => $sticker_path, 'L' => $date, 'F' => $device->getId()],
+            'INSERT INTO Instance (domain, link, `primary`, secondary, sticker_path, sticker_link, first_link_date, from_device, last_edit_date) VALUES (:D, :N, :P, :S, :H, :N, :L, :F, :L);',
+            ['D' => $domain, 'N' => $link, 'P' => $primary, 'S' => $secondary, 'H' => $sticker_path, 'N' => $sticker_link, 'L' => $date, 'F' => $device->getId()],
             'Instance'
         );
         return Instance::raw(
@@ -382,6 +398,7 @@ class InstanceDAO extends Instance implements DAO
             last_edit_date: $date,
             blocked: false,
             sticker_path: $sticker_path,
+            sticker_link: $sticker_link,
             display_sticker: false
         );
     }

@@ -33,7 +33,8 @@ return function (ReadWriteDatabase $db, ?int $instance_id = null, bool $retry_un
                 'link' => $instance->getLink(),
                 'primary' => $instance->getPrimaryColor(),
                 'secondary' => $instance->getSecondaryColor(),
-                'sticker' => $instance->getStickerPath()
+                'sticker_path' => $instance->getStickerPath(),
+                'sticker_link' => $instance->getStickerLink()
             ]),
             'ignore_errors' => true
         ]
@@ -66,8 +67,9 @@ return function (ReadWriteDatabase $db, ?int $instance_id = null, bool $retry_un
             $remote->getDomainName() != $result->domain ||
             $remote->getPrimaryColor() != $result->primary ||
             $remote->getSecondaryColor() != $result->secondary ||
-            $remote->getStickerPath() != $result->sticker
-        ) $remote->updateInstance($result->domain, $result->primary, $result->secondary, $result->sticker, $link_status);
+            $remote->getStickerPath() != $result->sticker_path ||
+            $remote->getStickerLink() != $result->sticker_link
+        ) $remote->updateInstance($result->domain, $result->primary, $result->secondary, $result->sticker_path, $result->sticker_link, $link_status);
         else $remote->updateLinkStatus($link_status);
     } catch (Exception) {
         /* Intended fail, new instance */
@@ -78,6 +80,7 @@ return function (ReadWriteDatabase $db, ?int $instance_id = null, bool $retry_un
             primary: $result->primary,
             secondary: $result->secondary,
             sticker_path: $result->sticker,
+            sticker_link: $result->sticker_link,
             status: $link_status
         );
     }

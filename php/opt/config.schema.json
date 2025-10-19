@@ -58,9 +58,15 @@
           "type": "string",
           "pattern": "#([0-9a-fA-F]{3}){1,2}"
         },
-        "sticker": {
+        "sticker_path": {
           "title": "Path to a sticker image file",
           "description": "Optional path, relative to the `link` field, specifying an image (sticker) that remote instances can display.",
+          "type": ["string", "null"],
+          "default": null
+        },
+        "sticker_link": {
+          "title": "Link the sticker on other instances will point to",
+          "description": "Optional link whereto the sticker will point when displayed on a remote instance. If left empty, the sticker will link to this evertide instance.",
           "type": ["string", "null"],
           "default": null
         },

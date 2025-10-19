@@ -42,7 +42,8 @@ if (isset($_GET['sync'])) {
                         'link' => $instance->getLink(),
                         'primary' => $instance->getPrimaryColor(),
                         'secondary' => $instance->getSecondaryColor(),
-                        'sticker' => $instance->getStickerPath(),
+                        'sticker_path' => $instance->getStickerPath(),
+                        'sticker_link' => $instance->getStickerLink(),
                         'categories' => array_keys($category_map),
                         'last_sync' => $original_date ?? ''
                     ]),
