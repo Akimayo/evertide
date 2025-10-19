@@ -79,7 +79,9 @@ class Handler
                 'domain' => $instance->getDisplayName(),
                 'link' => $instance->getLink(),
                 'primary' => $instance->getPrimaryColor(),
-                'secondary' => $instance->getSecondaryColor()
+                'secondary' => $instance->getSecondaryColor(),
+                'sticker_path' => $instance->getStickerPath(),
+                'sticker_link' => $instance->getStickerLink()
             ];
             header('Content-Type: application/json');
             echo json_encode($params);

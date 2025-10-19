@@ -32,14 +32,16 @@ if (isset($_GET['device'])) {
     if (!isset($_POST['link'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "link" in POST body');
     if (!isset($_POST['primary'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "primary" in POST body');
     if (!isset($_POST['secondary'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "secondary" in POST body');
-    if (!isset($_POST['sticker'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "sticker" in POST body');
+    if (!isset($_POST['sticker_path'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "sticker_path" in POST body');
+    if (!isset($_POST['sticker_link'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "sticker_link" in POST body');
 
     if (
         $remote->getDisplayName() != $_POST['domain'] ||
         $remote->getPrimaryColor() != $_POST['primary'] ||
         $remote->getSecondaryColor() != $_POST['secondary'] ||
-        $remote->getStickerPath() != $_POST['sticker']
-    ) $remote->updateInstance($_POST['domain'], $_POST['primary'], $_POST['secondary'], $_POST['sticker'], LinkStatus::SUCCESS);
+        $remote->getStickerPath() != $_POST['sticker_path'] ||
+        $remote->getStickerLink() != $_POST['sticker_link']
+    ) $remote->updateInstance($_POST['domain'], $_POST['primary'], $_POST['secondary'], $_POST['sticker_path'], $_POST['sticker_link'], LinkStatus::SUCCESS);
 
     if (!isset($_POST['categories'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "categories" in POST body');
     if (!isset($_POST['last_sync'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "last_sync" in POST body');
@@ -111,13 +113,16 @@ if (isset($_GET['device'])) {
     } catch (Exception) {
         /* Intended fail, new instance */
         if (!$instance->isOpen()) return $handler->error(HTTP_FORBIDDEN, 'Federation is not open');
+        $_normalize_url = require(__DIR__ . '/../functions/normalize_url.php');
         $remote = InstanceDAO::create(
             $db,
             domain: $_POST['domain'],
             link: $_POST['link'],
             primary: $_POST['primary'],
             secondary: $_POST['secondary'],
-            sticker_path: $_POST['sticker']
+            valid_link: $_normalize_url($_POST['link'])['valid_link'],
+            sticker_path: $_POST['sticker_path'],
+            sticker_link: $_POST['sticker_link']
         );
     }
     $remote->getAccessObject($db)->updateFetchDate();

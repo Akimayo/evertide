@@ -31,8 +31,8 @@ class Instance extends SettingsContainerAbstract implements DaoAccessible
     protected ?string $last_fetch_date;
     protected string $last_edit_date;
     protected bool $blocked = false;
-    protected ?string $sticker_path;
-    protected ?string $sticker_link;
+    protected ?string $sticker_path = null;
+    protected ?string $sticker_link = null;
     protected bool $display_sticker = false;
 
     public static function raw(

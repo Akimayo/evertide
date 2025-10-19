@@ -79,9 +79,11 @@ if (isset($_GET['sync'])) {
             if (
                 $remote->getDomainName() != $result->domain ||
                 $remote->getPrimaryColor() != $result->primary ||
-                $remote->getSecondaryColor() != $result->secondary
+                $remote->getSecondaryColor() != $result->secondary ||
+                $remote->getStickerPath() != $result->sticker_path ||
+                $remote->getStickerLink() != $result->sticker_link
             ) {
-                $remote->updateInstance($result->domain, $result->primary, $result->secondary, $link_status);
+                $remote->updateInstance($result->domain, $result->primary, $result->secondary, $result->sticker_path, $result->sticker_link, $link_status);
                 $instance_changed = true;
             } else $remote->updateLinkStatus($link_status);
             if ($link_status != $link_status::PRELOADED) {
