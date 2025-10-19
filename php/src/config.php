@@ -83,6 +83,9 @@ final class Config extends SettingsContainerCustomAbstract
         $cfg_array = spyc_load_file($opt_location . 'config.yml');
         parent::__construct($cfg_array);
 
+        // Initialize $instance properly - convert from string to enum
+        $this->instance->__initialize();
+
         // Build PDO connection
         switch ($this->database->type) {
             case 'sqlite':

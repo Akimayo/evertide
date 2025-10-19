@@ -75,14 +75,7 @@ class Handler
             $params['instance'] = $instance;
             $this->latte->render(__DIR__ . '/../templates/' . $template, $params);
         } else {
-            $params['instance'] = [
-                'domain' => $instance->getDisplayName(),
-                'link' => $instance->getLink(),
-                'primary' => $instance->getPrimaryColor(),
-                'secondary' => $instance->getSecondaryColor(),
-                'sticker_path' => $instance->getStickerPath(),
-                'sticker_link' => $instance->getStickerLink()
-            ];
+            $params['instance'] = $instance->getFederationInfo();
             header('Content-Type: application/json');
             echo json_encode($params);
         }
