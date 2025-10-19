@@ -42,7 +42,7 @@
                     <th scope="col">{_about_federation_instances_last}</th>
                     {if $authorized}
                     <th scope="col">{_about_federation_instances_sticker}</th>
-                    {* <th scope="col">{_about_federation_instances_actions}</th> *}
+                    <th scope="col">{_about_federation_instances_actions_title}</th>
                     {/if}
                 </tr>
             </thead>
@@ -51,6 +51,14 @@
                     <th scope="row">{$instance->getDisplayName()}</th>
                     <td><a href={$instance->getLink()} target="_blank">{$instance->getLink()}</a></td>
                     <td>{_about_federation_instances_this}</td>
+                    <td>
+                        {if $instance->getStickerPath() != null}
+                        <a href={$instance->getStickerLink()} target="_blank" rel="noopener noreferrer">
+                            <img src={$instance->getLink() . $instance->getStickerPath()}
+                            alt="{_about_federation_instances_sticker} {$instance->getDisplayName()}" />
+                        </a>
+                        {/if}
+                    </td>
                 </tr>
                 <tr n:foreach="$instances as $inst"
                     n:if="($authorized || !$inst->isBlocked()) && $inst->getLastLinkStatus()->value < 66">
@@ -71,9 +79,13 @@
                     {if $authorized}
                     <td>
                         {if $inst->getStickerPath() != null}
-                        <!-- TODO: Add sticker preview -->
+                        <a href={$inst->getStickerLink()} target="_blank" rel="noopener noreferrer">
+                            <img src={$inst->getLink() . $inst->getStickerPath()}
+                            alt="{_about_federation_instances_sticker} {$inst->getDisplayName()}" />
+                        </a>
                         {if $inst->isStickerDisplayed()}
-                        <a><i class={icon(push-pin-slash)} title={_about_federation_instances_actions_removesticker}></i></a>
+                        <a><i class={icon(push-pin-slash)}
+                                title={_about_federation_instances_actions_removesticker}></i></a>
                         {else}
                         <a><i class={icon(push-pin)} title={_about_federation_instances_actions_displaysticker}></i></a>
                         {/if}

@@ -85,6 +85,7 @@ about:
       this: (this instance)
       unreachable: The instance returned a fatal error during the last fetch attempt. It may mean that this instance is no longer online.
       actions:
+        title: Actions
         refetch: Re-fetch
         block: Block this instance
         allow: Re-approve this instance
