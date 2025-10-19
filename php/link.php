@@ -162,6 +162,18 @@ if (isset($_GET['device'])) {
                     'current' => DeviceDAO::getCurrent($db)->getId()
                 ]
             );
+        case 'pin':
+            /**
+             * PIN INSTANCE STICKER
+             */
+            $instance->getAccessObject($db)->setStickerDisplay(true);
+            return $handler->redirect('/about');
+        case 'unpin':
+            /**
+             * UNPIN INSTANCE STICKER
+             */
+            $instance->getAccessObject($db)->setStickerDisplay(false);
+            return $handler->redirect('/about');
         default:
             return $handler->error(HTTP_BAD_REQUEST, 'Unknown action');
     }

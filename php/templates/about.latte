@@ -84,10 +84,11 @@
                             alt="{_about_federation_instances_sticker} {$inst->getDisplayName()}" />
                         </a>
                         {if $inst->isStickerDisplayed()}
-                        <a><i class={icon(push-pin-slash)}
+                        <a href="/link?instance={$inst->getId()}&action=unpin"><i class={icon(push-pin-slash)}
                                 title={_about_federation_instances_actions_removesticker}></i></a>
                         {else}
-                        <a><i class={icon(push-pin)} title={_about_federation_instances_actions_displaysticker}></i></a>
+                        <a href="/link?instance={$inst->getId()}&action=pin"><i class={icon(push-pin)}
+                                title={_about_federation_instances_actions_displaysticker}></i></a>
                         {/if}
                         {/if}
                     </td>
