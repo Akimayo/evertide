@@ -149,7 +149,7 @@ if (isset($_GET['device'])) {
     $db = $handler->getDatabase();
     if (!isset($_GET['action'])) $_GET['action'] = 'devices';
     else if (!isset($_GET['instance'])) return $handler->error(HTTP_BAD_REQUEST, 'Missing "instance" query parameter');
-    else $instance = InstanceDAO::get($db, $_GET['instance']);
+    else $instance = InstanceDAO::get($db, intval($_GET['instance']));
     switch ($_GET['action']) {
         case 'devices':
             /**
