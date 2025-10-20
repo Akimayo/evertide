@@ -159,14 +159,17 @@
                         font-size: 14pt;
                         content: $icon-cross;
                         opacity: 0;
-                        margin-right: 8pt;
+                        margin-right: 0;
+                        width: 0;
 
                         grid-column: 4;
                         grid-row: 2 / 4;
                         align-self: center;
                         justify-self: end;
 
-                        transition: opacity 240ms ease-in-out;
+                        transition: opacity 240ms ease-in-out,
+                            margin-right 240ms ease-in-out,
+                            width 240ms ease-in-out;
 
                         @media (min-width: $breakpoint) {
                             font-size: 20pt;
@@ -440,6 +443,13 @@
                     hgroup {
                         &::before {
                             opacity: 1;
+                            margin-right: 8pt;
+                            width: 14pt;
+
+                            @media (min-width: $breakpoint) {
+                                width: 20pt;
+                                margin-right: 20pt;
+                            }
                         }
 
                         & > i {
