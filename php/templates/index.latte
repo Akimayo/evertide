@@ -5,9 +5,9 @@
 {block title}🌊 evertide{/block}
 {block body_}
 <header class="main-header">
-    <h1><a href="/about">🌊 evertide</a> {_'index_on'} {$instance->getDisplayName()}</h1>
+    <h1><a href="about">🌊 evertide</a> {_'index_on'} {$instance->getDisplayName()}</h1>
     <nav>
-        <a href="/add" n:if=$authorized><i class={icon(plus)}></i>&nbsp;{_add_title}</a>
+        <a href="add" n:if=$authorized><i class={icon(plus)}></i>&nbsp;{_add_title}</a>
     </nav>
 </header>
 {include 'index-bare.latte'}
