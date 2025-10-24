@@ -6,5 +6,9 @@ SetEnvIf Authorization .+ HTTP_AUTHORIZATION=$0
 RewriteCond %{REQUEST_FILENAME}.php -f [NC]
 RewriteRule ^ %{REQUEST_URI}.php [L]
 
+RewriteCond %{REQUEST_FILENAME} ^/(.+)(/.*)*$
+RewriteCond /opt/%1 -d
+RewriteRule ^(.+)(/.*)*$ $2 [L,E=EVERTIDE_INSTANCE:$1]
+
 AddType application/javascript .js
 AddType text/css .css
