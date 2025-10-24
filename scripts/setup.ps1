@@ -1,8 +1,25 @@
+param(
+    [Parameter(HelpMessage="URL where this instance of evertide will be hosted")]
+    [string]$InstanceUrl,
+    [Parameter(HelpMessage="Whether there are/will be multiple instances on this installation")]
+    [nullable[bool]]$IsMultiInstance,
+    [Parameter(HelpMessage="Force overwrite webmanifest and configuration files")]
+    [switch]$Force,
+    [Parameter(HelpMessage="Primary color for the instance")]
+    [string]$PrimaryColor,
+    [Parameter(HelpMessage="Secondary color for the instance")]
+    [string]$SecondaryColor,
+    [Parameter(HelpMessage="Display name for the instance")]
+    [string]$DisplayName
+)
+
 . ($PSScriptRoot + "\shared\variables.ps1")
 
 # Get instance information form user
-$isMultiInstance = ($Host.UI.PromptForChoice("🌊 evertide", "Are you running multiple instances?", ("&Yes", "&No"), 1)) -eq 0
-$instanceUrl = Read-Host -Prompt ("Please enter the URL where$(If ($isMultiInstance) { " this instance of" } Else { '' }) evertide will be hosted")
+If ($IsMultiInstance -eq $Null) { $isMultiInstance = ($Host.UI.PromptForChoice("🌊 evertide", "Are you running multiple instances?", ("&Yes", "&No"), 1)) -eq 0 }
+Else { $isMultiInstance = $IsMultiInstance }
+If ($instanceUrl -eq $Null -or $instanceUrl.Length -le 0) { $instanceUrl = Read-Host -Prompt ("Please enter the URL where$(If ($isMultiInstance) { " this instance of" } Else { '' }) evertide will be hosted") }
+Else { $instanceUrl = $InstanceUrl }
 
 # Parse domain out of URL
 If (!$instanceUrl.StartsWith("http://") -and !$instanceUrl.StartsWith("https://")) {
@@ -34,9 +51,12 @@ If ($isMultiInstance) {
 }
 
 # Get instance colors from user
-$primaryColor = Read-Host -Prompt "Primary color for $domain"
-$secondaryColor = Read-Host -Promp "Secondary color for $domain"
-$displayName = Read-Host -Prompt "How do you want the instance to be displayed to others? [$domain]"
+If ($PrimaryColor -eq $Null -or $PrimaryColor.Length -le 0) { $primaryColor = Read-Host -Prompt "Primary color for $domain" }
+Else { $primaryColor = $PrimaryColor }
+If ($SecondaryColor -eq $Null -or $SecondaryColor.Length -le 0) { $secondaryColor = Read-Host -Promp "Secondary color for $domain" }
+Else { $secondaryColor = $SecondaryColor }
+If ($DisplayName -eq $Null -or $DisplayName.Length -le 0) { $displayName = Read-Host -Prompt "How do you want the instance to be displayed to others? [$domain]" }
+Else { $displayName = $DisplayName }
 If (!$displayName -and $domainPath -ne $domain) { $displayName = $domain }
 
 # Modify webmanifest
@@ -50,7 +70,7 @@ Try {
     Write-Host "evertide is set up to be hosted at $instanceUrl"
 }
 Catch {
-    Write-Error "Web manifest could not be writted"
+    Write-Error "Web manifest could not be written"
     Exit
 }
 

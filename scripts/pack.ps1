@@ -1,3 +1,8 @@
+param(
+    [Parameter(HelpMessage="URL of the instance to be packed. If empty, all instances will be packed.")]
+    [string]$InstanceUrl
+)
+
 . ($PSScriptRoot + "\build.ps1")
 
 $jsdeps = @("blurhash") # Defines `node_modules` packages to be copied
